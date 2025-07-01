@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import RarityIcon from "./RarityIcon";
 
 const TYPE_OPTIONS = ["Fire", "Water", "Grass", "Psychic", "Fighting", "Lightning", "Metal", "Darkness", "Fairy", "Dragon", "Colorless"];
 
@@ -218,15 +219,14 @@ const RandomCards = () => {
                   <strong>Set:</strong> {card.set.name}
                 </p>
 
-                <p style={{ fontSize: "0.9rem", margin: "0.2rem" }}>
-                  <strong>Rarity:</strong>{" "}
-                  <span
-                    style={getRarityStyle(card.rarity)}
-                    title={tooltip}
-                  >
-                    {icon} {card.rarity || "Unknown"}
+                <p style={{ fontSize: "0.9rem", margin: "0.2rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <strong>Rarity:</strong>
+                  <RarityIcon rarity={card.rarity} />
+                  <span style={getRarityStyle(card.rarity)}>
+                    {card.rarity || "Unknown"}
                   </span>
                 </p>
+
 
                 <p style={{ fontSize: "0.9rem", margin: "0.2rem" }}>
                   <strong>Type:</strong>{" "}
