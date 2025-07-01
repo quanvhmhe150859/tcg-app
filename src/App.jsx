@@ -1,12 +1,18 @@
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import RandomCards from "./components/RandomCards";
+import AdminSettings from "./components/AdminSettings";
+import HamburgerMenu from "./components/HamburgerMenu";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <RandomCards />
-    </div>
+    <Router>
+      <HamburgerMenu />
+      <Routes>
+        <Route path="/" element={<RandomCards />} />
+        <Route path="/admin" element={<AdminSettings />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
