@@ -22,3 +22,12 @@ button {
 button:hover {
   background-color: #f4b400;
 }
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #f50057, 0 0 10px #f50057;
+  }
+  to {
+    box-shadow: 0 0 10px #ff9800, 0 0 20px #ff9800;
+  }
+}
