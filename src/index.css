@@ -3,10 +3,10 @@ body {
   background-color: #f0f4f8;
   margin: 0;
   padding: 2rem;
+  transition: background 0.3s, color 0.3s;
 }
 
 h1 {
-  color: #333;
   margin-bottom: 2rem;
 }
 
@@ -23,6 +23,11 @@ button:hover {
   background-color: #f4b400;
 }
 
+.card-glow {
+  animation: glow 1.5s infinite alternate;
+  border: 2px solid #f50057;
+}
+
 @keyframes glow {
   from {
     box-shadow: 0 0 5px #f50057, 0 0 10px #f50057;
@@ -30,4 +35,15 @@ button:hover {
   to {
     box-shadow: 0 0 10px #ff9800, 0 0 20px #ff9800;
   }
+}
+
+.app {
+  background: #f0f0f0;
+  color: #000;
+  min-height: 100vh;
+}
+
+.app.dark {
+  background: #1e1e1e;
+  color: #f5f5f5;
 }
