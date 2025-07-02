@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const HamburgerMenu = () => {
+const HamburgerMenu = ( {darkMode} ) => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       {/* Toggle button */}
       <button
+      className={darkMode ? "dark-container" : "light-container"}
         onClick={() => setOpen(!open)}
         style={{
           position: "fixed",

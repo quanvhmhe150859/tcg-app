@@ -48,7 +48,7 @@ const CardItem = ({ card, index, darkMode }) => {
       }}
     >
       <img
-        src={card.images.large}
+        src={card.images.small} // large
         alt={card.name}
         width="100%"
         style={{ borderRadius: "8px" }}
