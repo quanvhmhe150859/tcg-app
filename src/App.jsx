@@ -10,7 +10,7 @@ function App() {
   });
 
   useEffect(() => {
-    document.body.className = darkMode ? "dark-mode" : "";
+    document.body.className = darkMode ? "dark-container" : "light-container";
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 

@@ -60,7 +60,7 @@ const AdminSettings = ({ darkMode }) => {
   return (
     <div
       className={darkMode ? "dark-container" : "light-container"}
-      style={{ padding: "2rem" }}
+      style={{ padding: "2rem", background: "transparent" }}
     >
       <h2>⚙️ Admin Settings</h2>
 

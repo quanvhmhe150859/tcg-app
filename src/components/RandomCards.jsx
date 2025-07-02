@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CardItem from "./CardItem";
 import { AnimatePresence, motion } from "framer-motion";
-import "./Spinner.css";
 
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
@@ -127,7 +126,7 @@ const RandomCards = () => {
   ];
 
   return (
-    <div style={{ padding: "1rem" }}>
+    <div style={{ padding: "3rem" }}>
       <h2>🎴 Pokémon Card Roll</h2>
 
       {/* Tabs */}

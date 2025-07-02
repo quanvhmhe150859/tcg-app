@@ -1,6 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import RarityIcon from "./RarityIcon";
+import { Tooltip } from "react-tooltip";
+import "./CardItem.css";
 
 const getRarityStyle = (rarity) => {
   switch ((rarity || "").toLowerCase()) {
@@ -48,22 +50,61 @@ const CardItem = ({ card, index, darkMode }) => {
       }}
     >
       <img
-        src={card.images.small} // large
+        src={card.images.small}
         alt={card.name}
         width="100%"
         style={{ borderRadius: "8px" }}
       />
-      <h4>{card.name}</h4>
-      <p><strong>Set:</strong> {card.set.name}</p>
-      <p style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-        <strong>Rarity:</strong>
-        <RarityIcon rarity={card.rarity} />
-        <span style={getRarityStyle(card.rarity)}>
-          {card.rarity || "Unknown"}
-        </span>
+      <h4
+        className="card-info-line"
+        data-tooltip-id={`tooltip-${card.id}-name`}
+        data-tooltip-content={card.name}
+      >
+        {card.name}
+      </h4>
+      <Tooltip id={`tooltip-${card.id}-name`} place="top" />
+
+      <p
+        className="card-info-line"
+        data-tooltip-id={`tooltip-${card.id}-set`}
+        data-tooltip-content={card.set.name}
+      >
+        <strong>Set:</strong> {card.set.name}
       </p>
-      <p><strong>Type:</strong> {(card.types || []).join(", ")}</p>
-      <p><strong>Price:</strong> ${marketPrice}</p>
+      <Tooltip id={`tooltip-${card.id}-set`} place="top" />
+
+      <p className="card-info-line" style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+  <strong style={{ flexShrink: 0 }}>Rarity:</strong>
+  <RarityIcon rarity={card.rarity} />
+  <span
+    className="rarity-value"
+    data-tooltip-id={`tooltip-${card.id}-rarity`}
+    data-tooltip-content={card.rarity || "Unknown"}
+    style={getRarityStyle(card.rarity)}
+  >
+    {card.rarity || "Unknown"}
+  </span>
+</p>
+<Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
+
+
+      <p
+        className="card-info-line"
+        data-tooltip-id={`tooltip-${card.id}-type`}
+        data-tooltip-content={(card.types || []).join(", ")}
+      >
+        <strong>Type:</strong> {(card.types || []).join(", ")}
+      </p>
+      <Tooltip id={`tooltip-${card.id}-type`} place="top" />
+
+      <p
+        className="card-info-line"
+        data-tooltip-id={`tooltip-${card.id}-price`}
+        data-tooltip-content={`$${marketPrice}`}
+      >
+        <strong>Price:</strong> ${marketPrice}
+      </p>
+      <Tooltip id={`tooltip-${card.id}-price`} place="top" />
     </motion.div>
   );
 };
