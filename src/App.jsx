@@ -17,15 +17,15 @@ function App() {
   return (
     <Router>
       <div className="app">
-          <HamburgerMenu darkMode={darkMode} setDarkMode={setDarkMode} />
+          <HamburgerMenu/>
         <nav>
-          <button onClick={() => setDarkMode(!darkMode)} style={{ float: "right" }}>
+          <button onClick={() => setDarkMode(!darkMode)} style={{ float: "right", background: "var(--color-button-bg)" }}>
             {darkMode ? "☀️" : "🌙"}
           </button>
         </nav>
         <Routes>
-          <Route path="/" element={<RandomCards darkMode={darkMode} />} />
-          <Route path="/admin" element={<AdminSettings darkMode={darkMode} />} />
+          <Route path="/" element={<RandomCards/>} />
+          <Route path="/admin" element={<AdminSettings/>} />
         </Routes>
       </div>
     </Router>

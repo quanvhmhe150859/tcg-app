@@ -1,114 +1,105 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from '../utils/api';
 import CardItem from "./CardItem";
 import { AnimatePresence, motion } from "framer-motion";
+import styles from "./RandomCards.module.css";
+import { allTypes, allRarities } from "../utils/constants";
 
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [rarities, setRarities] = useState([]);
-  const [allowedTypes, setAllowedTypes] = useState([]);
-  const [allowedRarities, setAllowedRarities] = useState([]);
-
+  const [isRolling, setIsRolling] = useState(false);
+  const [rollMode, setRollMode] = useState("all");
   const [selectedType, setSelectedType] = useState("");
   const [selectedRarity, setSelectedRarity] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [rollMode, setRollMode] = useState("combo"); // combo | all
+  const [noResultWarning, setNoResultWarning] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get("https://api.pokemontcg.io/v2/types")
-      .then((res) => setTypes(res.data.data))
-      .catch(console.error);
+  const allowedTypes = JSON.parse(localStorage.getItem("allowedTypes")) || [];
+  const allowedRarities = JSON.parse(localStorage.getItem("allowedRarities")) || [];
 
-    axios
-      .get("https://api.pokemontcg.io/v2/rarities")
-      .then((res) => setRarities(res.data.data))
-      .catch(console.error);
+  const hasValidType = allowedTypes.length > 0;
+  const hasValidRarity = allowedRarities.length > 0;
 
-    const savedTypes = JSON.parse(localStorage.getItem("allowedTypes") || "[]");
-    const savedRarities = JSON.parse(
-      localStorage.getItem("allowedRarities") || "[]"
-    );
+  const filteredTypes = allTypes.filter((type) => allowedTypes.includes(type));
+  const filteredRarities = allRarities.filter((rarity) => allowedRarities.includes(rarity));
 
-    setAllowedTypes(savedTypes);
-    setAllowedRarities(savedRarities);
-  }, []);
-
-  const getMarketPrice = (card) => {
-    const priceObj = card.tcgplayer?.prices;
-    if (!priceObj) return 0;
-    const firstPrice = Object.values(priceObj)[0];
-    return firstPrice?.market || 0;
+  const rollCards = async (count = 1) => {
+    const rolled = [];
+    for (let i = 0; i < count; i++) {
+      const randomPage = Math.floor(Math.random() * 80) + 1;
+      const response = await api.get(
+        `https://api.pokemontcg.io/v2/cards?page=${randomPage}&pageSize=250`
+      );
+      const cardsList = response.data.data || [];
+      if (cardsList.length === 0) continue;
+      const randomCard = cardsList[Math.floor(Math.random() * cardsList.length)];
+      if (randomCard) rolled.push(randomCard);
+    }
+    return rolled;
   };
 
-  const rollFromQuery = async (query, count = 1) => {
-    try {
-      setLoading(true);
-      const meta = await axios.get(
-        `https://api.pokemontcg.io/v2/cards?q=${query}&pageSize=1`
-      );
-      const total = meta.data.totalCount;
-      const totalPages = Math.ceil(total / 250);
-      const results = [];
+  const rollByCombo = async (count = 1) => {
+    const q = [];
+    if (selectedType) q.push(`types:\"${selectedType}\"`);
+    if (selectedRarity) q.push(`rarity:\"${selectedRarity}\"`);
+    const query = q.join(" ");
 
-      for (let i = 0; i < count; i++) {
-        const randomPage = Math.floor(Math.random() * totalPages) + 1;
-        const res = await axios.get(
-          `https://api.pokemontcg.io/v2/cards?q=${query}&pageSize=250&page=${randomPage}`
-        );
-        const pageCards = res.data.data;
-        const picked = pageCards[Math.floor(Math.random() * pageCards.length)];
-        results.push(picked);
-      }
+    const result = [];
+    const pageSize = 250;
 
-      setCards(results);
-    } catch (err) {
-      console.error("Roll lỗi:", err);
-    } finally {
-      setLoading(false);
+    // Step 1: get total count
+    const res1 = await api.get(
+      `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(query)}&page=1&pageSize=1`
+    );
+    const total = res1.data.totalCount || 0;
+    if (total === 0) {
+      setNoResultWarning(true);
+      return [];
     }
+    setNoResultWarning(false);
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    for (let i = 0; i < count; i++) {
+      const randomPage = Math.floor(Math.random() * totalPages) + 1;
+      const res2 = await api.get(
+        `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(query)}&page=${randomPage}&pageSize=${pageSize}`
+      );
+      const data = res2.data.data || [];
+      if (data.length === 0) continue;
+      const random = data[Math.floor(Math.random() * data.length)];
+      if (random) result.push(random);
+    }
+    return result;
   };
 
   const handleRoll = async (count = 1) => {
-    if (loading) return;
-
+    setIsRolling(true);
+    let result = [];
     if (rollMode === "combo") {
-      if (!selectedType && !selectedRarity) {
-        alert("Bạn cần chọn ít nhất 1 trong Type hoặc Rarity");
-        return;
-      }
-
-      const parts = [];
-      if (selectedType) parts.push(`types:${selectedType}`);
-      if (selectedRarity) parts.push(`rarity:"${selectedRarity}"`);
-      const finalQuery = parts.join(" ");
-      await rollFromQuery(finalQuery, count);
-    } else if (rollMode === "all") {
-      await rollFromQuery("set.id:*", count);
+      result = await rollByCombo(count);
+    } else {
+      setNoResultWarning(false);
+      result = await rollCards(count);
     }
+    await new Promise((res) => setTimeout(res, 500));
+    setCards(result);
+    setIsRolling(false);
   };
 
-  const filteredTypes = types.filter((t) => allowedTypes.includes(t));
-  const filteredRarities = rarities.filter((r) => allowedRarities.includes(r));
-
-  const hasValidType = filteredTypes.length > 0;
-  const hasValidRarity = filteredRarities.length > 0;
-
-  useEffect(() => {
-    const noValidType = filteredTypes.length === 0;
-    const noValidRarity = filteredRarities.length === 0;
-
-    if (rollMode === "combo" && noValidType && noValidRarity) {
-      setRollMode("all"); // chuyển sang chế độ 'all' nếu combo không dùng được
-    }
-  }, [filteredTypes, filteredRarities, rollMode]);
-
-  const totalPrice = cards
-    .reduce((sum, c) => sum + getMarketPrice(c), 0)
-    .toFixed(2);
+  const totalPrice = cards.reduce((sum, card) => {
+    const price =
+      card?.tcgplayer?.prices?.normal?.market ??
+      card?.tcgplayer?.prices?.holofoil?.market ??
+      0;
+    return sum + price;
+  }, 0).toFixed(2);
 
   const modes = [
+    {
+      id: "all",
+      label: "🌐 Tất cả",
+      tooltip: "Roll ngẫu nhiên từ toàn bộ thẻ trong bộ sưu tập",
+    },
     ...(hasValidType || hasValidRarity
       ? [
           {
@@ -118,19 +109,14 @@ const RandomCards = () => {
           },
         ]
       : []),
-    {
-      id: "all",
-      label: "🌐 Tất cả",
-      tooltip: "Roll ngẫu nhiên từ toàn bộ thẻ trong bộ sưu tập",
-    },
   ];
 
   return (
-    <div style={{ padding: "3rem" }}>
+    <div className={styles.randomCardsContainer}>
       <h2>🎴 Pokémon Card Roll</h2>
-
+      
       {/* Tabs */}
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+      <div className={styles.tabs}>
         {modes.map((mode) => (
           <button
             key={mode.id}
@@ -145,19 +131,12 @@ const RandomCards = () => {
 
       {/* Combo Mode Controls */}
       {rollMode === "combo" && (hasValidType || hasValidRarity) && (
-        <div
-          style={{
-            display: "flex",
-            gap: "1rem",
-            marginBottom: "1rem",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className={styles.comboControls}>
           {hasValidType && (
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              disabled={loading}
+              disabled={isRolling}
             >
               <option value="">-- Chọn type --</option>
               {filteredTypes.map((t) => (
@@ -172,7 +151,7 @@ const RandomCards = () => {
             <select
               value={selectedRarity}
               onChange={(e) => setSelectedRarity(e.target.value)}
-              disabled={loading}
+              disabled={isRolling}
             >
               <option value="">-- Chọn rarity --</option>
               {filteredRarities.map((r) => (
@@ -186,54 +165,37 @@ const RandomCards = () => {
       )}
 
       {/* Roll Buttons */}
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          marginBottom: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <button onClick={() => handleRoll(1)} disabled={loading}>
+      <div className={styles.rollButtons}>
+        <button onClick={() => handleRoll(1)} disabled={isRolling}>
           🎲 Roll 1
         </button>
-        <button onClick={() => handleRoll(10)} disabled={loading}>
+        <button onClick={() => handleRoll(10)} disabled={isRolling}>
           🎲 Roll 10
         </button>
       </div>
 
-      {loading && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            marginTop: "1rem",
-          }}
-        >
+      {isRolling && (
+        <div className={styles.spinnerContainer}>
           <span className="spinner" />
           <span>⏳ Đang roll card, vui lòng chờ...</span>
         </div>
       )}
 
-      {!loading && cards.length > 0 && (
-        <p style={{ marginTop: "1rem", fontWeight: "bold" }}>
+      {!isRolling && noResultWarning && (
+        <p className={styles.warningMessage}>⚠️ Không có thẻ nào phù hợp với lựa chọn hiện tại.</p>
+      )}
+
+      {!isRolling && cards.length > 0 && (
+        <p className={styles.totalPrice}>
           💰 Tổng giá trị (market): ${totalPrice}
         </p>
       )}
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          marginTop: "2rem",
-        }}
-      >
+      <div className={styles.cardList}>
         <AnimatePresence>
-          {cards.map((card) => (
+          {cards.filter(Boolean).map((card, index) => (
             <motion.div
-              key={card.id}
+              key={card?.id || index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

@@ -2,14 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const HamburgerMenu = ( {darkMode} ) => {
+const HamburgerMenu = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       {/* Toggle button */}
       <button
-      className={darkMode ? "dark-container" : "light-container"}
         onClick={() => setOpen(!open)}
         style={{
           position: "fixed",
@@ -18,7 +17,7 @@ const HamburgerMenu = ( {darkMode} ) => {
           background: "transparent",
           border: "none",
           fontSize: "2rem",
-          zIndex: 1001,
+          zIndex: 1002,
           cursor: "pointer",
         }}
         aria-label="Toggle menu"
@@ -68,27 +67,29 @@ const HamburgerMenu = ( {darkMode} ) => {
               boxShadow: "2px 0 6px rgba(0,0,0,0.3)",
             }}
           >
-            <h3>📂 Menu</h3>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              <li>
-                <Link
-                  to="/"
-                  style={{ color: "#fff", textDecoration: "none" }}
-                  onClick={() => setOpen(false)}
-                >
-                  🏠 Trang chính
-                </Link>
-              </li>
-              <li style={{ marginTop: "1rem" }}>
-                <Link
-                  to="/admin"
-                  style={{ color: "#fff", textDecoration: "none" }}
-                  onClick={() => setOpen(false)}
-                >
-                  ⚙️ Trang admin
-                </Link>
-              </li>
-            </ul>
+            <div style={{ marginTop: "3rem", marginLeft: "1rem" }}>
+              <h3>📂 Menu</h3>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                <li>
+                  <Link
+                    to="/"
+                    style={{ color: "#fff", textDecoration: "none" }}
+                    onClick={() => setOpen(false)}
+                  >
+                    🏠 Trang chính
+                  </Link>
+                </li>
+                <li style={{ marginTop: "1rem" }}>
+                  <Link
+                    to="/admin"
+                    style={{ color: "#fff", textDecoration: "none" }}
+                    onClick={() => setOpen(false)}
+                  >
+                    ⚙️ Trang admin
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
