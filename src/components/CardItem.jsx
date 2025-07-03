@@ -1,33 +1,16 @@
+// CardItem.jsx
+
 import React from "react";
 import { motion } from "framer-motion";
 import RarityIcon from "./RarityIcon";
 import { Tooltip } from "react-tooltip";
 import "./CardItem.css";
-
-const getRarityStyle = (rarity) => {
-  switch ((rarity || "").toLowerCase()) {
-    case "common":
-      return { background: "#e0e0e0", color: "#000", padding: "2px 6px", borderRadius: "999px" };
-    case "uncommon":
-      return { background: "#4caf50", color: "#fff", padding: "2px 6px", borderRadius: "999px" };
-    case "rare":
-      return { background: "#1976d2", color: "#fff", padding: "2px 6px", borderRadius: "999px" };
-    case "ultra rare":
-    case "rare holo":
-    case "rare holo ex":
-    case "rare ultra":
-      return {
-        background: "linear-gradient(90deg, #f50057, #ff9800)",
-        color: "#fff",
-        padding: "2px 6px",
-        borderRadius: "999px",
-      };
-    default:
-      return { background: "#ccc", color: "#000", padding: "2px 6px", borderRadius: "999px" };
-  }
-};
+import { getRarityStyle } from "./getRarityStyle";
 
 const CardItem = ({ card, index, darkMode }) => {
+  const rarityStyle = getRarityStyle(card.rarity);
+  const rarityClass = rarityStyle.className || "";
+
   const marketPrice =
     card.tcgplayer?.prices?.normal?.market?.toFixed(2) ||
     card.tcgplayer?.prices?.holofoil?.market?.toFixed(2) ||
@@ -49,12 +32,15 @@ const CardItem = ({ card, index, darkMode }) => {
         transition: "background 0.3s, color 0.3s",
       }}
     >
-      <img
-        src={card.images.small}
-        alt={card.name}
-        width="100%"
-        style={{ borderRadius: "8px" }}
-      />
+      <div className={rarityClass}>
+        <img
+          src={card.images.small}
+          alt={card.name}
+          width="100%"
+          style={{ borderRadius: "15px", display: "block" }}
+        />
+      </div>
+
       <h4
         className="card-info-line"
         data-tooltip-id={`tooltip-${card.id}-name`}
@@ -74,19 +60,18 @@ const CardItem = ({ card, index, darkMode }) => {
       <Tooltip id={`tooltip-${card.id}-set`} place="top" />
 
       <p className="card-info-line" style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-  <strong style={{ flexShrink: 0 }}>Rarity:</strong>
-  <RarityIcon rarity={card.rarity} />
-  <span
-    className="rarity-value"
-    data-tooltip-id={`tooltip-${card.id}-rarity`}
-    data-tooltip-content={card.rarity || "Unknown"}
-    style={getRarityStyle(card.rarity)}
-  >
-    {card.rarity || "Unknown"}
-  </span>
-</p>
-<Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
-
+        <strong style={{ flexShrink: 0 }}>Rarity:</strong>
+        <RarityIcon rarity={card.rarity} />
+        <span
+          className="rarity-value"
+          data-tooltip-id={`tooltip-${card.id}-rarity`}
+          data-tooltip-content={card.rarity || "Unknown"}
+          style={rarityStyle}
+        >
+          {card.rarity || "Unknown"}
+        </span>
+      </p>
+      <Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
 
       <p
         className="card-info-line"
