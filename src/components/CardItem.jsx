@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import RarityIcon from "./RarityIcon";
 import { Tooltip } from "react-tooltip";
 import "./CardItem.css";
+import "./rarityEffects.css";
 import { getRarityStyle } from "./getRarityStyle";
 
 const CardItem = ({ card, index, darkMode }) => {
@@ -21,23 +22,13 @@ const CardItem = ({ card, index, darkMode }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      style={{
-        width: "200px",
-        background: darkMode ? "#2c2c2c" : "#fff",
-        color: darkMode ? "#f5f5f5" : "#000",
-        padding: "0.5rem",
-        borderRadius: "12px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        margin: "1rem",
-        transition: "background 0.3s, color 0.3s",
-      }}
+      className={`card-container ${darkMode ? "dark" : "light"}`}
     >
       <div className={rarityClass}>
         <img
           src={card.images.small}
           alt={card.name}
-          width="100%"
-          style={{ borderRadius: "15px", display: "block" }}
+          className="card-image"
         />
       </div>
 
@@ -59,8 +50,8 @@ const CardItem = ({ card, index, darkMode }) => {
       </p>
       <Tooltip id={`tooltip-${card.id}-set`} place="top" />
 
-      <p className="card-info-line" style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-        <strong style={{ flexShrink: 0 }}>Rarity:</strong>
+      <p className="card-info-line rarity-line">
+        <strong className="rarity-label">Rarity:</strong>
         <RarityIcon rarity={card.rarity} />
         <span
           className="rarity-value"
