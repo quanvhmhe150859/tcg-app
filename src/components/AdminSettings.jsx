@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { allTypes, allRarities } from "../utils/constants";
 import "./AdminSettings.css";
+import ImportData from "./ImportData";
 
 const AdminSettings = () => {
   const [allowedTypes, setAllowedTypes] = useState([]);
@@ -8,7 +9,8 @@ const AdminSettings = () => {
 
   useEffect(() => {
     const storedTypes = JSON.parse(localStorage.getItem("allowedTypes")) || [];
-    const storedRarities = JSON.parse(localStorage.getItem("allowedRarities")) || [];
+    const storedRarities =
+      JSON.parse(localStorage.getItem("allowedRarities")) || [];
     setAllowedTypes(storedTypes);
     setAllowedRarities(storedRarities);
   }, []);
@@ -21,7 +23,9 @@ const AdminSettings = () => {
 
   const handleToggleRarity = (rarity) => {
     setAllowedRarities((prev) =>
-      prev.includes(rarity) ? prev.filter((r) => r !== rarity) : [...prev, rarity]
+      prev.includes(rarity)
+        ? prev.filter((r) => r !== rarity)
+        : [...prev, rarity]
     );
   };
 
@@ -41,7 +45,9 @@ const AdminSettings = () => {
           {allTypes.map((type) => (
             <button
               key={type}
-              className={`toggle-button ${allowedTypes.includes(type) ? "selected" : ""}`}
+              className={`toggle-button ${
+                allowedTypes.includes(type) ? "selected" : ""
+              }`}
               onClick={() => handleToggleType(type)}
             >
               {type}
@@ -56,7 +62,9 @@ const AdminSettings = () => {
           {allRarities.map((rarity) => (
             <button
               key={rarity}
-              className={`toggle-button ${allowedRarities.includes(rarity) ? "selected" : ""}`}
+              className={`toggle-button ${
+                allowedRarities.includes(rarity) ? "selected" : ""
+              }`}
               onClick={() => handleToggleRarity(rarity)}
             >
               {rarity}
@@ -66,6 +74,9 @@ const AdminSettings = () => {
       </div>
 
       <button onClick={handleSave}>Save</button>
+      <div>
+        <ImportData />
+      </div>
     </div>
   );
 };

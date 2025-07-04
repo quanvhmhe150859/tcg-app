@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import RandomCards from "./components/RandomCards";
 import AdminSettings from "./components/AdminSettings";
 import HamburgerMenu from "./components/HamburgerMenu";
-import SplitTool from "./components/SplitTool";
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -30,7 +29,6 @@ function App() {
         <Routes>
           <Route path="/" element={<RandomCards />} />
           <Route path="/admin" element={<AdminSettings />} />
-          <Route path="/split-tool" element={<SplitTool />} />
         </Routes>
       </div>
     </Router>
