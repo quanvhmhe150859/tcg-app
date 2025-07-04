@@ -88,6 +88,15 @@ const HamburgerMenu = () => {
                     ⚙️ Trang admin
                   </Link>
                 </li>
+                <li style={{ marginTop: "1rem" }}>
+                  <Link
+                    to="/split-tool"
+                    style={{ color: "#fff", textDecoration: "none" }}
+                    onClick={() => setOpen(false)}
+                  >
+                    ⚙️ Trang tách thẻ
+                  </Link>
+                </li>
               </ul>
             </div>
           </motion.div>
