@@ -31,7 +31,7 @@
 
 .card-pulse-glow {
   position: relative;
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
   animation: pulse-glow 1.8s ease-in-out infinite;
 }

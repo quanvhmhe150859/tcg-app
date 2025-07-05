@@ -1,5 +1,3 @@
-// CardItem.jsx
-
 import React from "react";
 import { motion } from "framer-motion";
 import RarityIcon from "./RarityIcon";
