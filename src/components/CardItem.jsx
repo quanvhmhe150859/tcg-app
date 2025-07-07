@@ -6,6 +6,7 @@ import "./CardItem.css";
 import "./rarityEffects.css";
 import { getRarityStyle } from "./getRarityStyle";
 
+
 const CardItem = ({ card, index, darkMode }) => {
   const rarityStyle = getRarityStyle(card.rarity);
   const rarityClass = rarityStyle.className || "";
@@ -23,8 +24,13 @@ const CardItem = ({ card, index, darkMode }) => {
       className={`card-container ${darkMode ? "dark" : "light"}`}
     >
       <div className={rarityClass}>
+        {/* <img
+          src={card.cardImage.largeUrl}
+          alt={card.name}
+          className="card-image"
+        /> */}
         <img
-          src={card.images.small}
+          src={`${import.meta.env.VITE_API_BASE_URL}/images/${card.id}.png`}
           alt={card.name}
           className="card-image"
         />
@@ -39,18 +45,18 @@ const CardItem = ({ card, index, darkMode }) => {
       </h4>
       <Tooltip id={`tooltip-${card.id}-name`} place="top" />
 
-      <p
+      {/* <p
         className="card-info-line"
         data-tooltip-id={`tooltip-${card.id}-set`}
         data-tooltip-content={card.set.name}
       >
         <strong>Set:</strong> {card.set.name}
       </p>
-      <Tooltip id={`tooltip-${card.id}-set`} place="top" />
+      <Tooltip id={`tooltip-${card.id}-set`} place="top" /> */}
 
       <p className="card-info-line rarity-line">
         <strong className="rarity-label">Rarity:</strong>
-        <RarityIcon rarity={card.rarity} />
+        {/* <RarityIcon rarity={card.rarity} /> */}
         <span
           className="rarity-value"
           data-tooltip-id={`tooltip-${card.id}-rarity`}
@@ -62,23 +68,26 @@ const CardItem = ({ card, index, darkMode }) => {
       </p>
       <Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
 
-      <p
+      {/* <p
         className="card-info-line"
         data-tooltip-id={`tooltip-${card.id}-type`}
-        data-tooltip-content={(card.types || []).join(", ")}
+        data-tooltip-content={(card.cardTypes || [])
+          .map((t) => t.type)
+          .join(", ")}
       >
-        <strong>Type:</strong> {(card.types || []).join(", ")}
+        <strong>Type:</strong>{" "}
+        {(card.cardTypes || []).map((t) => t.type).join(", ")}
       </p>
-      <Tooltip id={`tooltip-${card.id}-type`} place="top" />
+      <Tooltip id={`tooltip-${card.id}-type`} place="top" /> */}
 
-      <p
+      {/* <p
         className="card-info-line"
         data-tooltip-id={`tooltip-${card.id}-price`}
         data-tooltip-content={`$${marketPrice}`}
       >
         <strong>Price:</strong> ${marketPrice}
       </p>
-      <Tooltip id={`tooltip-${card.id}-price`} place="top" />
+      <Tooltip id={`tooltip-${card.id}-price`} place="top" /> */}
     </motion.div>
   );
 };
