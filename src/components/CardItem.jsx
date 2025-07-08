@@ -70,10 +70,6 @@ const CardItem = ({ card, index, darkMode }) => {
       </p>
       <Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
 
-      {/* <button className="view-large-button" onClick={() => setShowModal(true)}>
-        🔍 Xem lớn
-      </button> */}
-
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

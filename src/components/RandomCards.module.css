@@ -1,11 +1,8 @@
-.randomCardsContainer {
-  padding: 3rem;
-}
-
 .tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  justify-content: center;
 }
 
 .comboControls,
@@ -14,11 +11,13 @@
   gap: 1rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .spinnerContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   margin-top: 1rem;
 }

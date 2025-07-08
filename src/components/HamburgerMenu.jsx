@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import "./HamburgerMenu.css"; // 👈 import file css
 
 const HamburgerMenu = () => {
   const [open, setOpen] = useState(false);
@@ -10,16 +11,7 @@ const HamburgerMenu = () => {
       {/* Toggle button */}
       <button
         onClick={() => setOpen(!open)}
-        style={{
-          position: "fixed",
-          top: 15,
-          left: 15,
-          background: "transparent",
-          border: "none",
-          fontSize: "2rem",
-          zIndex: 1002,
-          cursor: "pointer",
-        }}
+        className="hamburger-button"
         aria-label="Toggle menu"
       >
         {open ? "❌" : "☰"}
@@ -33,15 +25,7 @@ const HamburgerMenu = () => {
             animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              background: "#000",
-              zIndex: 1000,
-            }}
+            className="hamburger-overlay"
           />
         )}
       </AnimatePresence>
@@ -54,37 +38,18 @@ const HamburgerMenu = () => {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "200px",
-              height: "100vh",
-              background: "#333",
-              color: "#fff",
-              padding: "2rem 1rem",
-              zIndex: 1001,
-              boxShadow: "2px 0 6px rgba(0,0,0,0.3)",
-            }}
+            className="hamburger-menu"
           >
-            <div style={{ marginTop: "3rem", marginLeft: "1rem" }}>
+            <div className="hamburger-menu-content">
               <h3>📂 Menu</h3>
-              <ul style={{ listStyle: "none", padding: 0 }}>
+              <ul>
                 <li>
-                  <Link
-                    to="/"
-                    style={{ color: "#fff", textDecoration: "none" }}
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link to="/" onClick={() => setOpen(false)}>
                     🏠 Trang chính
                   </Link>
                 </li>
-                <li style={{ marginTop: "1rem" }}>
-                  <Link
-                    to="/admin"
-                    style={{ color: "#fff", textDecoration: "none" }}
-                    onClick={() => setOpen(false)}
-                  >
+                <li>
+                  <Link to="/admin" onClick={() => setOpen(false)}>
                     ⚙️ Trang admin
                   </Link>
                 </li>

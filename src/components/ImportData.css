@@ -1,0 +1,71 @@
+.import-container {
+  margin-top: 2rem;
+}
+
+.import-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.import-button.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.last-import-time {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.repo-update-time {
+  margin-top: 0.25rem;
+}
+
+.repo-warning {
+  color: orange;
+  margin-top: 0.5rem;
+}
+
+.sync-message,
+.import-message {
+  margin-top: 1rem;
+  color: green;
+  font-weight: bold;
+}
+
+.progress-bar-container {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 10px;
+  background-color: #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.import-status {
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}

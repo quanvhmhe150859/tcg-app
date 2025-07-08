@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
+import "./ImportData.css";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -94,73 +95,50 @@ const ImportData = () => {
     lastImportTime && lastRepoUpdate && lastRepoUpdate > lastImportTime;
 
   return (
-    <div style={{ marginTop: "2rem" }}>
+    <div className="import-container">
       <button
         onClick={handleImport}
         disabled={!connected || loading}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          opacity: loading ? 0.6 : 1,
-          cursor: loading ? "not-allowed" : "pointer",
-        }}
+        className={`import-button${loading ? " loading" : ""}`}
       >
         {loading ? "Đang nhập dữ liệu..." : "📥 Nhập dữ liệu từ Github"}
       </button>
 
       {lastImportTime && (
-        <p style={{ marginTop: "0.5rem", fontStyle: "italic" }}>
+        <p className="last-import-time">
           🕒 Lần import gần nhất:{" "}
           <strong>{lastImportTime.toLocaleString()}</strong>
         </p>
       )}
 
       {lastRepoUpdate && (
-        <p style={{ marginTop: "0.25rem" }}>
+        <p className="repo-update-time">
           📦 Repo <code>{repoName}</code> cập nhật gần nhất:{" "}
           <strong>{lastRepoUpdate.toLocaleString()}</strong>
         </p>
       )}
 
       {repoWarning && (
-        <p style={{ color: "orange", marginTop: "0.5rem" }}>
+        <p className="repo-warning">
           ⚠️ Repo đã được cập nhật sau lần import. Bạn nên cập nhật lại dữ liệu.
         </p>
       )}
 
-      {syncMessage && (
-        <p style={{ marginTop: "1rem", color: "green", fontWeight: "bold" }}>
-          {syncMessage}
-        </p>
-      )}
+      {syncMessage && <p className="sync-message">{syncMessage}</p>}
 
       {loading && (
-        <div style={{ marginTop: "1rem", width: "100%", maxWidth: "400px" }}>
-          <div
-            style={{
-              height: "10px",
-              backgroundColor: "#ccc",
-              borderRadius: "5px",
-            }}
-          >
+        <div className="progress-bar-container">
+          <div className="progress-bar-track">
             <div
-              style={{
-                width: `${progress}%`,
-                height: "100%",
-                backgroundColor: "#4caf50",
-                transition: "width 0.3s ease",
-              }}
+              className="progress-bar-fill"
+              style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <p style={{ marginTop: "8px" }}>{status}</p>
+          <p className="import-status">{status}</p>
         </div>
       )}
 
-      {message && (
-        <p style={{ marginTop: "1rem", color: "green", fontWeight: "bold" }}>
-          {message}
-        </p>
-      )}
+      {message && <p className="import-message">{message}</p>}
     </div>
   );
 };

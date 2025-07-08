@@ -393,7 +393,7 @@ const RandomCards = () => {
   ];
 
   return (
-    <div className={styles.randomCardsContainer}>
+    <div>
       <h2>🎴 Pokémon Card Roll</h2>
 
       {/* Tabs */}

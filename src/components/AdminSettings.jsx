@@ -36,7 +36,7 @@ const AdminSettings = () => {
   };
 
   return (
-    <div className="admin-settings" style={{ padding: "3rem" }}>
+    <div className="admin-settings">
       <h2>Admin Settings</h2>
 
       <div className="section">
