@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import RandomCards from "./components/RandomCards";
+import YugiohRoll from "./components/YugiohRoll";
 import AdminSettings from "./components/AdminSettings";
 import HamburgerMenu from "./components/HamburgerMenu";
 import DarkModeToggle from "./components/DarkModeToggle";
@@ -13,8 +14,9 @@ function App() {
         <HamburgerMenu />
         <DarkModeToggle />
         <Routes>
-          <Route path="/" element={<RandomCards />} />
-          <Route path="/admin" element={<AdminSettings />} />
+          <Route path="/" element={<AdminSettings />} />
+          <Route path="/pokemon" element={<RandomCards />} />
+          <Route path="/yugioh" element={<YugiohRoll />} />
         </Routes>
       </div>
     </Router>

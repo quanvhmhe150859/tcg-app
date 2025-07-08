@@ -44,12 +44,17 @@ const HamburgerMenu = () => {
               <h3>📂 Menu</h3>
               <ul>
                 <li>
-                  <Link to="/" onClick={() => setOpen(false)}>
-                    🏠 Trang chính
+                  <Link to="/pokemon" onClick={() => setOpen(false)}>
+                    🏠 Trang Pokémon
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin" onClick={() => setOpen(false)}>
+                  <Link to="/yugioh" onClick={() => setOpen(false)}>
+                    🏠 Trang Yugioh
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/" onClick={() => setOpen(false)}>
                     ⚙️ Trang admin
                   </Link>
                 </li>
