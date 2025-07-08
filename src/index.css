@@ -1,10 +1,15 @@
 :root {
-  --color-dark: #2A4359;
-  --color-light: #E4EAF2;
+  --color-light-bg: #E4EAF2;
+  --color-dark-bg: #2A4359;
+  --color-light: #E4CEF2;
+  --color-center: #DFC2F2;
+  --color-dark: #A884BF;
 
-  --color-button-bg: #E4CEF2;
-  --color-button-hover: #DFC2F2;
-  --color-button-selected: #A884BF;
+  --color-background: var(--color-light-bg);
+  --color-text: var(--color-dark-bg);
+  --color-button-bg: var(--color-light);
+  --color-button-hover: var(--color-center);
+  --color-button-selected: var(--color-dark);
 }
 
 body {
@@ -33,19 +38,33 @@ button:hover {
 }
 
 .dark-container {
-  background-color: var(--color-dark);
-  color: var(--color-light);
+  background-color: var(--color-background);
+  color: var(--color-text);
 
-  --color-button-bg: #A884BF;
-  --color-button-selected: #E4CEF2;
+  --color-background: var(--color-dark-bg);
+  --color-text: var(--color-light-bg);
+  --color-button-bg: var(--color-dark);
+  --color-button-selected: var(--color-light);
+}
+
+.dark-container button:hover,
+.dark-container .selected-tab {
+  color: var(--color-background);
 }
 
 .light-container {
-  background-color: var(--color-light);
-  color: var(--color-dark);
+  background-color: var(--color-background);
+  color: var(--color-text);
 
-  --color-button-bg: #E4CEF2;
-  --color-button-selected: #A884BF;
+  --color-background: var(--color-light-bg);
+  --color-text: var(--color-dark-bg);
+  --color-button-bg: var(--color-light);
+  --color-button-selected: var(--color-dark);
+}
+
+.light-container button:hover,
+.light-container .selected-tab {
+  color: var(--color-background);
 }
 
 .selected-tab {

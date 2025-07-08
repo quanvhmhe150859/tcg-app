@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import RarityIcon from "./RarityIcon";
 import { Tooltip } from "react-tooltip";
@@ -6,8 +6,13 @@ import "./CardItem.css";
 import "./rarityEffects.css";
 import { getRarityStyle } from "./getRarityStyle";
 
-
 const CardItem = ({ card, index, darkMode }) => {
+  const [showModal, setShowModal] = useState(false);
+  const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/images/${card.id}.png`;
+  const hiresUrl = `${import.meta.env.VITE_API_BASE_URL}/images/${
+    card.id
+  }_hires.png`;
+
   const rarityStyle = getRarityStyle(card.rarity);
   const rarityClass = rarityStyle.className || "";
 
@@ -23,17 +28,14 @@ const CardItem = ({ card, index, darkMode }) => {
       transition={{ delay: index * 0.05, duration: 0.4 }}
       className={`card-container ${darkMode ? "dark" : "light"}`}
     >
-      <div className={rarityClass}>
+      <div className={`imageContainer ${rarityClass}`}>
         {/* <img
           src={card.cardImage.largeUrl}
           alt={card.name}
           className="card-image"
         /> */}
-        <img
-          src={`${import.meta.env.VITE_API_BASE_URL}/images/${card.id}.png`}
-          alt={card.name}
-          className="card-image"
-        />
+        <img src={smallUrl} alt={card.name} className="card-image" onClick={() => setShowModal(true)}/>
+        <span className="zoom-icon">🔍</span>
       </div>
 
       <h4
@@ -67,6 +69,24 @@ const CardItem = ({ card, index, darkMode }) => {
         </span>
       </p>
       <Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
+
+      {/* <button className="view-large-button" onClick={() => setShowModal(true)}>
+        🔍 Xem lớn
+      </button> */}
+
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <img className="hires-image" src={hiresUrl} alt={card.name} />
+            <button
+              className="close-button"
+              onClick={() => setShowModal(false)}
+            >
+              ✖
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* <p
         className="card-info-line"

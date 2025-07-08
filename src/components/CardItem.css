@@ -43,9 +43,42 @@
 
 .card-image {
   width: 100%;
-  border-radius: 15px;
+  border-radius: 6px;
   display: block;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
+
+.imageContainer {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.imageContainer:hover .card-image {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+.zoom-icon {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 1.2rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #333;
+  padding: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.imageContainer:hover .zoom-icon {
+  opacity: 1;
+}
+
 
 .card-info-line {
   margin: 0.3rem 0;
@@ -60,12 +93,6 @@
 .rarity-label {
   flex-shrink: 0;
 }
-
-
-
-
-
-
 
 .view-large-button {
   margin-top: 0.5rem;
@@ -92,7 +119,7 @@
 }
 
 .hires-image {
-  width: 100%;
+  width: 70%;
   height: auto;
   border-radius: 1rem;
   box-shadow: 0 0 20px rgba(255,255,255,0.3);
