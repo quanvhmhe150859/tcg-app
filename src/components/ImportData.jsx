@@ -20,7 +20,7 @@ const ImportData = () => {
   useEffect(() => {
     const fetchLastImport = async () => {
       try {
-        const res = await axios.get("/ImportLog/last");
+        const res = await axios.get("/ImportLog/last/pokemon");
         if (res.data.lastImport) {
           setLastImportTime(new Date(res.data.lastImport));
         }
@@ -81,7 +81,7 @@ const ImportData = () => {
       setMessage(res.data.message);
       setLastImportTime(now);
 
-      await axios.post("/ImportLog/log", { time: now.toISOString() });
+      await axios.post("/ImportLog/log/pokemon", { time: now.toISOString() });
     } catch (err) {
       setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
     } finally {
