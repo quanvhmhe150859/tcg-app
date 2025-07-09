@@ -12,10 +12,11 @@ const ImportData = () => {
   const [message, setMessage] = useState("");
   const [connected, setConnected] = useState(false);
   const [lastImportTime, setLastImportTime] = useState(null);
-  const [lastRepoUpdate] = useState(null);
+  const [lastUpdate, setlastUpdate] = useState(null);
   const [syncMessage, setSyncMessage] = useState("");
 
   const connectionRef = useRef(null);
+  const repoName = "PokemonTCG/pokemon-tcg-data";
 
   useEffect(() => {
     const fetchLastImport = async () => {
@@ -27,7 +28,17 @@ const ImportData = () => {
       } catch {}
     };
 
+    const fetchDbVersion = async () => {
+      try {
+        const res = await axios.get(`https://api.github.com/repos/${repoName}`);
+        if (res.data.pushed_at) {
+          setlastUpdate(new Date(res.data.pushed_at));
+        }
+      } catch {}
+    };
+
     fetchLastImport();
+    fetchDbVersion();
 
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_BASE_URL}/progressHub`, {
@@ -90,9 +101,8 @@ const ImportData = () => {
     }
   };
 
-  const repoName = "facebook/react";
   const repoWarning =
-    lastImportTime && lastRepoUpdate && lastRepoUpdate > lastImportTime;
+    lastImportTime && lastUpdate && lastUpdate > lastImportTime;
 
   return (
     <div className="import-container">
@@ -101,7 +111,7 @@ const ImportData = () => {
         disabled={!connected || loading}
         className={`import-button${loading ? " loading" : ""}`}
       >
-        {loading ? "Đang nhập dữ liệu..." : "📥 Nhập dữ liệu từ Github"}
+        {loading ? "Đang nhập dữ liệu..." : "📥 Cập nhật dữ liệu Pokémon"}
       </button>
 
       {lastImportTime && (
@@ -111,10 +121,10 @@ const ImportData = () => {
         </p>
       )}
 
-      {lastRepoUpdate && (
+      {lastUpdate && (
         <p className="repo-update-time">
           📦 Repo <code>{repoName}</code> cập nhật gần nhất:{" "}
-          <strong>{lastRepoUpdate.toLocaleString()}</strong>
+          <strong>{lastUpdate.toLocaleString()}</strong>
         </p>
       )}
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { allTypes, allRarities } from "../utils/constants";
 import "./AdminSettings.css";
-import ImportData from "./ImportData";
+import ImportDataPokemon from "./ImportDataPokemon";
 import ImportDataYugioh from "./ImportDataYugioh";
-import ImportDataYugiohToDb from "./ImportDataYugiohToDb";
 
 const AdminSettings = () => {
   const [allowedTypes, setAllowedTypes] = useState([]);
@@ -77,9 +76,8 @@ const AdminSettings = () => {
 
       <button onClick={handleSave}>Save</button>
       <div>
-        <ImportData />
-        {/* <ImportDataYugioh /> */}
-        <ImportDataYugiohToDb />
+        <ImportDataPokemon />
+        <ImportDataYugioh />
       </div>
     </div>
   );
