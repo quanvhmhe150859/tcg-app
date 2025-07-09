@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import api from "../utils/api";
-import YugiohCardItem from "./YugiohCardItem";
+import api from "../../utils/api";
+import YugiohCardItem from "./CardItemYugioh";
 import Select from "react-select";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "./RandomCards.module.css";
+import styles from "../common/RandomCards.module.css";
 
 const YugiohRoll = () => {
   const [archetypes, setArchetypes] = useState([]);

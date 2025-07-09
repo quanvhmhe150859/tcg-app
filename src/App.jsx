@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import RandomCards from "./components/RandomCards";
-import YugiohRoll from "./components/YugiohRoll";
-import AdminSettings from "./components/AdminSettings";
-import HamburgerMenu from "./components/HamburgerMenu";
-import DarkModeToggle from "./components/DarkModeToggle";
+import RandomCards from "./components/pokemon/RandomCardsPokemon";
+import YugiohRoll from "./components/yugioh/RandomCardsYugioh";
+import AdminSettings from "./components/setting/AdminSettings";
+import HamburgerMenu from "./components/common/HamburgerMenu";
+import DarkModeToggle from "./components/common/DarkModeToggle";
 import "./App.css";
 
 function setFavicon(iconUrl) {

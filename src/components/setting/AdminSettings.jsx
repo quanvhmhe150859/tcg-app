@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { allTypes, allRarities } from "../utils/constants";
+import { allTypes, allRarities } from "../../utils/constants";
 import "./AdminSettings.css";
-import ImportDataPokemon from "./ImportDataPokemon";
-import ImportDataYugioh from "./ImportDataYugioh";
+import ImportDataPokemon from "../pokemon/ImportDataPokemon";
+import ImportDataYugioh from "../yugioh/ImportDataYugioh";
 
 const AdminSettings = () => {
   const [allowedTypes, setAllowedTypes] = useState([]);

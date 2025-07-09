@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-import "./ImportData.css";
+import "../common/ImportData.css";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -72,7 +72,7 @@ const ImportData = () => {
 
   const handleImport = async () => {
     const confirmed = window.confirm(
-      "Bạn có chắc muốn nhập toàn bộ dữ liệu từ file JSON?"
+      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu?"
     );
     if (!confirmed) return;
 

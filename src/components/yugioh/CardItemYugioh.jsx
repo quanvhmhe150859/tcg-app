@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./YugiohCardItem.module.css";
+import styles from "./CardItemYugioh.module.css";
 
 const YugiohCardItem = ({ card }) => {
   const image = card.imageUrl;
