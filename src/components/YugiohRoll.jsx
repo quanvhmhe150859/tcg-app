@@ -1,65 +1,109 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../utils/api";
+import YugiohCardItem from "./YugiohCardItem";
+import Select from "react-select";
+import { AnimatePresence, motion } from "framer-motion";
+import styles from "./RandomCards.module.css";
 
-export default function YugiohRoll() {
-  const [allCards, setAllCards] = useState([]);
-  const [rolledCards, setRolledCards] = useState([]);
-  const [loading, setLoading] = useState(false);
+const YugiohRoll = () => {
+  const [archetypes, setArchetypes] = useState([]);
+  const [selectedArchetype, setSelectedArchetype] = useState(null);
+  const [cards, setCards] = useState([]);
+  const [isRolling, setIsRolling] = useState(false);
 
-  // Gọi API 1 lần để lấy toàn bộ danh sách bài
   useEffect(() => {
-    fetch("https://db.ygoprodeck.com/api/v7/cardinfo.php")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllCards(data.data);
-      });
+    const fetchArchetypes = async () => {
+      try {
+        const res = await api.get("/api/YugiohCards/archetypes");
+        const options = res.data.map((arch) => ({
+          value: arch,
+          label: arch,
+        }));
+        setArchetypes(options);
+      } catch (err) {
+        console.error("Không thể tải danh sách archetype:", err);
+      }
+    };
+    fetchArchetypes();
   }, []);
 
-  const getRandomCards = (count) => {
-    if (allCards.length === 0) return [];
-
-    const result = [];
-    for (let i = 0; i < count; i++) {
-      const randomIndex = Math.floor(Math.random() * allCards.length);
-      result.push(allCards[randomIndex]);
+  const handleRoll = async (count = 1) => {
+    setIsRolling(true);
+    try {
+      const res = await api.get("/api/YugiohCards/cards", {
+        params: {
+          limit: count,
+          archetype: selectedArchetype?.value,
+        },
+      });
+      const data = Array.isArray(res.data) ? res.data : [];
+      setCards(data);
+    } catch (err) {
+      console.error("Lỗi khi roll:", err);
+    } finally {
+      setTimeout(() => setIsRolling(false), 500);
     }
-    return result;
   };
 
-  const handleRoll = (count) => {
-    setLoading(true);
-    setTimeout(() => {
-      const newCards = getRandomCards(count);
-      setRolledCards(newCards);
-      setLoading(false);
-    }, 300); // hiệu ứng loading nhẹ
-  };
+  const totalPrice = cards
+    .reduce((sum, card) => sum + (card?.price ?? 0), 0)
+    .toFixed(2);
 
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1>🎴 Roll bài Yu-Gi-Oh!</h1>
-      <div style={{ margin: "1rem 0" }}>
-        <button onClick={() => handleRoll(1)} disabled={loading}>
-          Roll 1
+    <div className={styles.randomCardsContainer}>
+      <h2>🃏 Yu-Gi-Oh! Roll theo Archetype</h2>
+
+      <div className={styles.comboControls}>
+        <Select
+          className={styles.fullWidthSelect}
+          options={archetypes}
+          isClearable
+          placeholder="Tìm kiếm archetype..."
+          value={selectedArchetype}
+          onChange={(selected) => setSelectedArchetype(selected)}
+          isDisabled={isRolling}
+        />
+      </div>
+
+      <div className={styles.rollButtons}>
+        <button onClick={() => handleRoll(1)} disabled={isRolling}>
+          🎲 Roll 1
         </button>
-        <button onClick={() => handleRoll(10)} disabled={loading} style={{ marginLeft: "1rem" }}>
-          Roll 10
+        <button onClick={() => handleRoll(10)} disabled={isRolling}>
+          🎲 Roll 10
         </button>
       </div>
 
-      {loading && <p>⏳ Đang roll...</p>}
+      {isRolling && (
+        <div className={styles.spinnerContainer}>
+          <span className="spinner" />
+          <span>⏳ Đang roll card, vui lòng chờ...</span>
+        </div>
+      )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
-        {rolledCards.map((card) => (
-          <div key={card.id} style={{ width: "150px", textAlign: "center" }}>
-            <img
-              src={card.card_images?.[0]?.image_url}
-              alt={card.name}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <div style={{ marginTop: "0.5rem" }}>{card.name}</div>
-          </div>
-        ))}
+      {!isRolling && cards.length > 0 && (
+        <p className={styles.totalPrice}>
+          💰 Tổng giá trị (market): ${totalPrice}
+        </p>
+      )}
+
+      <div className={styles.cardList}>
+        <AnimatePresence>
+          {cards.map((card, index) => (
+            <motion.div
+              key={`card-${card.id || "noid"}-${index}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <YugiohCardItem card={card} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );
-}
+};
+
+export default YugiohRoll;

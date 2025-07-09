@@ -1,0 +1,33 @@
+.cardItem {
+  width: 200px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 8px;
+}
+
+.cardImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.cardInfo {
+  margin-top: 8px;
+}
+
+.cardName {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.cardRarity,
+.cardPrice {
+  font-size: 14px;
+  margin: 2px 0;
+}
