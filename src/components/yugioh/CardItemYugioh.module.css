@@ -31,3 +31,58 @@
   font-size: 14px;
   margin: 2px 0;
 }
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.yugiohCard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Layer gradient lấp lánh */
+.yugiohCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: 200% 200%;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: shimmer 6s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Layer hiệu ứng holofoil + sparkle */
+.yugiohCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("/sparkles.gif"),
+    url("/holo.png");
+  background-position: center;
+  background-size: 160%;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.4;
+  animation: sparkle 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Animation lấp lánh */
+@keyframes shimmer {
+  0% { background-position: -200% -200%; }
+  100% { background-position: 200% 200%; }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}

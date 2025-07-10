@@ -75,13 +75,13 @@ export const useImportPokemon = () => {
     setStatus("🔄 Đồng bộ GitHub...");
 
     try {
-      const syncRes = await axios.post("/Sync/sync-github");
+      const syncRes = await axios.post("/Sync/sync-pokemon");
       if (syncRes.data.message) {
         setSyncMessage(syncRes.data.message);
       }
 
       setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
-      const res = await axios.post("/Import/import-json");
+      const res = await axios.post("/Import/import-pokemon");
       setMessage(res.data.message);
       setLastImportTime(now);
 

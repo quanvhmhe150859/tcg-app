@@ -51,7 +51,7 @@ const YugiohRoll = () => {
 
   return (
     <div className={styles.randomCardsContainer}>
-      <h2>🃏 Yu-Gi-Oh! Roll theo Archetype</h2>
+      <h2>🃏 Yu-Gi-Oh! Card Roll</h2>
 
       <div className={styles.comboControls}>
         <Select
@@ -83,7 +83,7 @@ const YugiohRoll = () => {
 
       {!isRolling && cards.length > 0 && (
         <p className={styles.totalPrice}>
-          💰 Tổng giá trị (market): ${totalPrice}
+          💰 Tổng giá trị : ${totalPrice}
         </p>
       )}
 
