@@ -3,20 +3,31 @@ import styles from "./CardItemYugioh.module.css";
 import RarityDot from "./RarityDot";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import CardItemYugiohModal from "./CardItemYugiohModal";
+import "../pokemon/CardItemPokemon.css";
 
 const YugiohCardItem = ({ card }) => {
+  const cardId = card.cardId || card.card_id || "unknown";
+  const smallImageUrl = `${
+    import.meta.env.VITE_API_BASE_URL
+  }/images/yugioh/${cardId}_small.jpg`;
+
   const [showModal, setShowModal] = useState(false);
-  const image = card.imageUrl;
   const tooltipId = `tooltip-${card.id}`;
   const rarity = card.rarity || "Unknown";
   const price = card.price ?? 0;
 
   return (
-    <div className={styles.cardItem}>
-      <div className={styles.yugiohCard} onClick={() => setShowModal(true)}>
-        {image && (
-          <img src={image} alt={card.name} className={styles.cardImage} />
-        )}
+    <div className={`card-container ${styles.cardItem}`}>
+      <div
+        className={`imageContainer ${styles.yugiohCard}`}
+        onClick={() => setShowModal(true)}
+      >
+        <img
+          src={smallImageUrl}
+          alt={card.name}
+          className={`card-image ${styles.cardImage}`}
+        />
+        <span className="zoom-icon">🔍</span>
       </div>
 
       <div className={styles.cardInfo}>
@@ -34,6 +45,14 @@ const YugiohCardItem = ({ card }) => {
           data-tooltip-content={`${card.setName}`}
         >
           📦 Set: {card.setName}
+        </p>
+
+        <p
+          className={styles.ellipsis}
+          data-tooltip-id={tooltipId}
+          data-tooltip-content={`${card.archetype}`}
+        >
+          🏷️ Archetype: {card.archetype}
         </p>
 
         <p
