@@ -29,7 +29,7 @@ const RandomCards = () => {
     try {
       let result = [];
       if (rollMode === "combo") {
-        const res = await api.get("/PokemonCards/search", {
+        const res = await api.get("/CardsPokemon/search", {
           params: {
             type: selectedType || undefined,
             rarity: selectedRarity || undefined,
@@ -38,13 +38,13 @@ const RandomCards = () => {
         });
         result = res.data;
       } else if (rollMode === "energy") {
-        const res = await api.get("/PokemonCards/energy", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/energy", { params: { limit: count } });
         result = res.data;
       } else if (rollMode === "trainer") {
-        const res = await api.get("/PokemonCards/trainer", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/trainer", { params: { limit: count } });
         result = res.data;
       } else {
-        const res = await api.get("/PokemonCards/random", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/random", { params: { limit: count } });
         result = res.data;
       }
 

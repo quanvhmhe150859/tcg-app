@@ -14,7 +14,7 @@ const YugiohRoll = () => {
   useEffect(() => {
     const fetchArchetypes = async () => {
       try {
-        const res = await api.get("/api/YugiohCards/archetypes");
+        const res = await api.get("/api/CardsYugioh/archetypes");
         const options = res.data.map((arch) => ({
           value: arch,
           label: arch,
@@ -30,7 +30,7 @@ const YugiohRoll = () => {
   const handleRoll = async (count = 1) => {
     setIsRolling(true);
     try {
-      const res = await api.get("/api/YugiohCards/cards", {
+      const res = await api.get("/api/CardsYugioh/cards", {
         params: {
           limit: count,
           archetype: selectedArchetype?.value,
