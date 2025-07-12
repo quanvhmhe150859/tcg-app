@@ -55,7 +55,7 @@ const HamburgerMenu = () => {
                 </li>
                 <li>
                   <Link to="/" onClick={() => setOpen(false)}>
-                    ⚙️ Trang admin
+                    ⚙️ Trang Admin
                   </Link>
                 </li>
               </ul>

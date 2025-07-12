@@ -43,7 +43,7 @@
 
 .card-image {
   width: 100%;
-  border-radius: 6px;
+  border-radius: 15px;
   display: block;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -86,8 +86,9 @@
 
 .rarity-line {
   display: flex;
-  align-items: center;
   gap: 0.3rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .rarity-label {

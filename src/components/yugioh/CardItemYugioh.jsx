@@ -52,7 +52,7 @@ const YugiohCardItem = ({ card }) => {
           data-tooltip-id={tooltipId}
           data-tooltip-content={`${card.archetype}`}
         >
-          🏷️ Archetype: {card.archetype}
+          🏷️ Archetype: {card.archetype ?? "None"}
         </p>
 
         <p
