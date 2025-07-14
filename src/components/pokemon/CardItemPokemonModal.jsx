@@ -1,5 +1,5 @@
 import React from "react";
-import "./CardItemPokemon.css";
+import "../common/CardItem.css";
 
 const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
@@ -9,7 +9,7 @@ const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <img className="hires-image" src={hiresUrl} alt={card.name} />
+        <img className="hires-image pokemon" src={hiresUrl} alt={card.name} />
         <button className="close-button" onClick={onClose}>
           ✖
         </button>

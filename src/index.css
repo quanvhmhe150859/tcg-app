@@ -5,6 +5,9 @@
   --color-center: #DFC2F2;
   --color-dark: #A884BF;
 
+  --color-card-bg: #000;
+  --color-card-text: #fff;
+
   --color-background: var(--color-light-bg);
   --color-text: var(--color-dark-bg);
   --color-button-bg: var(--color-light);
@@ -45,6 +48,9 @@ button:hover {
   --color-text: var(--color-light-bg);
   --color-button-bg: var(--color-dark);
   --color-button-selected: var(--color-light);
+
+  --color-card-bg: #2c2c2c;
+  --color-card-text: #f5f5f5;
 }
 
 .dark-container button:hover,
@@ -60,6 +66,9 @@ button:hover {
   --color-text: var(--color-dark-bg);
   --color-button-bg: var(--color-light);
   --color-button-selected: var(--color-dark);
+
+  --color-card-bg:#fff;
+  --color-card-text: #000;
 }
 
 .light-container button:hover,

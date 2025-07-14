@@ -50,7 +50,7 @@ const HamburgerMenu = () => {
                 </li>
                 <li>
                   <Link to="/yugioh" onClick={() => setOpen(false)}>
-                    🏠 Trang Yugioh
+                    🏠 Trang Yu-Gi-Oh!
                   </Link>
                 </li>
                 <li>

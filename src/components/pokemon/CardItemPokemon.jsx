@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
-import "./CardItemPokemon.css";
+import "../common/CardItem.css";
 import "./rarityEffects.css";
 import { getRarityStyle } from "../../utils/getRarityStyle";
 import CardItemPokemonModal from "./CardItemPokemonModal";
@@ -20,11 +20,11 @@ const CardItem = ({ card, index, darkMode }) => {
       transition={{ delay: index * 0.05, duration: 0.4 }}
       className={`card-container ${darkMode ? "dark" : "light"}`}
     >
-      <div className={`imageContainer ${rarityClass}`}>
+      <div className={`image-container ${rarityClass}`}>
         <img
           src={smallUrl}
           alt={card.name}
-          className="card-image"
+          className="card-image pokemon"
           onClick={() => setShowModal(true)}
         />
         <span className="zoom-icon">🔍</span>

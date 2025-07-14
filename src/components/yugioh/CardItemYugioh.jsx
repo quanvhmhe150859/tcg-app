@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import styles from "./CardItemYugioh.module.css";
+// import styles from "./CardItemYugioh.module.css";
 import RarityDot from "./RarityDot";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import CardItemYugiohModal from "./CardItemYugiohModal";
-import "../pokemon/CardItemPokemon.css";
+import "../common/CardItem.css";
 import { motion } from "framer-motion";
 
-const YugiohCardItem = ({ card, index, darkMode }) => {
+const YugiohCardItem = ({ card, index }) => {
   const cardId = card.cardId || card.card_id || "unknown";
   const smallImageUrl = `${
     import.meta.env.VITE_API_BASE_URL
@@ -22,18 +22,16 @@ const YugiohCardItem = ({ card, index, darkMode }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className={`card-container ${styles.cardItem} ${
-        darkMode ? "dark" : "light"
-      }`}
+      className={`card-container`}
     >
       <div
-        className={`imageContainer ${styles.yugiohCard} `}
+        className={`image-container yugioh-card`}
         onClick={() => setShowModal(true)}
       >
         <img
           src={smallImageUrl}
           alt={card.name}
-          className={`card-image ${styles.cardImage}`}
+          className={`card-image`}
           style={
             card.frameType === "skill"
               ? { width: "200px", height: "291.79px" }
@@ -43,9 +41,9 @@ const YugiohCardItem = ({ card, index, darkMode }) => {
         <span className="zoom-icon">🔍</span>
       </div>
 
-      <div className={styles.cardInfo}>
+      <div>
         <h4
-          className={`${styles.cardName} ${styles.ellipsis}`}
+          className={`card-info-line`}
           data-tooltip-id={tooltipId}
           data-tooltip-content={card.name}
         >
@@ -53,15 +51,15 @@ const YugiohCardItem = ({ card, index, darkMode }) => {
         </h4>
 
         <p
-          className={styles.ellipsis}
+          className={`card-info-line`}
           data-tooltip-id={tooltipId}
-          data-tooltip-content={`${card.archetype}`}
+          data-tooltip-content={`${card.archetype ?? "None"}`}
         >
           🏷️ Archetype: {card.archetype ?? "None"}
         </p>
 
         <p
-          className={styles.ellipsis}
+          className={`card-info-line`}
           data-tooltip-id={tooltipId}
           data-tooltip-content={`${card.setName}`}
         >
@@ -69,7 +67,7 @@ const YugiohCardItem = ({ card, index, darkMode }) => {
         </p>
 
         <p
-          className={styles.ellipsis}
+          className={`card-info-line`}
           data-tooltip-id={tooltipId}
           data-tooltip-content={`${rarity}`}
         >
@@ -78,7 +76,11 @@ const YugiohCardItem = ({ card, index, darkMode }) => {
           {rarity}
         </p>
 
-        <p>💰 Price: ${price.toFixed(2)}</p>
+        <p
+          className={`card-info-line`}
+          data-tooltip-id={tooltipId}
+          data-tooltip-content={`${price.toFixed(2)}`}
+        >💰 Price: ${price.toFixed(2)}</p>
 
         <ReactTooltip id={tooltipId} place="top" />
       </div>

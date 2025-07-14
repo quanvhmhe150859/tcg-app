@@ -9,6 +9,7 @@
   word-break: break-word;
   white-space: normal;
   font-weight: bold;
+  margin: 0.3rem 0;
 }
 
 .rarity-value {
@@ -29,34 +30,31 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   margin: 1rem;
   transition: background 0.3s, color 0.3s;
-}
+  /* border: 1px solid #aaa; */
 
-.card-container.light {
-  background: #fff;
-  color: #000;
-}
-
-.card-container.dark {
-  background: #2c2c2c;
-  color: #f5f5f5;
+  background: var(--color-card-bg);
+  color: var(--color-card-text);
 }
 
 .card-image {
   width: 100%;
-  border-radius: 15px;
   display: block;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.imageContainer {
+.card-image.pokemon {
+  border-radius: 15px;
+}
+
+.image-container {
   position: relative;
   cursor: pointer;
   display: inline-block;
   transition: transform 0.2s ease;
 }
 
-.imageContainer:hover .card-image {
+.image-container:hover .card-image {
   transform: scale(1.02);
   filter: brightness(1.05);
 }
@@ -75,13 +73,8 @@
   transition: opacity 0.2s ease;
 }
 
-.imageContainer:hover .zoom-icon {
+.image-container:hover .zoom-icon {
   opacity: 1;
-}
-
-
-.card-info-line {
-  margin: 0.3rem 0;
 }
 
 .rarity-line {
@@ -104,9 +97,11 @@
 
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.7);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -120,10 +115,18 @@
 }
 
 .hires-image {
-  width: 70%;
   height: auto;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.hires-image.pokemon {
+  width: 70%;
   border-radius: 2rem;
-  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.hires-image.yugioh {
+  width: 60%;
+  border-radius: 1rem;
 }
 
 .close-button {
@@ -135,4 +138,53 @@
   border: none;
   color: white;
   cursor: pointer;
+}
+
+/* Layer gradient lấp lánh */
+.yugioh-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: 200% 200%;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: shimmer 6s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Layer hiệu ứng holofoil + sparkle */
+.yugioh-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/sparkles.gif"), url("/holo.png");
+  background-position: center;
+  background-size: 160%;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.4;
+  animation: sparkle 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Animation lấp lánh */
+@keyframes shimmer {
+  0% {
+    background-position: -200% -200%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
