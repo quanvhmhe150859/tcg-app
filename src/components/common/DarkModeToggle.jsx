@@ -16,7 +16,7 @@ export default function DarkModeToggle() {
   };
 
   return (
-    <button className="darkmode-toggle" onClick={toggleDarkMode}>
+    <button className="floating-button" style={{ top: "30px" }} onClick={toggleDarkMode}>
       {isDarkMode ? '☀️' : '🌙'}
     </button>
   );

@@ -5,6 +5,7 @@ import YugiohRoll from "./components/yugioh/RandomCardsYugioh";
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
 import DarkModeToggle from "./components/common/DarkModeToggle";
+import ScrollToTopButton from "./components/common/ScrollToTopButton";
 import "./App.css";
 
 function setFavicon(iconUrl) {
@@ -44,6 +45,7 @@ function App() {
         <HamburgerMenu />
         <DarkModeToggle />
         <FaviconUpdater />
+        <ScrollToTopButton />
         <Routes>
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCards />} />

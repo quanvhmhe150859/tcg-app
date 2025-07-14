@@ -10,6 +10,7 @@ const YugiohRoll = () => {
   const [selectedArchetype, setSelectedArchetype] = useState(null);
   const [cards, setCards] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
+  const [noResultWarning, setNoResultWarning] = useState(false);
 
   useEffect(() => {
     const fetchArchetypes = async () => {
@@ -29,6 +30,7 @@ const YugiohRoll = () => {
 
   const handleRoll = async (count = 1) => {
     setIsRolling(true);
+    setNoResultWarning(false);
     try {
       const res = await api.get("/api/CardsYugioh/cards", {
         params: {
@@ -36,12 +38,23 @@ const YugiohRoll = () => {
           archetype: selectedArchetype?.value,
         },
       });
-      const data = Array.isArray(res.data) ? res.data : [];
-      setCards(data);
+
+      const result = Array.isArray(res.data) ? res.data.slice(0, 10) : [];
+
+      if (!result || result.length === 0) {
+        setNoResultWarning(true);
+        setCards([]);
+      } else {
+        setCards(result);
+      }
+
+      await new Promise((res) => setTimeout(res, 500));
     } catch (err) {
-      console.error("Lỗi khi roll:", err);
+      console.error("Roll lỗi:", err);
+      setNoResultWarning(true);
+      setCards([]);
     } finally {
-      setTimeout(() => setIsRolling(false), 500);
+      setIsRolling(false);
     }
   };
 
@@ -50,7 +63,7 @@ const YugiohRoll = () => {
     .toFixed(2);
 
   return (
-    <div className={styles.randomCardsContainer}>
+    <div>
       <h2>🃏 Yu-Gi-Oh! Card Roll</h2>
 
       <div className={styles.comboControls}>
@@ -81,17 +94,21 @@ const YugiohRoll = () => {
         </div>
       )}
 
-      {!isRolling && cards.length > 0 && (
-        <p className={styles.totalPrice}>
-          💰 Tổng giá trị : ${totalPrice}
+      {!isRolling && noResultWarning && (
+        <p className={styles.warningMessage}>
+          ⚠️ Không có thẻ nào phù hợp với lựa chọn hiện tại.
         </p>
+      )}
+
+      {!isRolling && cards.length > 0 && (
+        <p className={styles.totalPrice}>💰 Tổng giá trị : ${totalPrice}</p>
       )}
 
       <div className={styles.cardList}>
         <AnimatePresence>
-          {cards.map((card, index) => (
+          {cards.filter(Boolean).map((card, index) => (
             <motion.div
-              key={`card-${card.id || "noid"}-${index}`}
+              key={`${card.cardId}-${index}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
