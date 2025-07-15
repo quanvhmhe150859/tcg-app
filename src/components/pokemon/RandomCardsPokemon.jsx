@@ -6,6 +6,8 @@ import styles from "../common/RandomCards.module.css";
 import { allTypes, allRarities } from "../../utils/constants";
 import Button from "../common/Button";
 import RollButtonGroup from "../common/RollButtonGroup";
+import Select from "react-select";
+import customSelectStyles from "../../utils/customSelectStyles";
 
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
@@ -78,15 +80,6 @@ const RandomCards = () => {
       label: "🌐 Tất cả",
       tooltip: "Roll ngẫu nhiên từ toàn bộ thẻ trong bộ sưu tập",
     },
-    ...(hasValidType || hasValidRarity
-      ? [
-          {
-            id: "combo",
-            label: "🔥 Type + Rarity",
-            tooltip: "Chọn loại Pokémon và độ hiếm để roll chính xác hơn",
-          },
-        ]
-      : []),
     {
       id: "energy",
       label: "⚡ Energy",
@@ -97,63 +90,84 @@ const RandomCards = () => {
       label: "📘 Trainer",
       tooltip: "Chỉ roll các thẻ huấn luyện (Trainer cards)",
     },
+    ...(hasValidType || hasValidRarity
+      ? [
+          {
+            id: "combo",
+            label: "🔥 Type + Rarity",
+            tooltip: "Chọn loại Pokémon và độ hiếm để roll chính xác hơn",
+          },
+        ]
+      : []),
   ];
+
+  const optionsType = [{ label: "All type", value: "" }].concat(
+    filteredTypes.map((t) => ({
+      label: t,
+      value: t,
+    }))
+  );
+
+  const optionsRarity = [{ label: "All rarity", value: "" }].concat(
+    filteredRarities.map((r) => ({
+      label: r,
+      value: r,
+    }))
+  );
 
   return (
     <div className={styles.container}>
-      <h2>🎴 Pokémon Card Roll</h2>
-
-      {/* Tabs */}
-      <div className={`${styles.tabs} flex flex-col md:flex-row gap-2`}>
-        {modes.map((mode) => (
-          <Button
-            key={mode.id}
-            id={mode.id}
-            label={mode.label}
-            tooltip={mode.tooltip}
-            selected={rollMode === mode.id}
-            onClick={() => setRollMode(mode.id)}
-          />
-        ))}
-      </div>
-
-      {/* Combo Mode Controls */}
-      {rollMode === "combo" && (hasValidType || hasValidRarity) && (
-        <div className={styles.comboControls}>
-          {hasValidType && (
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              disabled={isRolling}
-            >
-              <option value="">-- Chọn type --</option>
-              {filteredTypes.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {hasValidRarity && (
-            <select
-              value={selectedRarity}
-              onChange={(e) => setSelectedRarity(e.target.value)}
-              disabled={isRolling}
-            >
-              <option value="">-- Chọn rarity --</option>
-              {filteredRarities.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          )}
+      <div className={styles.rollContainer}>
+        <h1 className="text-4xl font-bold mt-4 mb-8">
+          <span className="hidden md:inline">🎴 </span>
+          Pokémon Card Roll
+        </h1>
+        {/* Tabs */}
+        <div className={`${styles.tabs} flex flex-col md:flex-row gap-2`}>
+          {modes.map((mode) => (
+            <Button
+              key={mode.id}
+              id={mode.id}
+              label={mode.label}
+              tooltip={mode.tooltip}
+              selected={rollMode === mode.id}
+              onClick={() => setRollMode(mode.id)}
+            />
+          ))}
         </div>
-      )}
 
-      {/* Roll Buttons */}
-      <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
+        {/* Combo Mode Controls */}
+        {rollMode === "combo" && (hasValidType || hasValidRarity) && (
+          <div className={styles.comboControls}>
+            {hasValidType && (
+              <Select
+                className="w-full"
+                value={optionsType.find((opt) => opt.value === selectedType)}
+                onChange={(selected) => setSelectedType(selected.value)}
+                options={optionsType}
+                isDisabled={isRolling}
+                isSearchable={false}
+                styles={customSelectStyles}
+              />
+            )}
+
+            {hasValidRarity && (
+              <Select
+                className="w-full"
+                value={optionsRarity.find((opt) => opt.value === selectedType)}
+                onChange={(selected) => setSelectedType(selected.value)}
+                options={optionsRarity}
+                isDisabled={isRolling}
+                isSearchable={false}
+                styles={customSelectStyles}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Roll Buttons */}
+        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
+      </div>
 
       {isRolling && (
         <div className={styles.spinnerContainer}>

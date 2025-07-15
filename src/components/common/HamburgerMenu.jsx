@@ -11,7 +11,7 @@ const HamburgerMenu = () => {
       {/* Toggle button */}
       <button
         onClick={() => setOpen(!open)}
-        className="hamburger-button"
+        className="hamburger-button w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-200 rounded"
         aria-label="Toggle menu"
       >
         {open ? "❌" : "☰"}
@@ -41,7 +41,7 @@ const HamburgerMenu = () => {
             className="hamburger-menu"
           >
             <div className="hamburger-menu-content">
-              <h3>📂 Menu</h3>
+              <h1 className="text-2xl font-bold">📂 Menu</h1>
               <ul>
                 <li>
                   <Link to="/pokemon" onClick={() => setOpen(false)}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { allTypes, allRarities } from "../../utils/constants";
 import "./AdminSettings.css";
-import ImportDataPokemon from "../pokemon/ImportDataPokemon";
-import ImportDataYugioh from "../yugioh/ImportDataYugioh";
+import ImportDataPokemon from "./ImportDataPokemon";
+import ImportDataYugioh from "./ImportDataYugioh";
 
 const AdminSettings = () => {
   const [allowedTypes, setAllowedTypes] = useState([]);
@@ -38,10 +38,13 @@ const AdminSettings = () => {
 
   return (
     <div className="admin-settings">
-      <h2>Admin Settings</h2>
+      <h1 className="text-4xl font-bold mt-4 mb-8">
+        <span className="hidden md:inline">🛠️ </span>
+        Admin Settings
+      </h1>
 
       <div className="section">
-        <h3>Allowed Types</h3>
+        <h3 className="text-2xl font-bold mb-2">Allowed Types</h3>
         <div className="toggle-group">
           {allTypes.map((type) => (
             <button
@@ -58,7 +61,7 @@ const AdminSettings = () => {
       </div>
 
       <div className="section">
-        <h3>Allowed Rarities</h3>
+        <h3 className="text-2xl font-bold mb-2">Allowed Rarities</h3>
         <div className="toggle-group">
           {allRarities.map((rarity) => (
             <button

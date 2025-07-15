@@ -5,6 +5,7 @@ import Select from "react-select";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import RollButtonGroup from "../common/RollButtonGroup";
+import customSelectStyles from "../../utils/customSelectStyles";
 
 const YugiohRoll = () => {
   const [archetypes, setArchetypes] = useState([]);
@@ -65,23 +66,27 @@ const YugiohRoll = () => {
 
   return (
     <div className={styles.container}>
-      <h2>🃏 Yu-Gi-Oh! Card Roll</h2>
+      <div className={styles.rollContainer}>
+        <h1 className="text-4xl font-bold mt-4 mb-8">
+          <span className="hidden md:inline">🃏 </span>
+          Yu-Gi-Oh! Card Roll
+        </h1>
+        <div className={styles.comboControls}>
+          <Select
+            className="w-full"
+            options={archetypes}
+            isClearable
+            placeholder="All archetype"
+            value={selectedArchetype}
+            onChange={(selected) => setSelectedArchetype(selected)}
+            isDisabled={isRolling}
+            styles={customSelectStyles}
+          />
+        </div>
 
-      <div className={styles.comboControls}>
-        <Select
-          className={styles.fullWidthSelect}
-          options={archetypes}
-          isClearable
-          placeholder="Tìm kiếm archetype..."
-          value={selectedArchetype}
-          onChange={(selected) => setSelectedArchetype(selected)}
-          isDisabled={isRolling}
-        />
+        {/* Roll Buttons */}
+        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
       </div>
-
-      {/* Roll Buttons */}
-      <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
-
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />

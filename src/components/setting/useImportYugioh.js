@@ -2,9 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 
+// Base URL lấy từ biến môi trường giống như các hook khác
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
-export const useImportPokemon = () => {
+/**
+ * Hook chuyên xử lý luồng import + đồng bộ dữ liệu Yu‑Gi‑Oh!
+ * Dùng tương tự useImportPokemon trong ImportDataPokemon.jsx
+ */
+export const useImportYugioh = () => {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,30 +20,44 @@ export const useImportPokemon = () => {
   const [syncMessage, setSyncMessage] = useState("");
 
   const connectionRef = useRef(null);
-  const repoName = "PokemonTCG/pokemon-tcg-data";
+  // Hiển thị trong UI để người dùng biết repo/nguồn tham chiếu
+  const repoName = "db.ygoprodeck.com";
 
+  /* -------------------------------------------------------------------------- */
+  /*                              Side‑effects                                  */
+  /* -------------------------------------------------------------------------- */
   useEffect(() => {
+    /** Lấy lần import gần nhất từ server */
     const fetchLastImport = async () => {
       try {
-        const res = await axios.get("/ImportLog/last/pokemon");
+        const res = await axios.get("/ImportLog/last/yugioh");
         if (res.data.lastImport) {
           setLastImportTime(new Date(res.data.lastImport));
         }
-      } catch {}
+      } catch {
+        /* silent fail */
+      }
     };
 
+    /** Lấy thời gian cập nhật DB mới nhất từ ygoprodeck */
     const fetchDbVersion = async () => {
       try {
-        const res = await axios.get(`https://api.github.com/repos/${repoName}`);
-        if (res.data.pushed_at) {
-          setLastUpdate(new Date(res.data.pushed_at));
+        const res = await axios.get(
+          "https://db.ygoprodeck.com/api/v7/checkDBVer.php"
+        );
+        const data = Array.isArray(res.data) ? res.data[0] : undefined;
+        if (data?.last_update) {
+          setLastUpdate(new Date(data.last_update));
         }
-      } catch {}
+      } catch {
+        /* silent fail */
+      }
     };
 
     fetchLastImport();
     fetchDbVersion();
 
+    // Kết nối SignalR để nhận progress real‑time
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_BASE_URL}/progressHub`, {
         withCredentials: true,
@@ -47,9 +66,10 @@ export const useImportPokemon = () => {
       .build();
 
     connection.on("ProgressUpdate", (data) => {
+      // data: { current, total }
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
-      setStatus(`📄 Đang xử lý file ${data.file} (${data.current}/${data.total})`);
+      setStatus(`📄 Đang xử lý file (${data.current}/${data.total})`);
     });
 
     connection
@@ -64,28 +84,36 @@ export const useImportPokemon = () => {
     };
   }, []);
 
+  /* -------------------------------------------------------------------------- */
+  /*                                Actions                                     */
+  /* -------------------------------------------------------------------------- */
   const handleImport = async () => {
-    const confirmed = window.confirm("Bạn có chắc muốn cập nhật toàn bộ dữ liệu?");
+    const confirmed = window.confirm(
+      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Yu‑Gi‑Oh!?"
+    );
     if (!confirmed) return;
 
     const now = new Date();
     setLoading(true);
     setMessage("");
     setProgress(0);
-    setStatus("🔄 Đồng bộ GitHub...");
+    setStatus("🔄 Đồng bộ Repo...");
 
     try {
-      const syncRes = await axios.post("/Sync/sync-pokemon");
+      // Bước 1: đồng bộ trước khi import
+      const syncRes = await axios.post("/Sync/sync-yugioh");
       if (syncRes.data.message) {
         setSyncMessage(syncRes.data.message);
       }
 
+      // Bước 2: gọi import
       setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
-      const res = await axios.post("/Import/import-pokemon");
+      const res = await axios.post("/Import/import-yugioh");
       setMessage(res.data.message);
       setLastImportTime(now);
 
-      await axios.post("/ImportLog/log/pokemon", { time: now.toISOString() });
+      // Ghi log import
+      await axios.post("/ImportLog/log/yugioh", { time: now.toISOString() });
     } catch (err) {
       setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
     } finally {
@@ -94,6 +122,7 @@ export const useImportPokemon = () => {
     }
   };
 
+  /* -------------------------------------------------------------------------- */
   return {
     progress,
     status,
