@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --color-light-bg: #E4EAF2;
   --color-dark-bg: #2A4359;
@@ -83,7 +85,6 @@ button:hover {
 
 .roll-tab {
   cursor: pointer;
-  margin-right: 0.5rem;
 }
 
 .spinner {

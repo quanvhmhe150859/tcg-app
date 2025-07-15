@@ -4,7 +4,8 @@ import CardItem from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import { allTypes, allRarities } from "../../utils/constants";
-import { Tooltip } from "react-tooltip";
+import Button from "../common/Button";
+import RollButtonGroup from "../common/RollButtonGroup";
 
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
@@ -15,13 +16,16 @@ const RandomCards = () => {
   const [noResultWarning, setNoResultWarning] = useState(false);
 
   const allowedTypes = JSON.parse(localStorage.getItem("allowedTypes")) || [];
-  const allowedRarities = JSON.parse(localStorage.getItem("allowedRarities")) || [];
+  const allowedRarities =
+    JSON.parse(localStorage.getItem("allowedRarities")) || [];
 
   const hasValidType = allowedTypes.length > 0;
   const hasValidRarity = allowedRarities.length > 0;
 
   const filteredTypes = allTypes.filter((type) => allowedTypes.includes(type));
-  const filteredRarities = allRarities.filter((rarity) => allowedRarities.includes(rarity));
+  const filteredRarities = allRarities.filter((rarity) =>
+    allowedRarities.includes(rarity)
+  );
 
   const handleRoll = async (count = 1) => {
     setIsRolling(true);
@@ -33,18 +37,24 @@ const RandomCards = () => {
           params: {
             type: selectedType || undefined,
             rarity: selectedRarity || undefined,
-            limit: count
-          }
+            limit: count,
+          },
         });
         result = res.data;
       } else if (rollMode === "energy") {
-        const res = await api.get("/CardsPokemon/energy", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/energy", {
+          params: { limit: count },
+        });
         result = res.data;
       } else if (rollMode === "trainer") {
-        const res = await api.get("/CardsPokemon/trainer", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/trainer", {
+          params: { limit: count },
+        });
         result = res.data;
       } else {
-        const res = await api.get("/CardsPokemon/random", { params: { limit: count } });
+        const res = await api.get("/CardsPokemon/random", {
+          params: { limit: count },
+        });
         result = res.data;
       }
 
@@ -72,7 +82,7 @@ const RandomCards = () => {
       ? [
           {
             id: "combo",
-            label: "🔥 Theo Type + Rarity",
+            label: "🔥 Type + Rarity",
             tooltip: "Chọn loại Pokémon và độ hiếm để roll chính xác hơn",
           },
         ]
@@ -90,23 +100,20 @@ const RandomCards = () => {
   ];
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>🎴 Pokémon Card Roll</h2>
 
       {/* Tabs */}
-      <div className={styles.tabs}>
+      <div className={`${styles.tabs} flex flex-col md:flex-row gap-2`}>
         {modes.map((mode) => (
-          <div key={mode.id}>
-            <button
-              data-tooltip-id={`tooltip-${mode.id}`}
-              data-tooltip-content={mode.tooltip}
-              className={`roll-tab ${rollMode === mode.id ? "selected-tab" : ""}`}
-              onClick={() => setRollMode(mode.id)}
-            >
-              {mode.label}
-            </button>
-            <Tooltip id={`tooltip-${mode.id}`} place="top" />
-          </div>
+          <Button
+            key={mode.id}
+            id={mode.id}
+            label={mode.label}
+            tooltip={mode.tooltip}
+            selected={rollMode === mode.id}
+            onClick={() => setRollMode(mode.id)}
+          />
         ))}
       </div>
 
@@ -121,7 +128,9 @@ const RandomCards = () => {
             >
               <option value="">-- Chọn type --</option>
               {filteredTypes.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>
+                  {t}
+                </option>
               ))}
             </select>
           )}
@@ -134,7 +143,9 @@ const RandomCards = () => {
             >
               <option value="">-- Chọn rarity --</option>
               {filteredRarities.map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           )}
@@ -142,10 +153,7 @@ const RandomCards = () => {
       )}
 
       {/* Roll Buttons */}
-      <div className={styles.rollButtons}>
-        <button onClick={() => handleRoll(1)} disabled={isRolling}>🎲 Roll 1</button>
-        <button onClick={() => handleRoll(10)} disabled={isRolling}>🎲 Roll 10</button>
-      </div>
+      <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
 
       {isRolling && (
         <div className={styles.spinnerContainer}>

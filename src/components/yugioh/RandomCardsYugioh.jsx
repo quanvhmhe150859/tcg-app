@@ -4,6 +4,7 @@ import YugiohCardItem from "./CardItemYugioh";
 import Select from "react-select";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
+import RollButtonGroup from "../common/RollButtonGroup";
 
 const YugiohRoll = () => {
   const [archetypes, setArchetypes] = useState([]);
@@ -63,7 +64,7 @@ const YugiohRoll = () => {
     .toFixed(2);
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>🃏 Yu-Gi-Oh! Card Roll</h2>
 
       <div className={styles.comboControls}>
@@ -78,14 +79,8 @@ const YugiohRoll = () => {
         />
       </div>
 
-      <div className={styles.rollButtons}>
-        <button onClick={() => handleRoll(1)} disabled={isRolling}>
-          🎲 Roll 1
-        </button>
-        <button onClick={() => handleRoll(10)} disabled={isRolling}>
-          🎲 Roll 10
-        </button>
-      </div>
+      {/* Roll Buttons */}
+      <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
 
       {isRolling && (
         <div className={styles.spinnerContainer}>

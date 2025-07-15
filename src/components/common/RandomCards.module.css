@@ -1,8 +1,14 @@
+.container{
+  display:grid;
+  justify-content: center;
+}
+
 .tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
   justify-content: center;
+  margin-top: 2rem;
 }
 
 .comboControls,
