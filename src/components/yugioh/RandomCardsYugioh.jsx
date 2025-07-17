@@ -6,38 +6,77 @@ import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import RollButtonGroup from "../common/RollButtonGroup";
 import customSelectStyles from "../../utils/customSelectStyles";
+import { Tooltip } from "react-tooltip";
+
+const DEFAULT_OPTIONS = [
+  { value: "", label: "🌐 Tất cả" },
+  { value: "__random_pack__", label: "🔀 Pack ngẫu nhiên" },
+];
+
+const defaultSet = DEFAULT_OPTIONS[0];
 
 const YugiohRoll = () => {
-  const [archetypes, setArchetypes] = useState([]);
-  const [selectedArchetype, setSelectedArchetype] = useState(null);
+  const [allSets, setAllSets] = useState([]);
+  const [filteredOptions, setFilteredOptions] = useState([]);
+  const [selectedSet, setSelectedSet] = useState(defaultSet);
   const [cards, setCards] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
   const [noResultWarning, setNoResultWarning] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    const fetchArchetypes = async () => {
+    const fetchCardSets = async () => {
       try {
-        const res = await api.get("/api/CardsYugioh/archetypes");
-        const options = res.data.map((arch) => ({
-          value: arch,
-          label: arch,
+        const res = await api.get("/api/cardsyugioh/cardsets");
+        const options = res.data.map((item) => ({
+          value: item.setName,
+          label: item.displayName,
         }));
-        setArchetypes(options);
+
+        setAllSets(options);
+        setFilteredOptions([...DEFAULT_OPTIONS]);
+        setSelectedSet(defaultSet); // set default luôn khi load
       } catch (err) {
-        console.error("Không thể tải danh sách archetype:", err);
+        console.error("Lỗi khi tải danh sách set:", err);
       }
     };
-    fetchArchetypes();
+    fetchCardSets();
   }, []);
+
+  const handleInputChange = (value) => {
+    setInputValue(value);
+    if (value.length >= 3) {
+      const filtered = allSets.filter((opt) =>
+        opt.label.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredOptions([...DEFAULT_OPTIONS,...filtered,]);
+    } else {
+      setFilteredOptions([...DEFAULT_OPTIONS]);
+    }
+  };
 
   const handleRoll = async (count = 1) => {
     setIsRolling(true);
     setNoResultWarning(false);
+
+    let actualSet = selectedSet?.value;
+
+    if (actualSet === "__random_pack__") {
+      const filtered = allSets.filter(
+        (s) => s.value !== "__random_pack__" && s.value !== ""
+      );
+      const random = filtered[Math.floor(Math.random() * filtered.length)];
+      actualSet = random.value;
+      console.log("Pack ngẫu nhiên chọn:", actualSet);
+    } else if (actualSet === "") {
+      actualSet = null;
+    }
+
     try {
-      const res = await api.get("/api/CardsYugioh/cards", {
+      const res = await api.get("/api/cardsyugioh/cards", {
         params: {
           limit: count,
-          archetype: selectedArchetype?.value,
+          set: actualSet || undefined,
         },
       });
 
@@ -52,7 +91,7 @@ const YugiohRoll = () => {
 
       await new Promise((res) => setTimeout(res, 500));
     } catch (err) {
-      console.error("Roll lỗi:", err);
+      console.error("Lỗi khi roll:", err);
       setNoResultWarning(true);
       setCards([]);
     } finally {
@@ -71,22 +110,35 @@ const YugiohRoll = () => {
           <span className="hidden md:inline">🃏 </span>
           Yu-Gi-Oh! Card Roll
         </h1>
-        <div className={styles.comboControls}>
+
+        {/* Dropdown chọn pack */}
+        <div
+          className={styles.comboControls}
+          data-tooltip-id="select-pack-tooltip"
+          data-tooltip-content="🔍 Nhập từ 3 ký tự để tìm pack..."
+        >
           <Select
             className="w-full"
-            options={archetypes}
-            isClearable
-            placeholder="All archetype"
-            value={selectedArchetype}
-            onChange={(selected) => setSelectedArchetype(selected)}
+            options={filteredOptions}
+            value={selectedSet}
+            onChange={(option) => setSelectedSet(option || defaultSet)}
+            onInputChange={handleInputChange}
+            placeholder="🔍 Nhập từ 3 ký tự để tìm pack..."
+            isSearchable
             isDisabled={isRolling}
             styles={customSelectStyles}
+            noOptionsMessage={() =>
+              inputValue.length < 3
+                ? "Nhập ít nhất 3 ký tự để tìm pack"
+                : "Không tìm thấy pack nào"
+            }
           />
+          <Tooltip id="select-pack-tooltip" place="top" />
         </div>
 
-        {/* Roll Buttons */}
         <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
       </div>
+
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />
