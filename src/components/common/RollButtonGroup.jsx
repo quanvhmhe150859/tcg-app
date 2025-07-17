@@ -13,10 +13,10 @@ const RollButtonGroup = ({ handleRoll, isRolling, options = [1, 10] }) => {
               500 + index * 100
             } text-white rounded disabled:opacity-50`}
             data-tooltip-id={`tooltip-roll-${count}`}
-            data-tooltip-content={`Random ${count} card${count > 1 ? "s" : ""}`}
+            data-tooltip-content={`Roll ${count} card${count > 1 ? "s" : ""}`}
           >
             <span className="text-2xl">🎲</span>
-            <span className="whitespace-nowrap text-sm">Roll {count}</span>
+            <span className="whitespace-nowrap text-sm">Quay {count}</span>
           </button>
           <Tooltip
             id={`tooltip-roll-${count}`}
