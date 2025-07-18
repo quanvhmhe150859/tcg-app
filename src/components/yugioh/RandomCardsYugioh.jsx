@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../utils/api";
-import YugiohCardItem from "./CardItemYugioh";
+import CardItemYugioh from "./CardItemYugioh";
 import Select from "react-select";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
@@ -166,7 +166,7 @@ const YugiohRoll = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <YugiohCardItem card={card} index={index} />
+              <CardItemYugioh card={card} index={index} />
             </motion.div>
           ))}
         </AnimatePresence>

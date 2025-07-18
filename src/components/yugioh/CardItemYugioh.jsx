@@ -6,7 +6,7 @@ import CardItemYugiohModal from "./CardItemYugiohModal";
 import "../common/CardItem.css";
 import { motion } from "framer-motion";
 
-const YugiohCardItem = ({ card, index }) => {
+const CardItemYugioh = ({ card, index }) => {
   const cardId = card.cardId || card.card_id || "unknown";
   const smallImageUrl = `${
     import.meta.env.VITE_API_BASE_URL
@@ -95,4 +95,4 @@ const YugiohCardItem = ({ card, index }) => {
   );
 };
 
-export default YugiohCardItem;
+export default CardItemYugioh;
