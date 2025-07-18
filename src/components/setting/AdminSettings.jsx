@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { allTypes, allRarities } from "../../utils/constants";
+import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import "./AdminSettings.css";
 import ImportDataPokemon from "./ImportDataPokemon";
 import ImportDataYugioh from "./ImportDataYugioh";
@@ -46,7 +46,7 @@ const AdminSettings = () => {
       <div className="section">
         <h3 className="text-2xl font-bold mb-2">Allowed Types</h3>
         <div className="toggle-group">
-          {allTypes.map((type) => (
+          {allTypesPokemon.map((type) => (
             <button
               key={type}
               className={`toggle-button ${
@@ -63,7 +63,7 @@ const AdminSettings = () => {
       <div className="section">
         <h3 className="text-2xl font-bold mb-2">Allowed Rarities</h3>
         <div className="toggle-group">
-          {allRarities.map((rarity) => (
+          {allRaritiesPokemon.map((rarity) => (
             <button
               key={rarity}
               className={`toggle-button ${

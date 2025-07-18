@@ -3,7 +3,7 @@ import api from "../../utils/api";
 import CardItem from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
-import { allTypes, allRarities } from "../../utils/constants";
+import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import Button from "../common/Button";
 import RollButtonGroup from "../common/RollButtonGroup";
 import Select from "react-select";
@@ -24,8 +24,8 @@ const RandomCards = () => {
   const hasValidType = allowedTypes.length > 0;
   const hasValidRarity = allowedRarities.length > 0;
 
-  const filteredTypes = allTypes.filter((type) => allowedTypes.includes(type));
-  const filteredRarities = allRarities.filter((rarity) =>
+  const filteredTypes = allTypesPokemon.filter((type) => allowedTypes.includes(type));
+  const filteredRarities = allRaritiesPokemon.filter((rarity) =>
     allowedRarities.includes(rarity)
   );
 
