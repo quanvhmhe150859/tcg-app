@@ -84,7 +84,7 @@ export const allTypesYugioh = [
   "Pendulum Flip Effect Monster",
 ];
 
-export const allRaritiesYuGiOh = [
+export const allRaritiesYugioh = [
   "Common",
   "Super Rare",
   "Ultra Rare",

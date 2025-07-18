@@ -22,3 +22,22 @@
 .toggle-button.selected {
   background: var(--color-button-bg);
 }
+
+/* Slide animation */
+.tab-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+
+.tab-content.open {
+  max-height: 9999px; /* hoặc auto nếu dùng animation JS */
+  opacity: 1;
+}
+
+.rarity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
