@@ -12,7 +12,7 @@ const AllowedRaritiesYugioh = ({ rarities, percentages, onChangePercentage }) =>
 
   return (
     <div className="section">
-      <h3 className="text-2xl font-bold mb-2 mt-4">Yu-Gi-Oh! Rarity Drop Rates (%)</h3>
+      <h3>Yu-Gi-Oh! Rarity Drop Rates (%)</h3>
       <div className="rarity-list">
         {reversed.map((rarity, index) => {
           const currentValue = percentages[rarity] || 0;

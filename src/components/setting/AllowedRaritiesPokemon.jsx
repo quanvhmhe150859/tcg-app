@@ -4,7 +4,7 @@ import "./AdminSettings.css"; // dùng lại style toggle-button
 const AllowedRaritiesPokemon = ({ rarities, selected, onToggle }) => {
   return (
     <div className="section">
-      <h3 className="text-2xl font-bold mb-2">Allowed Rarities</h3>
+      <h3>Allowed Rarities</h3>
       <div className="toggle-group">
         {rarities.map((rarity) => (
           <button

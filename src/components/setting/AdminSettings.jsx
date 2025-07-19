@@ -222,7 +222,7 @@ const AdminSettings = () => {
           onToggle={handleToggleRarity}
         />
 
-        <button onClick={handleSave} className="mt-6">
+        <button onClick={handleSave}>
           Save
         </button>
       </div>
@@ -270,16 +270,18 @@ const AdminSettings = () => {
           </div>
         </div>
 
-        <button onClick={handleSave} className="mt-6">
+        <button onClick={handleSave}>
           Save
         </button>
       </div>
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "import" ? "open" : "closed"}`}>
-        <h3 className="text-2xl font-bold mb-2">Import Data</h3>
-        <ImportDataPokemon />
-        <ImportDataYugioh />
+        <div className="section">
+          <h3 className="text-2xl font-bold mb-2">Import Data</h3>
+          <ImportDataPokemon />
+          <ImportDataYugioh />
+        </div>
       </div>
     </div>
   );

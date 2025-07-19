@@ -4,7 +4,7 @@ import "./AdminSettings.css"; // hoặc file riêng nếu muốn
 const AllowedTypesSelector = ({ title, allTypes, selectedTypes, onToggle }) => {
   return (
     <div className="section">
-      <h3 className="text-2xl font-bold mb-2">{title}</h3>
+      <h3>{title}</h3>
       <div className="toggle-group">
         {allTypes.map((type) => (
           <button
