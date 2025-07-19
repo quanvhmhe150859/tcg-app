@@ -182,25 +182,19 @@ const AdminSettings = () => {
       {/* Tab Buttons */}
       <div className="mb-6 flex gap-4 justify-center">
         <button
-          className={`px-4 py-2 rounded-md border text-sm font-semibold ${
-            tab === "pokemon" ? "selected-tab" : ""
-          }`}
+          className={tab === "pokemon" ? "selected-tab" : ""}
           onClick={() => setTab("pokemon")}
         >
           Pokémon
         </button>
         <button
-          className={`px-4 py-2 rounded-md border text-sm font-semibold ${
-            tab === "yugioh" ? "selected-tab" : ""
-          }`}
+          className={tab === "yugioh" ? "selected-tab" : ""}
           onClick={() => setTab("yugioh")}
         >
           Yu-Gi-Oh!
         </button>
         <button
-          className={`px-4 py-2 rounded-md border text-sm font-semibold ${
-            tab === "import" ? "selected-tab" : ""
-          }`}
+          className={tab === "import" ? "selected-tab" : ""}
           onClick={() => setTab("import")}
         >
           Import Data
@@ -222,9 +216,7 @@ const AdminSettings = () => {
           onToggle={handleToggleRarity}
         />
 
-        <button onClick={handleSave}>
-          Save
-        </button>
+        <button onClick={handleSave}>Save</button>
       </div>
 
       {/* Yu-Gi-Oh Tab */}
@@ -240,45 +232,23 @@ const AdminSettings = () => {
           rarities={allRaritiesYugioh}
           percentages={rarityPercentagesYugioh}
           onChangePercentage={handleChangeRarityPercentage}
+          fixedFirstPercent={fixedFirstPercent}
+          setFixedFirstPercent={setFixedFirstPercent}
+          onRandom={() => {
+            const fixed =
+              fixedFirstPercent === "" ? null : parseFloat(fixedFirstPercent);
+            const random = getRandomPercentages(allRaritiesYugioh, fixed);
+            setRarityPercentagesYugioh(random);
+          }}
         />
 
-        <div className="flex justify-center items-center gap-3 mt-4">
-          <button
-            onClick={() => {
-              const fixed =
-                fixedFirstPercent === "" ? null : parseFloat(fixedFirstPercent);
-              const random = getRandomPercentages(allRaritiesYugioh, fixed);
-              setRarityPercentagesYugioh(random);
-            }}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded ml-2"
-          >
-            🎲 Random %
-          </button>
-
-          <div className="flex items-center gap-2">
-            <label className="font-medium">Common:</label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              max="100"
-              value={fixedFirstPercent}
-              onChange={(e) => setFixedFirstPercent(e.target.value)}
-              className="border rounded px-2 py-1 w-24 text-right"
-            />
-            <label className="font-medium">%</label>
-          </div>
-        </div>
-
-        <button onClick={handleSave}>
-          Save
-        </button>
+        <button onClick={handleSave}>Save</button>
       </div>
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "import" ? "open" : "closed"}`}>
         <div className="section">
-          <h3 className="text-2xl font-bold mb-2">Import Data</h3>
+          <h3>Import Data</h3>
           <ImportDataPokemon />
           <ImportDataYugioh />
         </div>

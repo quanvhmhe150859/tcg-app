@@ -14,7 +14,7 @@ const ImportDataYugioh = () => {
     syncMessage,
     handleImport,
     repoName,
-  } = useImportYugioh();   // ✅ dùng hook mới
+  } = useImportYugioh();
 
   const repoWarning =
     lastImportTime && lastUpdate && lastUpdate > lastImportTime;

@@ -1,5 +1,5 @@
 import React from "react";
-import "./AdminSettings.css"; // hoặc file riêng nếu muốn
+import "./AdminSettings.css";
 
 const AllowedTypesSelector = ({ title, allTypes, selectedTypes, onToggle }) => {
   return (

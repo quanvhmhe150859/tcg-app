@@ -89,7 +89,7 @@ export const useImportYugioh = () => {
   /* -------------------------------------------------------------------------- */
   const handleImport = async () => {
     const confirmed = window.confirm(
-      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Yu‑Gi‑Oh!?"
+      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Yu-Gi-Oh!?"
     );
     if (!confirmed) return;
 

@@ -1,7 +1,14 @@
 import React from "react";
 import "./AdminSettings.css";
 
-const AllowedRaritiesYugioh = ({ rarities, percentages, onChangePercentage }) => {
+const AllowedRaritiesYugioh = ({
+  rarities,
+  percentages,
+  onChangePercentage,
+  fixedFirstPercent,
+  setFixedFirstPercent,
+  onRandom,
+}) => {
   const reversed = [...rarities].reverse();
 
   // Tính max hợp lệ cho mỗi rarity (dựa vào các rarity ở trên nó)
@@ -29,12 +36,33 @@ const AllowedRaritiesYugioh = ({ rarities, percentages, onChangePercentage }) =>
                 step={0.01}
                 className="border p-1 w-20 rounded text-right"
                 onChange={(e) =>
-                  onChangePercentage(rarity, Math.min(+e.target.value, maxValue))
+                  onChangePercentage(
+                    rarity,
+                    Math.min(+e.target.value, maxValue)
+                  )
                 }
               />
             </div>
           );
         })}
+      </div>
+
+      <div className="flex justify-center items-center gap-3 mt-4">
+        <button onClick={onRandom}>🎲 Random %</button>
+
+        <div className="flex items-center gap-2">
+          <label className="font-medium">Common:</label>
+          <input
+            type="number"
+            step="1"
+            min="0"
+            max="100"
+            value={fixedFirstPercent}
+            onChange={(e) => setFixedFirstPercent(e.target.value)}
+            className="border rounded py-1 w-24 text-right"
+          />
+          <label className="font-medium">%</label>
+        </div>
       </div>
     </div>
   );
