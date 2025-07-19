@@ -11,6 +11,7 @@ import ImportDataYugioh from "./ImportDataYugioh";
 import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugioh from "./AllowedRaritiesYugioh";
+import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 
 const AdminSettings = () => {
   const [tab, setTab] = useState("import");
@@ -252,6 +253,7 @@ const AdminSettings = () => {
           <ImportDataPokemon />
           <ImportDataYugioh />
         </div>
+        <AllowedRaritiesYugiohWeight />
       </div>
     </div>
   );
