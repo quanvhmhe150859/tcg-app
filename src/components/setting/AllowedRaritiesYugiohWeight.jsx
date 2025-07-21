@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { allRaritiesYugioh } from "../../utils/constants";
 import { Tooltip } from "react-tooltip";
 
 const LOCAL_KEY = "rarityWeightsYugioh";
 const TOTAL_WEIGHT = 10000;
 
-const AllowedRaritiesYugiohWeight = () => {
+const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
   const [weights, setWeights] = useState({});
   const [fixedFirstPercent, setFixedFirstPercent] = useState("");
 
@@ -14,8 +19,14 @@ const AllowedRaritiesYugiohWeight = () => {
     setWeights(stored);
   }, []);
 
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(weights));
+    },
+  }));
+
   const onChangeWeight = (rarity, value) => {
-    const maxValue = 9999; // Max 4 digits
+    const maxValue = 10000;
     const parsed = parseInt(value);
     if (!isNaN(parsed)) {
       setWeights((prev) => ({
@@ -36,11 +47,6 @@ const AllowedRaritiesYugiohWeight = () => {
     if (isNaN(num)) num = 0;
     num = Math.min(Math.max(num, 0), 100);
     setFixedFirstPercent(num.toFixed(2));
-  };
-
-  const handleSave = () => {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(weights));
-    alert("Saved rarity weights!");
   };
 
   const getRandomWeights = (keys, fixedFirstPercent) => {
@@ -104,13 +110,13 @@ const AllowedRaritiesYugiohWeight = () => {
     <div className="section">
       <Tooltip id="tooltip" />
 
-      <h3 className="text-lg font-bold">Yu-Gi-Oh! Rarity Weights</h3>
+      <h3 className="text-lg font-bold">Allowed Rarities</h3>
 
       <div className="flex justify-center items-center gap-2">
         <label>Common:</label>
         <input
           type="number"
-          step="0.01"
+          step="10"
           min={0}
           max={100}
           value={fixedFirstPercent}
@@ -149,7 +155,8 @@ const AllowedRaritiesYugiohWeight = () => {
                   </span>
                   <div className="flex items-center gap-4 min-w-32 justify-end">
                     <input
-                      type="text"
+                      type="number"
+                      step="10"
                       inputMode="numeric"
                       pattern="\\d*"
                       value={weight}
@@ -166,14 +173,8 @@ const AllowedRaritiesYugiohWeight = () => {
           })}
         </div>
       </div>
-      <button
-        onClick={handleSave}
-        className="bg-green-600 text-white px-4 py-2 rounded"
-      >
-        Save
-      </button>
     </div>
   );
-};
+});
 
 export default AllowedRaritiesYugiohWeight;

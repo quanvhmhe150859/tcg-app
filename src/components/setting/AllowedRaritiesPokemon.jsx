@@ -1,16 +1,38 @@
-import React from "react";
-import "./AdminSettings.css"; // dùng lại style toggle-button
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { allRaritiesPokemon } from "../../utils/constants";
+import "./AdminSettings.css";
 
-const AllowedRaritiesPokemon = ({ rarities, selected, onToggle }) => {
+const LOCAL_KEY = "allowedRaritiesPokemon";
+
+const AllowedRaritiesPokemon = forwardRef((_, ref) => {
+  const [selected, setSelected] = useState([]);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+    setSelected(stored);
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(selected));
+    },
+  }));
+
+  const toggleRarity = (rarity) => {
+    setSelected((prev) =>
+      prev.includes(rarity) ? prev.filter((r) => r !== rarity) : [...prev, rarity]
+    );
+  };
+
   return (
     <div className="section">
       <h3>Allowed Rarities</h3>
       <div className="toggle-group">
-        {rarities.map((rarity) => (
+        {allRaritiesPokemon.map((rarity) => (
           <button
             key={rarity}
             className={`toggle-button ${selected.includes(rarity) ? "selected" : ""}`}
-            onClick={() => onToggle(rarity)}
+            onClick={() => toggleRarity(rarity)}
           >
             {rarity}
           </button>
@@ -18,6 +40,6 @@ const AllowedRaritiesPokemon = ({ rarities, selected, onToggle }) => {
       </div>
     </div>
   );
-};
+});
 
 export default AllowedRaritiesPokemon;

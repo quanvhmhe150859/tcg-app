@@ -1,9 +1,4 @@
-import React, { useEffect, useState } from "react";
-import {
-  allTypesPokemon,
-  allRaritiesPokemon,
-  allTypesYugioh,
-} from "../../utils/constants";
+import React, { useState, useRef } from "react";
 import "./AdminSettings.css";
 import ImportDataPokemon from "./ImportDataPokemon";
 import ImportDataYugioh from "./ImportDataYugioh";
@@ -14,77 +9,30 @@ import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 const AdminSettings = () => {
   const [tab, setTab] = useState("import");
 
-  const [allowedTypesPokemon, setAllowedTypesPokemon] = useState([]);
-  const [allowedRaritiesPokemon, setAllowedRaritiesPokemon] = useState([]);
-
-  const [allowedTypesYugioh, setAllowedTypesYugioh] = useState([]);
-
-  const [rarityPercentagesYugioh, setRarityPercentagesYugioh] = useState({});
-
-  useEffect(() => {
-    const storedTypesPoke =
-      JSON.parse(localStorage.getItem("allowedTypesPokemon")) || [];
-    const storedRaritiesPoke =
-      JSON.parse(localStorage.getItem("allowedRaritiesPokemon")) || [];
-    const storedTypesYugi =
-      JSON.parse(localStorage.getItem("allowedTypesYugioh")) || [];
-
-    const storedRarityPercentsYugi =
-      JSON.parse(localStorage.getItem("rarityPercentagesYugioh")) || {};
-
-    setAllowedTypesPokemon(storedTypesPoke);
-    setAllowedRaritiesPokemon(storedRaritiesPoke);
-    setAllowedTypesYugioh(storedTypesYugi);
-    setRarityPercentagesYugioh(storedRarityPercentsYugi);
-  }, []);
-
-  const handleToggleType = (type, isYugioh = false) => {
-    if (isYugioh) {
-      setAllowedTypesYugioh((prev) =>
-        prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-      );
-    } else {
-      setAllowedTypesPokemon((prev) =>
-        prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-      );
-    }
-  };
-
-  const handleToggleRarity = (rarity) => {
-    setAllowedRaritiesPokemon((prev) =>
-      prev.includes(rarity)
-        ? prev.filter((r) => r !== rarity)
-        : [...prev, rarity]
-    );
-  };
+  const yugiohTypes = useRef();
+  const pokemonTypes = useRef();
+  const yugiohRaritites = useRef();
+  const pokemonRarities = useRef();
 
   const handleSave = () => {
-    localStorage.setItem(
-      "allowedTypesPokemon",
-      JSON.stringify(allowedTypesPokemon)
-    );
-    localStorage.setItem(
-      "allowedRaritiesPokemon",
-      JSON.stringify(allowedRaritiesPokemon)
-    );
-    localStorage.setItem(
-      "allowedTypesYugioh",
-      JSON.stringify(allowedTypesYugioh)
-    );
+    if (tab === "yugioh") {
+      yugiohTypes.current?.save();
+      yugiohRaritites.current?.save();
+    }
 
-    localStorage.setItem(
-      "rarityPercentagesYugioh",
-      JSON.stringify(rarityPercentagesYugioh)
-    );
+    if (tab === "pokemon") {
+      pokemonTypes.current?.save();
+      pokemonRarities.current?.save();
+    }
 
-    alert("Settings saved!");
+    alert("All settings saved!");
   };
 
   return (
     <div className="admin-settings">
       <h1 className="text-4xl font-bold mt-4 mb-8">
         <span className="hidden md:inline">🛠️ </span>
-        Admin Settings
+        Settings
       </h1>
 
       {/* Tab Buttons */}
@@ -111,34 +59,14 @@ const AdminSettings = () => {
 
       {/* Pokémon Tab */}
       <div className={`tab-content ${tab === "pokemon" ? "open" : "closed"}`}>
-        <AllowedTypesSelector
-          title="Allowed Types"
-          allTypes={allTypesPokemon}
-          selectedTypes={allowedTypesPokemon}
-          onToggle={(type) => handleToggleType(type, false)}
-        />
-
-        <AllowedRaritiesPokemon
-          rarities={allRaritiesPokemon}
-          selected={allowedRaritiesPokemon}
-          onToggle={handleToggleRarity}
-        />
-
-        <button onClick={handleSave}>Save</button>
+        <AllowedTypesSelector ref={pokemonTypes} type="pokemon" />
+        <AllowedRaritiesPokemon ref={pokemonRarities} />
       </div>
 
       {/* Yu-Gi-Oh Tab */}
       <div className={`tab-content ${tab === "yugioh" ? "open" : "closed"}`}>
-        <AllowedTypesSelector
-          title="Allowed Types"
-          allTypes={allTypesYugioh}
-          selectedTypes={allowedTypesYugioh}
-          onToggle={(type) => handleToggleType(type, true)}
-        />
-
-        <AllowedRaritiesYugiohWeight />
-
-        <button onClick={handleSave}>Save</button>
+        <AllowedTypesSelector ref={yugiohTypes} type="yugioh" />
+        <AllowedRaritiesYugiohWeight ref={yugiohRaritites} />
       </div>
 
       {/* Import Data Tab */}
@@ -149,6 +77,8 @@ const AdminSettings = () => {
           <ImportDataYugioh />
         </div>
       </div>
+
+      {tab !== "import" && <button onClick={handleSave}>Save</button>}
     </div>
   );
 };
