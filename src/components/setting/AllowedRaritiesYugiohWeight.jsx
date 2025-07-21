@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { allRaritiesYugioh } from "../../utils/constants";
+import { Tooltip } from "react-tooltip";
 
 const LOCAL_KEY = "rarityWeightsYugioh";
 const TOTAL_WEIGHT = 10000;
@@ -15,13 +16,22 @@ const AllowedRaritiesYugiohWeight = () => {
 
   const onChangeWeight = (rarity, value) => {
     const maxValue = 9999; // Max 4 digits
-    setWeights((prev) => ({
-      ...prev,
-      [rarity]: isNaN(value) ? 0 : Math.min(value, maxValue),
-    }));
+    const parsed = parseInt(value);
+    if (!isNaN(parsed)) {
+      setWeights((prev) => ({
+        ...prev,
+        [rarity]: Math.min(parsed, maxValue),
+      }));
+    }
   };
 
-  const handleFixedPercentChange = (value) => {
+  const handleFixedPercentChange = (e) => {
+    setFixedFirstPercent(e.target.value);
+  };
+
+  const handleFixedPercentBlur = () => {
+    let value = fixedFirstPercent;
+    if (value === "") return;
     let num = parseFloat(value);
     if (isNaN(num)) num = 0;
     num = Math.min(Math.max(num, 0), 100);
@@ -40,10 +50,15 @@ const AllowedRaritiesYugiohWeight = () => {
     let fixedValue = 0;
     let available = TOTAL_WEIGHT;
 
-    const isFixed = fixedFirstPercent !== null && fixedFirstPercent !== "" && !isNaN(fixedFirstPercent);
+    const isFixed =
+      fixedFirstPercent !== null &&
+      fixedFirstPercent !== "" &&
+      !isNaN(fixedFirstPercent);
 
     if (isFixed) {
-      fixedValue = Math.round(Math.min(Math.max(+fixedFirstPercent, 0), 100) / 100 * TOTAL_WEIGHT);
+      fixedValue = Math.round(
+        (Math.min(Math.max(+fixedFirstPercent, 0), 100) / 100) * TOTAL_WEIGHT
+      );
       available = TOTAL_WEIGHT - fixedValue;
     }
 
@@ -76,7 +91,9 @@ const AllowedRaritiesYugiohWeight = () => {
   };
 
   const handleRandom = () => {
-    const fixed = fixedFirstPercent === "" ? null : parseFloat(fixedFirstPercent);
+    handleFixedPercentBlur(); // Ensure cleaned value is used
+    const fixed =
+      fixedFirstPercent === "" ? null : parseFloat(fixedFirstPercent);
     const random = getRandomWeights(allRaritiesYugioh, fixed);
     setWeights(random);
   };
@@ -84,52 +101,75 @@ const AllowedRaritiesYugiohWeight = () => {
   const total = Object.values(weights).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-bold">
-        Yu-Gi-Oh! Rarity Weights (Total = {total})
-      </h3>
+    <div className="section">
+      <Tooltip id="tooltip" />
 
-      <div className="flex items-center gap-2">
-        <label>Fixed % for First Rarity:</label>
+      <h3 className="text-lg font-bold">Yu-Gi-Oh! Rarity Weights</h3>
+
+      <div className="flex justify-center items-center gap-2">
+        <label>Common:</label>
         <input
           type="number"
           step="0.01"
           min={0}
           max={100}
           value={fixedFirstPercent}
-          onChange={(e) => handleFixedPercentChange(e.target.value)}
+          onChange={handleFixedPercentChange}
+          onBlur={handleFixedPercentBlur}
           className="border p-1 rounded w-24"
         />
-        <button onClick={handleRandom} className="bg-blue-500 text-white px-2 py-1 rounded">
+        <label>%</label>
+        <button
+          onClick={handleRandom}
+          className="bg-blue-500 text-white px-2 py-1 rounded"
+        >
           Randomize
         </button>
+        <label>Total Weights: (Total = {total})</label>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-        {allRaritiesYugioh.map((rarity) => {
-          const weight = weights[rarity] ?? 0;
-          const percent = total > 0 ? ((weight / total) * 100).toFixed(2) : "0.00";
-          return (
-            <div key={rarity} className="flex justify-between items-center gap-2 border p-2 rounded">
-              <div className="flex-1">{rarity}</div>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={weight}
-                  min={0}
-                  max={9999}
-                  step={1}
-                  className="border p-1 w-24 text-right rounded"
-                  onChange={(e) => onChangeWeight(rarity, +e.target.value)}
-                />
-                <span className="text-sm text-gray-500">{percent}%</span>
+      <div className="overflow-y-auto max-h-[500px] m-1 p-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+          {allRaritiesYugioh.map((rarity) => {
+            const weight = weights[rarity] ?? 0;
+            const percent =
+              total > 0 ? ((weight / total) * 100).toFixed(2) : "0.00";
+            return (
+              <div
+                key={rarity}
+                className="flex justify-between items-center gap-2 border p-2 rounded"
+              >
+                <div className="flex justify-between items-center w-full">
+                  <span
+                    className="truncate pr-2 flex-1 min-w-0 text-left"
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content={rarity}
+                  >
+                    {rarity}
+                  </span>
+                  <div className="flex items-center gap-4 min-w-32 justify-end">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="\\d*"
+                      value={weight}
+                      className="border p-1 w-20 text-right rounded"
+                      onChange={(e) => onChangeWeight(rarity, e.target.value)}
+                    />
+                    <span className="text-sm text-gray-400 leading-none w-[60px] text-right">
+                      {percent}%
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-
-      <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded">
+      <button
+        onClick={handleSave}
+        className="bg-green-600 text-white px-4 py-2 rounded"
+      >
         Save
       </button>
     </div>
