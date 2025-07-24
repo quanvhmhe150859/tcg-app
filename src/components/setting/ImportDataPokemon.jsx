@@ -43,7 +43,7 @@ const ImportDataPokemon = () => {
 
       {repoWarning && (
         <p className="repo-warning">
-          ⚠️ Repo đã được cập nhật sau lần import. Bạn nên cập nhật lại dữ liệu.
+          ⚠️ Dữ liệu đã được cập nhật sau lần import. Bạn nên cập nhật lại dữ liệu.
         </p>
       )}
 

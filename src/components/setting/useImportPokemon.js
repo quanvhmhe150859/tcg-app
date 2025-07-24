@@ -72,7 +72,7 @@ export const useImportPokemon = () => {
     setLoading(true);
     setMessage("");
     setProgress(0);
-    setStatus("🔄 Đồng bộ GitHub...");
+    setStatus("🔄 Đồng bộ dữ liệu...");
 
     try {
       const syncRes = await axios.post("/Sync/sync-pokemon");

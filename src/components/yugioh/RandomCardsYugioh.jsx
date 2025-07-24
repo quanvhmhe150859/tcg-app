@@ -8,6 +8,24 @@ import RollButtonGroup from "../common/RollButtonGroup";
 import customSelectStyles from "../../utils/customSelectStyles";
 import { Tooltip } from "react-tooltip";
 
+function rollWithWeight(weightMap) {
+  const entries = Object.entries(weightMap).map(([rarity, weight]) => ({
+    rarity,
+    weight: Number(weight),
+  }));
+
+  const total = entries.reduce((sum, r) => sum + r.weight, 0);
+  const rand = Math.random() * total;
+  let acc = 0;
+
+  for (let r of entries) {
+    acc += r.weight;
+    if (rand < acc) return r.rarity;
+  }
+
+  return entries[entries.length - 1]?.rarity ?? "Unknown";
+}
+
 const DEFAULT_OPTIONS = [
   { value: "", label: "🌐 Tất cả" },
   { value: "__random_pack__", label: "🔀 Pack ngẫu nhiên" },
@@ -49,7 +67,7 @@ const YugiohRoll = () => {
       const filtered = allSets.filter((opt) =>
         opt.label.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredOptions([...DEFAULT_OPTIONS,...filtered,]);
+      setFilteredOptions([...DEFAULT_OPTIONS, ...filtered]);
     } else {
       setFilteredOptions([...DEFAULT_OPTIONS]);
     }
@@ -68,19 +86,42 @@ const YugiohRoll = () => {
       const random = filtered[Math.floor(Math.random() * filtered.length)];
       actualSet = random.value;
       console.log("Pack ngẫu nhiên chọn:", actualSet);
-    } else if (actualSet === "") {
-      actualSet = null;
     }
 
     try {
-      const res = await api.get("/api/cardsyugioh/cards", {
-        params: {
-          limit: count,
-          set: actualSet || undefined,
-        },
-      });
+      let result = [];
 
-      const result = Array.isArray(res.data) ? res.data.slice(0, 10) : [];
+      // 🌐 Nếu là "Tất cả" (actualSet === "")
+      if (!actualSet) {
+        const raw = localStorage.getItem("rarityWeightsYugioh");
+        if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
+
+        const weights = JSON.parse(raw);
+        const rolledRarities = [];
+
+        // Roll count lần để lấy danh sách độ hiếm
+        for (let i = 0; i < count; i++) {
+          rolledRarities.push(rollWithWeight(weights));
+        }
+
+        const query = rolledRarities
+          .map((r) => `rarity=${encodeURIComponent(r)}`)
+          .join("&");
+
+        const res = await api.post(
+          `/api/cardsyugioh/roll-fixed?limit=${count}&${query}`
+        );
+        result = Array.isArray(res.data) ? res.data.slice(0, 10) : [];
+      } else {
+        // Giữ nguyên cách gọi cũ nếu có set cụ thể
+        const res = await api.get("/api/cardsyugioh/cards", {
+          params: {
+            limit: count,
+            set: actualSet,
+          },
+        });
+        result = Array.isArray(res.data) ? res.data.slice(0, 10) : [];
+      }
 
       if (!result || result.length === 0) {
         setNoResultWarning(true);

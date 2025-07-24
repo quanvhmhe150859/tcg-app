@@ -97,7 +97,7 @@ export const useImportYugioh = () => {
     setLoading(true);
     setMessage("");
     setProgress(0);
-    setStatus("🔄 Đồng bộ Repo...");
+    setStatus("🔄 Đồng bộ dữ liệu...");
 
     try {
       // Bước 1: đồng bộ trước khi import

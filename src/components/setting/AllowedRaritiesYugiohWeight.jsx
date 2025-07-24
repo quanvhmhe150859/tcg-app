@@ -97,7 +97,7 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
   };
 
   const handleRandom = () => {
-    handleFixedPercentBlur(); // Ensure cleaned value is used
+    handleFixedPercentBlur();
     const fixed =
       fixedFirstPercent === "" ? null : parseFloat(fixedFirstPercent);
     const random = getRandomWeights(allRaritiesYugioh, fixed);
