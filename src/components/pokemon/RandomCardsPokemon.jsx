@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
 import CardItem from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
@@ -8,6 +7,7 @@ import Button from "../common/Button";
 import RollButtonGroup from "../common/RollButtonGroup";
 import Select from "react-select";
 import customSelectStyles from "../../utils/customSelectStyles";
+import { getPokemonCards } from "../../utils/pokemonApiHelpers";
 
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
@@ -17,9 +17,9 @@ const RandomCards = () => {
   const [selectedRarity, setSelectedRarity] = useState("");
   const [noResultWarning, setNoResultWarning] = useState(false);
 
-  const allowedTypes = JSON.parse(localStorage.getItem("allowedTypes")) || [];
+  const allowedTypes = JSON.parse(localStorage.getItem("allowedTypesPokemon")) || [];
   const allowedRarities =
-    JSON.parse(localStorage.getItem("allowedRarities")) || [];
+    JSON.parse(localStorage.getItem("allowedRaritiesPokemon")) || [];
 
   const hasValidType = allowedTypes.length > 0;
   const hasValidRarity = allowedRarities.length > 0;
@@ -30,49 +30,29 @@ const RandomCards = () => {
   );
 
   const handleRoll = async (count = 1) => {
-    setIsRolling(true);
-    setNoResultWarning(false);
-    try {
-      let result = [];
-      if (rollMode === "combo") {
-        const res = await api.get("/CardsPokemon/search", {
-          params: {
-            type: selectedType || undefined,
-            rarity: selectedRarity || undefined,
-            limit: count,
-          },
-        });
-        result = res.data;
-      } else if (rollMode === "energy") {
-        const res = await api.get("/CardsPokemon/energy", {
-          params: { limit: count },
-        });
-        result = res.data;
-      } else if (rollMode === "trainer") {
-        const res = await api.get("/CardsPokemon/trainer", {
-          params: { limit: count },
-        });
-        result = res.data;
-      } else {
-        const res = await api.get("/CardsPokemon/random", {
-          params: { limit: count },
-        });
-        result = res.data;
-      }
+  setIsRolling(true);
+  setNoResultWarning(false);
 
-      if (!result || result.length === 0) {
-        setNoResultWarning(true);
-      }
+  try {
+    const result = await getPokemonCards({
+      mode: rollMode,
+      count,
+      type: selectedType,
+      rarity: selectedRarity,
+    });
 
-      await new Promise((res) => setTimeout(res, 500));
-      setCards(result);
-    } catch (err) {
-      console.error("Lỗi khi gọi API backend:", err);
+    if (!result || result.length === 0) {
       setNoResultWarning(true);
-    } finally {
-      setIsRolling(false);
     }
-  };
+
+    await new Promise((res) => setTimeout(res, 500));
+    setCards(result);
+  } catch (err) {
+    setNoResultWarning(true);
+  } finally {
+    setIsRolling(false);
+  }
+};
 
   const modes = [
     {
@@ -154,8 +134,8 @@ const RandomCards = () => {
             {hasValidRarity && (
               <Select
                 className="w-full"
-                value={optionsRarity.find((opt) => opt.value === selectedType)}
-                onChange={(selected) => setSelectedType(selected.value)}
+                value={optionsRarity.find((opt) => opt.value === selectedRarity)}
+                onChange={(selected) => setSelectedRarity(selected.value)}
                 options={optionsRarity}
                 isDisabled={isRolling}
                 isSearchable={false}
@@ -177,7 +157,7 @@ const RandomCards = () => {
       )}
 
       {!isRolling && noResultWarning && (
-        <p className={styles.warningMessage}>
+        <p className="m-4">
           ⚠️ Không có thẻ nào phù hợp với lựa chọn hiện tại.
         </p>
       )}

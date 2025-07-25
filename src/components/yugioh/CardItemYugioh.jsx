@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import styles from "./CardItemYugioh.module.css";
 import RarityDot from "./RarityDot";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import CardItemYugiohModal from "./CardItemYugiohModal";

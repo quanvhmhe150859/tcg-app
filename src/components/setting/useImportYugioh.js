@@ -2,13 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 
-// Base URL lấy từ biến môi trường giống như các hook khác
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
-/**
- * Hook chuyên xử lý luồng import + đồng bộ dữ liệu Yu‑Gi‑Oh!
- * Dùng tương tự useImportPokemon trong ImportDataPokemon.jsx
- */
 export const useImportYugioh = () => {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
@@ -20,26 +15,18 @@ export const useImportYugioh = () => {
   const [syncMessage, setSyncMessage] = useState("");
 
   const connectionRef = useRef(null);
-  // Hiển thị trong UI để người dùng biết repo/nguồn tham chiếu
   const repoName = "db.ygoprodeck.com";
 
-  /* -------------------------------------------------------------------------- */
-  /*                              Side‑effects                                  */
-  /* -------------------------------------------------------------------------- */
   useEffect(() => {
-    /** Lấy lần import gần nhất từ server */
     const fetchLastImport = async () => {
       try {
         const res = await axios.get("/ImportLog/last/yugioh");
         if (res.data.lastImport) {
           setLastImportTime(new Date(res.data.lastImport));
         }
-      } catch {
-        /* silent fail */
-      }
+      } catch {}
     };
 
-    /** Lấy thời gian cập nhật DB mới nhất từ ygoprodeck */
     const fetchDbVersion = async () => {
       try {
         const res = await axios.get(
@@ -49,15 +36,12 @@ export const useImportYugioh = () => {
         if (data?.last_update) {
           setLastUpdate(new Date(data.last_update));
         }
-      } catch {
-        /* silent fail */
-      }
+      } catch {}
     };
 
     fetchLastImport();
     fetchDbVersion();
 
-    // Kết nối SignalR để nhận progress real‑time
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_BASE_URL}/progressHub`, {
         withCredentials: true,
@@ -66,7 +50,6 @@ export const useImportYugioh = () => {
       .build();
 
     connection.on("ProgressUpdate", (data) => {
-      // data: { current, total }
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
       setStatus(`📄 Đang xử lý file (${data.current}/${data.total})`);
@@ -84,9 +67,6 @@ export const useImportYugioh = () => {
     };
   }, []);
 
-  /* -------------------------------------------------------------------------- */
-  /*                                Actions                                     */
-  /* -------------------------------------------------------------------------- */
   const handleImport = async () => {
     const confirmed = window.confirm(
       "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Yu-Gi-Oh!?"
@@ -100,19 +80,16 @@ export const useImportYugioh = () => {
     setStatus("🔄 Đồng bộ dữ liệu...");
 
     try {
-      // Bước 1: đồng bộ trước khi import
       const syncRes = await axios.post("/Sync/sync-yugioh");
       if (syncRes.data.message) {
         setSyncMessage(syncRes.data.message);
       }
 
-      // Bước 2: gọi import
       setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
       const res = await axios.post("/Import/import-yugioh");
       setMessage(res.data.message);
       setLastImportTime(now);
 
-      // Ghi log import
       await axios.post("/ImportLog/log/yugioh", { time: now.toISOString() });
     } catch (err) {
       setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
@@ -122,7 +99,6 @@ export const useImportYugioh = () => {
     }
   };
 
-  /* -------------------------------------------------------------------------- */
   return {
     progress,
     status,

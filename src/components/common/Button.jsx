@@ -1,4 +1,3 @@
-// components/Button.jsx
 import { Tooltip } from "react-tooltip";
 
 const Button = ({ id, label, tooltip, selected, onClick }) => {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import "./HamburgerMenu.css"; // 👈 import file css
+import "./HamburgerMenu.css";
 
 const HamburgerMenu = () => {
   const [open, setOpen] = useState(false);
