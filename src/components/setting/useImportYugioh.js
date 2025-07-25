@@ -46,6 +46,7 @@ export const useImportYugioh = () => {
       .withUrl(`${import.meta.env.VITE_API_BASE_URL}/progressHub`, {
         withCredentials: true,
       })
+      .configureLogging(signalR.LogLevel.Warning)
       .withAutomaticReconnect()
       .build();
 

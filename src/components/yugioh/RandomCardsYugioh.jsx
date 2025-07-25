@@ -29,20 +29,38 @@ const YugiohRoll = () => {
   const [noResultWarning, setNoResultWarning] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  useEffect(() => {
-  const fetchCardSets = async () => {
-    try {
-      const options = await getAllCardSets();
-      setAllSets(options);
-      setFilteredOptions([...DEFAULT_OPTIONS]);
-      setSelectedSet(defaultSet);
-    } catch (err) {
-      console.error("Lỗi khi tải danh sách set:", err);
-    }
-  };
-  fetchCardSets();
-}, []);
+  const [typeOptions, setTypeOptions] = useState([]);
+  const [selectedType, setSelectedType] = useState(""); // "" = All types
 
+  useEffect(() => {
+    const raw = localStorage.getItem("allowedTypesYugioh");
+    if (raw) {
+      try {
+        const types = JSON.parse(raw);
+        const options = [
+          { value: "", label: "All types" },
+          ...types.map((t) => ({ value: t, label: t })),
+        ];
+        setTypeOptions(options);
+      } catch (err) {
+        console.error("Không thể parse typesYugioh:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchCardSets = async () => {
+      try {
+        const options = await getAllCardSets();
+        setAllSets(options);
+        setFilteredOptions([...DEFAULT_OPTIONS]);
+        setSelectedSet(defaultSet);
+      } catch (err) {
+        console.error("Lỗi khi tải danh sách set:", err);
+      }
+    };
+    fetchCardSets();
+  }, []);
 
   const handleInputChange = (value) => {
     setInputValue(value);
@@ -57,57 +75,56 @@ const YugiohRoll = () => {
   };
 
   const handleRoll = async (count = 1) => {
-  setIsRolling(true);
-  setNoResultWarning(false);
+    setIsRolling(true);
+    setNoResultWarning(false);
 
-  let actualSet = selectedSet?.value;
+    let actualSet = selectedSet?.value;
 
-  // 🔀 Nếu là pack ngẫu nhiên
-  if (actualSet === "__random_pack__") {
-    const filtered = allSets.filter(
-      (s) => s.value !== "__random_pack__" && s.value !== ""
-    );
-    const random = filtered[Math.floor(Math.random() * filtered.length)];
-    actualSet = random.value;
-    console.log("Pack ngẫu nhiên chọn:", actualSet);
-  }
-
-  try {
-    let result = [];
-
-    if (!actualSet) {
-      // 🌐 Tất cả (sử dụng roll theo weight)
-      const raw = localStorage.getItem("rarityWeightsYugioh");
-      if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
-
-      const weights = JSON.parse(raw);
-      const rolledRarities = Array.from({ length: count }, () =>
-        rollWithWeight(weights)
+    // 🔀 Nếu là pack ngẫu nhiên
+    if (actualSet === "__random_pack__") {
+      const filtered = allSets.filter(
+        (s) => s.value !== "__random_pack__" && s.value !== ""
       );
-
-      result = await getCardsByRarities(rolledRarities);
-    } else {
-      // 📦 Deck cụ thể
-      result = await getCardsFromSet(count, actualSet);
+      const random = filtered[Math.floor(Math.random() * filtered.length)];
+      actualSet = random.value;
+      console.log("Pack ngẫu nhiên chọn:", actualSet);
     }
 
-    if (!result || result.length === 0) {
+    try {
+      let result = [];
+
+      if (!actualSet) {
+        // 🌐 Tất cả (sử dụng roll theo weight)
+        const raw = localStorage.getItem("rarityWeightsYugioh");
+        if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
+
+        const weights = JSON.parse(raw);
+        const rolledRarities = Array.from({ length: count }, () =>
+          rollWithWeight(weights)
+        );
+
+        result = await getCardsByRarities(rolledRarities);
+      } else {
+        // 📦 Deck cụ thể
+        result = await getCardsFromSet(count, actualSet);
+      }
+
+      if (!result || result.length === 0) {
+        setNoResultWarning(true);
+        setCards([]);
+      } else {
+        setCards(result);
+      }
+
+      await new Promise((res) => setTimeout(res, 500));
+    } catch (err) {
+      console.error("Lỗi khi roll:", err);
       setNoResultWarning(true);
       setCards([]);
-    } else {
-      setCards(result);
+    } finally {
+      setIsRolling(false);
     }
-
-    await new Promise((res) => setTimeout(res, 500));
-  } catch (err) {
-    console.error("Lỗi khi roll:", err);
-    setNoResultWarning(true);
-    setCards([]);
-  } finally {
-    setIsRolling(false);
-  }
-};
-
+  };
 
   const totalPrice = cards
     .reduce((sum, card) => sum + (card?.price ?? 0), 0)
@@ -145,6 +162,19 @@ const YugiohRoll = () => {
           />
           <Tooltip id="select-pack-tooltip" place="top" />
         </div>
+
+        {selectedSet?.value === "" && (
+          <div className="mt-2">
+            <Select
+              value={typeOptions.find((t) => t.value === selectedType)}
+              onChange={(selected) => setSelectedType(selected.value)}
+              options={typeOptions}
+              isDisabled={isRolling}
+              isSearchable
+              styles={customSelectStyles}
+            />
+          </div>
+        )}
 
         <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
       </div>

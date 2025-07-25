@@ -103,7 +103,7 @@ const RandomCards = () => {
           Pokémon Card Roll
         </h1>
         {/* Tabs */}
-        <div className={`${styles.tabs} flex flex-col md:flex-row gap-2`}>
+        <div className={`${styles.tabs} flex flex-col md:flex-row gap-2 z-[999]`}>
           {modes.map((mode) => (
             <Button
               key={mode.id}

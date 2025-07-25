@@ -20,7 +20,7 @@ export const getCardsFromSet = async (limit, setName) => {
 
 export const getCardsByRarities = async (rarities) => {
   const query = rarities.map((r) => `rarity=${encodeURIComponent(r)}`).join("&");
-  const res = await api.post(
+  const res = await api.get(
     `/api/cardsyugioh/roll-fixed?limit=${rarities.length}&${query}`
   );
   return Array.isArray(res.data) ? res.data.slice(0, 10) : [];
