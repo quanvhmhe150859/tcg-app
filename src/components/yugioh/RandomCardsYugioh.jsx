@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import CardItemYugioh from "./CardItemYugioh";
-import Select from "react-select";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import RollButtonGroup from "../common/RollButtonGroup";
-import customSelectStyles from "../../utils/customSelectStyles";
 import { Tooltip } from "react-tooltip";
 import {
   getAllCardSets,
   getCardsFromSet,
   getCardsByRarities,
   rollWithWeight,
-} from "../../utils/yugiohApiHelpers";
+} from "./yugiohApiHelpers";
+import SelectBox from "../common/SelectBox";
 
 const DEFAULT_OPTIONS = [
-  { value: "", label: "🌐 Tất cả" },
-  { value: "__random_pack__", label: "🔀 Pack ngẫu nhiên" },
+  { value: "", label: "🌐 All Pack" },
+  { value: "__random_pack__", label: "🔀 Random Pack" },
 ];
 
 const defaultSet = DEFAULT_OPTIONS[0];
@@ -33,20 +32,10 @@ const YugiohRoll = () => {
   const [selectedType, setSelectedType] = useState(""); // "" = All types
 
   useEffect(() => {
-    const raw = localStorage.getItem("allowedTypesYugioh");
-    if (raw) {
-      try {
-        const types = JSON.parse(raw);
-        const options = [
-          { value: "", label: "All types" },
-          ...types.map((t) => ({ value: t, label: t })),
-        ];
-        setTypeOptions(options);
-      } catch (err) {
-        console.error("Không thể parse typesYugioh:", err);
-      }
+    if (selectedSet?.value !== "") {
+      setSelectedType("");
     }
-  }, []);
+  }, [selectedSet]);
 
   useEffect(() => {
     const fetchCardSets = async () => {
@@ -60,6 +49,22 @@ const YugiohRoll = () => {
       }
     };
     fetchCardSets();
+  }, []);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("allowedTypesYugioh");
+    if (raw) {
+      try {
+        const types = JSON.parse(raw);
+        const options = [
+          { value: "", label: "All Types" },
+          ...types.map((t) => ({ value: t, label: t })),
+        ];
+        setTypeOptions(options);
+      } catch (err) {
+        console.error("Không thể parse typesYugioh:", err);
+      }
+    }
   }, []);
 
   const handleInputChange = (value) => {
@@ -103,7 +108,7 @@ const YugiohRoll = () => {
           rollWithWeight(weights)
         );
 
-        result = await getCardsByRarities(rolledRarities);
+        result = await getCardsByRarities(rolledRarities, selectedType || null);
       } else {
         // 📦 Deck cụ thể
         result = await getCardsFromSet(count, actualSet);
@@ -129,13 +134,14 @@ const YugiohRoll = () => {
   const totalPrice = cards
     .reduce((sum, card) => sum + (card?.price ?? 0), 0)
     .toFixed(2);
+  const placeholder = defaultSet.label;
 
   return (
     <div className={styles.container}>
       <div className={styles.rollContainer}>
         <h1 className="text-4xl font-bold mt-4 mb-8">
           <span className="hidden md:inline">🃏 </span>
-          Yu-Gi-Oh! Card Roll
+          Yu-Gi-Oh! Card
         </h1>
 
         {/* Dropdown chọn pack */}
@@ -144,37 +150,38 @@ const YugiohRoll = () => {
           data-tooltip-id="select-pack-tooltip"
           data-tooltip-content="🔍 Nhập từ 3 ký tự để tìm pack..."
         >
-          <Select
-            className="w-full"
+          <SelectBox
             options={filteredOptions}
-            value={selectedSet}
-            onChange={(option) => setSelectedSet(option || defaultSet)}
-            onInputChange={handleInputChange}
-            placeholder="🔍 Nhập từ 3 ký tự để tìm pack..."
-            isSearchable
+            value={selectedSet?.value}
+            onChange={(v) =>
+              setSelectedSet(
+                filteredOptions.find((opt) => opt.value === v) || defaultSet
+              )
+            }
             isDisabled={isRolling}
-            styles={customSelectStyles}
+            isSearchable
+            onInputChange={handleInputChange}
             noOptionsMessage={() =>
               inputValue.length < 3
                 ? "Nhập ít nhất 3 ký tự để tìm pack"
                 : "Không tìm thấy pack nào"
             }
+            placeholder={placeholder}
           />
-          <Tooltip id="select-pack-tooltip" place="top" />
-        </div>
 
-        {selectedSet?.value === "" && (
-          <div className="mt-2">
-            <Select
-              value={typeOptions.find((t) => t.value === selectedType)}
-              onChange={(selected) => setSelectedType(selected.value)}
+          <Tooltip id="select-pack-tooltip" place="top" />
+
+          {selectedSet?.value === "" && (
+            <SelectBox
               options={typeOptions}
+              value={selectedType}
+              onChange={setSelectedType}
               isDisabled={isRolling}
               isSearchable
-              styles={customSelectStyles}
+              placeholder="All Types"
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
       </div>

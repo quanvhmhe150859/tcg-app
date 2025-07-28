@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "../../utils/api";
 
 export const getAllCardSets = async () => {
   const res = await api.get("/api/cardsyugioh/cardsets");
@@ -18,11 +18,14 @@ export const getCardsFromSet = async (limit, setName) => {
   return Array.isArray(res.data) ? res.data.slice(0, 10) : [];
 };
 
-export const getCardsByRarities = async (rarities) => {
-  const query = rarities.map((r) => `rarity=${encodeURIComponent(r)}`).join("&");
-  const res = await api.get(
-    `/api/cardsyugioh/roll-fixed?limit=${rarities.length}&${query}`
-  );
+export const getCardsByRarities = async (rarities, cardType = null) => {
+  const query = [
+    ...rarities.map((r) => `rarity=${encodeURIComponent(r)}`),
+    ...(cardType ? [`cardType=${encodeURIComponent(cardType)}`] : []),
+    `limit=${rarities.length}`,
+  ].join("&");
+
+  const res = await api.get(`/api/cardsyugioh/roll-fixed?${query}`);
   return Array.isArray(res.data) ? res.data.slice(0, 10) : [];
 };
 

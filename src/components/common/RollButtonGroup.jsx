@@ -3,7 +3,7 @@ import { Tooltip } from "react-tooltip";
 
 const RollButtonGroup = ({ handleRoll, isRolling, options = [1, 10] }) => {
   return (
-    <div className="flex w-full md:w-fit md:mx-auto gap-2 md:justify-center">
+    <div className="flex w-full md:w-fit md:mx-auto gap-2 md:justify-center p-4">
       {options.map((count, index) => (
         <React.Fragment key={index}>
           <button
@@ -16,11 +16,11 @@ const RollButtonGroup = ({ handleRoll, isRolling, options = [1, 10] }) => {
             data-tooltip-content={`Roll ${count} card${count > 1 ? "s" : ""}`}
           >
             <span className="text-2xl">🎲</span>
-            <span className="whitespace-nowrap text-sm">Quay {count}</span>
+            <span className="whitespace-nowrap text-sm">Roll {count}</span>
           </button>
           <Tooltip
             id={`tooltip-roll-${count}`}
-            place="top"
+            place="bottom"
             multiline
             className="max-w-[200px] break-words text-sm"
           />
