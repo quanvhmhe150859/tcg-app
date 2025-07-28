@@ -3,13 +3,6 @@
   justify-content: center;
 }
 
-.tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  justify-content: center;
-}
-
 .comboControls,
 .rollButtons {
   display: flex;
@@ -17,7 +10,14 @@
   margin-bottom: 1rem;
   flex-wrap: wrap;
   justify-content: center;
-  width: 100%;
+  /* width: 100%; */
+  min-width: 300px;
+}
+
+@media (min-width: 640px) {
+  .comboControls {
+    min-width: 500px;
+  }
 }
 
 .comboControls{

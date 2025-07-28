@@ -3,7 +3,7 @@ import { Tooltip } from "react-tooltip";
 
 const RollButtonGroup = ({ handleRoll, isRolling, options = [1, 10] }) => {
   return (
-    <div className="flex w-full md:w-fit md:mx-auto gap-2 md:justify-center p-4">
+    <div className="flex w-full sm:w-fit sm:mx-auto gap-2 sm:justify-center">
       {options.map((count, index) => (
         <React.Fragment key={index}>
           <button

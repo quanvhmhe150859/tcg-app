@@ -10,7 +10,6 @@ import SelectBox from "../common/SelectBox";
 const RandomCards = () => {
   const [cards, setCards] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
-  // const [rollMode, setRollMode] = useState("all");
 
   const [selectedType, setSelectedType] = useState("");
   const [selectedRarity, setSelectedRarity] = useState("");
@@ -39,7 +38,6 @@ const RandomCards = () => {
 
     try {
       const result = await getPokemonCards({
-        // mode: rollMode,
         count,
         type: selectedType,
         rarity: selectedRarity,
@@ -59,47 +57,20 @@ const RandomCards = () => {
     }
   };
 
-  // const modes = [
-  //   {
-  //     id: "all",
-  //     label: " Tất cả",
-  //     tooltip: "Roll ngẫu nhiên từ toàn bộ thẻ trong bộ sưu tập",
-  //   },
-  //   {
-  //     id: "energy",
-  //     label: " Energy",
-  //     tooltip: "Chỉ roll các thẻ năng lượng (Energy cards)",
-  //   },
-  //   {
-  //     id: "trainer",
-  //     label: " Trainer",
-  //     tooltip: "Chỉ roll các thẻ huấn luyện (Trainer cards)",
-  //   },
-  //   ...(hasValidType || hasValidRarity
-  //     ? [
-  //         {
-  //           id: "combo",
-  //           label: " Type + Rarity",
-  //           tooltip: "Chọn loại Pokémon và độ hiếm để roll chính xác hơn",
-  //         },
-  //       ]
-  //     : []),
-  // ];
   const optionsSuperType = [
     { label: "🌐 All Super Types", value: "" },
     { label: "🔥 Pokémon", value: "Pokémon" },
     { label: "📘 Trainer", value: "Trainer" },
     { label: "⚡ Energy", value: "Energy" },
   ];
-  
-  
+
   const optionsRarity = [{ label: "All Rarity", value: "" }].concat(
     filteredRarities.map((r) => ({
       label: r,
       value: r,
     }))
   );
-  
+
   const optionsType = [{ label: "All Type", value: "" }].concat(
     filteredTypes.map((t) => ({
       label: t,
@@ -108,10 +79,10 @@ const RandomCards = () => {
   );
 
   useEffect(() => {
-  if (selectedSuperType !== "Pokémon") {
-    setSelectedType("");
-  }
-}, [selectedSuperType]);
+    if (selectedSuperType !== "Pokémon") {
+      setSelectedType("");
+    }
+  }, [selectedSuperType]);
 
   return (
     <div className={styles.container}>
@@ -120,51 +91,32 @@ const RandomCards = () => {
           <span className="hidden md:inline">🎴 </span>
           Pokémon Card
         </h1>
-        {/* Tabs */}
-        {/* <div
-          className={`${styles.tabs} flex flex-col md:flex-row gap-2 z-[999]`}
-        >
-          {modes.map((mode) => (
-            <Button
-              key={mode.id}
-              id={mode.id}
-              label={mode.label}
-              tooltip={mode.tooltip}
-              selected={rollMode === mode.id}
-              onClick={() => setRollMode(mode.id)}
-            />
-          ))}
-        </div> */}
+        <div className={styles.comboControls}>
+          <SelectBox
+            options={optionsSuperType}
+            value={selectedSuperType}
+            onChange={setSelectedSuperType}
+            isDisabled={isRolling}
+          />
 
-        {/* Combo Mode Controls */}
-        {/* {rollMode === "combo" && (hasValidType || hasValidRarity) && ( */}
-          <div className={styles.comboControls}>
+          {hasValidRarity && (
             <SelectBox
-              options={optionsSuperType}
-              value={selectedSuperType}
-              onChange={setSelectedSuperType}
+              options={optionsRarity}
+              value={selectedRarity}
+              onChange={setSelectedRarity}
               isDisabled={isRolling}
             />
+          )}
 
-            {hasValidRarity && (
-              <SelectBox
-                options={optionsRarity}
-                value={selectedRarity}
-                onChange={setSelectedRarity}
-                isDisabled={isRolling}
-              />
-            )}
-
-            {hasValidType && selectedSuperType === "Pokémon" && (
-              <SelectBox
-                options={optionsType}
-                value={selectedType}
-                onChange={setSelectedType}
-                isDisabled={isRolling}
-              />
-            )}
-          </div>
-        {/* )} */}
+          {hasValidType && selectedSuperType === "Pokémon" && (
+            <SelectBox
+              options={optionsType}
+              value={selectedType}
+              onChange={setSelectedType}
+              isDisabled={isRolling}
+            />
+          )}
+        </div>
 
         {/* Roll Buttons */}
         <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
