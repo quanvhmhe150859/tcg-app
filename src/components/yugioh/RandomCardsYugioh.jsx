@@ -99,8 +99,8 @@ const YugiohRoll = () => {
     try {
       let result = [];
 
-      const raw = localStorage.getItem("rarityWeightsYugioh");
-      if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
+      const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
+      if (!raw) throw new Error("Không có dữ liệu allowedRaritiesYugiohWeights");
 
       const fullWeights = JSON.parse(raw);
 

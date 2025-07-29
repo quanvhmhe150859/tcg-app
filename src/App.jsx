@@ -6,6 +6,7 @@ import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
 import DarkModeToggle from "./components/common/DarkModeToggle";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
+import MusicToggleButton from "./components/common/MusicToggleButton";
 import "./App.css";
 
 function setFavicon(iconUrl) {
@@ -46,6 +47,7 @@ function App() {
         <DarkModeToggle />
         <FaviconUpdater />
         <ScrollToTopButton />
+        <MusicToggleButton />
         <Routes>
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCards />} />

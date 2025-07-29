@@ -7,7 +7,7 @@ import React, {
 import { allRaritiesYugioh } from "../../utils/constants";
 import { Tooltip } from "react-tooltip";
 
-const LOCAL_KEY = "rarityWeightsYugioh";
+const LOCAL_KEY = "allowedRaritiesYugiohWeights";
 const TOTAL_WEIGHT = 10000;
 
 const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {

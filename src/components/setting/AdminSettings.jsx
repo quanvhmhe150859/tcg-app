@@ -5,6 +5,7 @@ import ImportDataYugioh from "./ImportDataYugioh";
 import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
+import BgmPlayer from "./BgmPlayer";
 
 const AdminSettings = () => {
   const [tab, setTab] = useState("general");
@@ -71,6 +72,9 @@ const AdminSettings = () => {
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
+        
+        <BgmPlayer />
+
         <div className="section">
           <h3>Import Data</h3>
           <ImportDataPokemon />
