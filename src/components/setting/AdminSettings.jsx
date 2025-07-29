@@ -7,7 +7,7 @@ import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 
 const AdminSettings = () => {
-  const [tab, setTab] = useState("import");
+  const [tab, setTab] = useState("general");
 
   const yugiohTypes = useRef();
   const pokemonTypes = useRef();
@@ -38,10 +38,10 @@ const AdminSettings = () => {
       {/* Tab Buttons */}
       <div className="mb-6 flex gap-4 justify-center">
         <button
-          className={tab === "import" ? "selected-tab" : ""}
-          onClick={() => setTab("import")}
+          className={tab === "general" ? "selected-tab" : ""}
+          onClick={() => setTab("general")}
         >
-          Import Data
+          General
         </button>
         <button
           className={tab === "pokemon" ? "selected-tab" : ""}
@@ -70,7 +70,7 @@ const AdminSettings = () => {
       </div>
 
       {/* Import Data Tab */}
-      <div className={`tab-content ${tab === "import" ? "open" : "closed"}`}>
+      <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
         <div className="section">
           <h3>Import Data</h3>
           <ImportDataPokemon />
@@ -78,7 +78,7 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      {tab !== "import" && <button onClick={handleSave}>Save</button>}
+      {tab !== "general" && <button onClick={handleSave}>Save</button>}
     </div>
   );
 };

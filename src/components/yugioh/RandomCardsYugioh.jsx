@@ -6,9 +6,10 @@ import RollButtonGroup from "../common/RollButtonGroup";
 import { Tooltip } from "react-tooltip";
 import {
   getAllCardSets,
-  getCardsFromSet,
+  getCardsRandom,
   getCardsByRarities,
   rollWithWeight,
+  getRaritiesInPack,
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
 
@@ -98,21 +99,41 @@ const YugiohRoll = () => {
     try {
       let result = [];
 
-      if (!actualSet) {
-        // 🌐 Tất cả (sử dụng roll theo weight)
-        const raw = localStorage.getItem("rarityWeightsYugioh");
-        if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
+      const raw = localStorage.getItem("rarityWeightsYugioh");
+      if (!raw) throw new Error("Không có dữ liệu rarityWeightsYugioh");
 
-        const weights = JSON.parse(raw);
-        const rolledRarities = Array.from({ length: count }, () =>
-          rollWithWeight(weights)
+      const fullWeights = JSON.parse(raw);
+
+      let filteredWeights = fullWeights;
+
+      if (actualSet || selectedType) {
+        const raritiesInPack = await getRaritiesInPack(
+          actualSet || null,
+          selectedType || null
         );
 
-        result = await getCardsByRarities(rolledRarities, selectedType || null);
-      } else {
-        // 📦 Deck cụ thể
-        result = await getCardsFromSet(count, actualSet);
+        filteredWeights = Object.fromEntries(
+          Object.entries(fullWeights).filter(([rarity]) =>
+            raritiesInPack.includes(rarity)
+          )
+        );
+
+        if (Object.keys(filteredWeights).length === 0) {
+          throw new Error("Không tìm thấy rarity phù hợp với bộ lọc");
+        }
       }
+
+      // Roll rarity theo weight (dù là pack hay all)
+      const rolledRarities = Array.from({ length: count }, () =>
+        rollWithWeight(filteredWeights)
+      );
+
+      // Gọi API roll bài
+      result = await getCardsByRarities(
+        rolledRarities,
+        selectedType || null,
+        actualSet || null
+      );
 
       if (!result || result.length === 0) {
         setNoResultWarning(true);

@@ -8,26 +8,29 @@ export const getAllCardSets = async () => {
   }));
 };
 
-export const getCardsFromSet = async (limit, setName) => {
-  const res = await api.get("/api/cardsyugioh/cards", {
+export const getCardsRandom = async (limit, setName, cardType) => {
+  const res = await api.get("/api/cardsyugioh/roll-random", {
     params: {
       limit,
-      set: setName || undefined,
+      setName: setName || undefined,
+      cardType: cardType || undefined,
     },
   });
   return Array.isArray(res.data) ? res.data.slice(0, 10) : [];
 };
 
-export const getCardsByRarities = async (rarities, cardType = null) => {
+export const getCardsByRarities = async (rarities, cardType = null, setName = null) => {
   const query = [
     ...rarities.map((r) => `rarity=${encodeURIComponent(r)}`),
     ...(cardType ? [`cardType=${encodeURIComponent(cardType)}`] : []),
+    ...(setName ? [`setName=${encodeURIComponent(setName)}`] : []),
     `limit=${rarities.length}`,
   ].join("&");
 
   const res = await api.get(`/api/cardsyugioh/roll-fixed?${query}`);
   return Array.isArray(res.data) ? res.data.slice(0, 10) : [];
 };
+
 
 export function rollWithWeight(weightMap) {
   const entries = Object.entries(weightMap).map(([rarity, weight]) => ({
@@ -46,3 +49,18 @@ export function rollWithWeight(weightMap) {
 
   return entries[entries.length - 1]?.rarity ?? "Unknown";
 }
+
+export const getRaritiesInPack = async (setName = null, cardType = null) => {
+  const query = [];
+
+  if (setName) query.push(`setName=${encodeURIComponent(setName)}`);
+  if (cardType) query.push(`cardType=${encodeURIComponent(cardType)}`);
+
+  if (query.length === 0) {
+    throw new Error("Phải truyền ít nhất setName hoặc cardType");
+  }
+
+  const res = await api.get(`/api/cardsyugioh/rarities-in-pack?${query.join("&")}`);
+  return Array.isArray(res.data) ? res.data : [];
+};
+
