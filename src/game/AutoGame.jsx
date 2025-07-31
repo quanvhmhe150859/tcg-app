@@ -18,11 +18,11 @@ export default function TextStatGame() {
     startBattle,
     restartGame,
     applyUpgrade,
-    setAutoBattle
+    setAutoBattle,
   } = useGameEngine();
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 p-4 max-w-4xl mx-auto bg-gray-900 text-white rounded">
+    <div className="flex flex-col sm:flex-row gap-4 p-4 max-w-4xl mx-auto bg-gray-900 rounded">
       <div className="flex-1 flex flex-col gap-4">
         <PlayerStats stats={stats} />
 

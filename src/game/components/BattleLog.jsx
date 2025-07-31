@@ -1,6 +1,6 @@
 export default function BattleLog({ logs }) {
   return (
-    <div className="max-h-96 overflow-y-auto bg-gray-800 p-2 rounded text-sm">
+    <div className="max-h-96 overflow-y-auto bg-gray-800 p-2 rounded text-sm text-white">
       <h3 className="font-bold mb-1">Battle Log</h3>
       <ul className="space-y-2">
         {logs.map((turn, i) => (

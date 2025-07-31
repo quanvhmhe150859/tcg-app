@@ -33,17 +33,47 @@ export default function BgmPlayer() {
     setIsLoopOne,
   } = useBgm();
 
+  // Load danh sách bài hát
   useEffect(() => {
     fetch("/bgm/bgm.json")
       .then((res) => res.json())
       .then(setTracks);
   }, []);
 
+  // Cập nhật chế độ phát
   useEffect(() => {
     localStorage.setItem("bgm-mode", mode);
     setIsLoopOne(mode === PLAY_MODES.LOOP_ONE);
   }, [mode]);
 
+  // Khôi phục bài đã lưu hoặc chọn bài đầu
+  useEffect(() => {
+    if (tracks.length === 0) return;
+
+    const savedUrl = localStorage.getItem("bgm-current-url");
+    if (savedUrl) {
+      const name = savedUrl.replace("/bgm/", "");
+      const foundIndex = tracks.indexOf(name);
+      if (foundIndex !== -1) {
+        setIndex(foundIndex);
+        return;
+      }
+    }
+
+    setIndex(0);
+    setCurrentTrackUrl(`/bgm/${tracks[0]}`);
+  }, [tracks]);
+
+  // Cập nhật URL nếu index thay đổi
+  useEffect(() => {
+    if (!tracks[index]) return;
+    const url = `/bgm/${tracks[index]}`;
+    if (url !== currentTrackUrl) {
+      setCurrentTrackUrl(url);
+    }
+  }, [index, tracks]);
+
+  // Xử lý phát bài tiếp theo
   useEffect(() => {
     if (!audioRef.current) return;
     const audio = audioRef.current;
@@ -62,20 +92,7 @@ export default function BgmPlayer() {
     return () => audio.removeEventListener("ended", handler);
   }, [mode, index, tracks]);
 
-  useEffect(() => {
-    if (tracks[index]) {
-      setCurrentTrackUrl(`/bgm/${tracks[index]}`);
-    }
-  }, [index, tracks]);
-
-  const handleChangeMode = () => {
-    setMode((prev) => {
-      if (prev === PLAY_MODES.LOOP_ONE) return PLAY_MODES.LOOP_ALL;
-      if (prev === PLAY_MODES.LOOP_ALL) return PLAY_MODES.RANDOM;
-      return PLAY_MODES.LOOP_ONE;
-    });
-  };
-
+  // Cập nhật thời gian phát
   const handleTimeUpdate = () => {
     if (!audioRef.current) return;
     setCurrentTime(audioRef.current.currentTime);
@@ -87,6 +104,14 @@ export default function BgmPlayer() {
     audio.addEventListener("timeupdate", handleTimeUpdate);
     return () => audio.removeEventListener("timeupdate", handleTimeUpdate);
   }, []);
+
+  const handleChangeMode = () => {
+    setMode((prev) => {
+      if (prev === PLAY_MODES.LOOP_ONE) return PLAY_MODES.LOOP_ALL;
+      if (prev === PLAY_MODES.LOOP_ALL) return PLAY_MODES.RANDOM;
+      return PLAY_MODES.LOOP_ONE;
+    });
+  };
 
   const formatTime = (sec) => {
     if (!sec) return "0:00";

@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function DarkModeToggle() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
+    return localStorage.getItem("theme") === "dark";
   });
 
   useEffect(() => {
-    document.body.classList.toggle('dark-container', isDarkMode);
-    document.body.classList.toggle('light-container', !isDarkMode);
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    document.body.classList.toggle("dark-container", isDarkMode);
+    document.body.classList.toggle("light-container", !isDarkMode);
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
   }, [isDarkMode]);
 
   const toggleDarkMode = () => {
@@ -16,8 +16,13 @@ export default function DarkModeToggle() {
   };
 
   return (
-    <button className="floating-button" style={{ top: "15px" }} onClick={toggleDarkMode}>
-      {isDarkMode ? '☀️' : '🌙'}
+    <button
+      className="floating-button"
+      style={{ top: "15px" }}
+      onClick={toggleDarkMode}
+      title={isDarkMode ? "Light mode" : "Dark mode"}
+    >
+      {isDarkMode ? "🌙" : "☀️"}
     </button>
   );
 }
