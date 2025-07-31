@@ -58,6 +58,11 @@ const HamburgerMenu = () => {
                     🏠 Yu-Gi-Oh!
                   </Link>
                 </li>
+                <li>
+                  <Link to="/game" onClick={() => setOpen(false)}>
+                    🧩 Gamble Game
+                  </Link>
+                </li>
               </ul>
             </div>
           </motion.div>

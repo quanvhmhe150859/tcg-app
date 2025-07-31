@@ -9,6 +9,8 @@ import ScrollToTopButton from "./components/common/ScrollToTopButton";
 import MusicToggleButton from "./components/common/MusicToggleButton";
 import "./App.css";
 
+import AutoBouncingGame from "./game/AutoGame"
+
 function setFavicon(iconUrl) {
   const link =
     document.querySelector("link[rel*='icon']") || document.createElement("link");
@@ -52,6 +54,7 @@ function App() {
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCards />} />
           <Route path="/yugioh" element={<YugiohRoll />} />
+          <Route path="/game" element={<AutoBouncingGame />} />
         </Routes>
       </div>
     </Router>
