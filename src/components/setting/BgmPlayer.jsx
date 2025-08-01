@@ -1,106 +1,38 @@
 import { useEffect, useState } from "react";
 import { useBgm } from "../context/BgmContext";
 
-const PLAY_MODES = {
-  LOOP_ONE: "loop_one",
-  LOOP_ALL: "loop_all",
-  RANDOM: "random"
-};
-
 const getLabel = (mode) => {
   switch (mode) {
-    case PLAY_MODES.LOOP_ONE: return "🔂";
-    case PLAY_MODES.LOOP_ALL: return "🔁";
-    case PLAY_MODES.RANDOM: return "🔀";
+    case "loop_one": return "🔂";
+    case "loop_all": return "🔁";
+    case "random": return "🔀";
     default: return "";
   }
 };
 
 export default function BgmPlayer() {
-  const [tracks, setTracks] = useState([]);
-  const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState(() => localStorage.getItem("bgm-mode") || PLAY_MODES.LOOP_ALL);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-
   const {
     audioRef,
     volume,
     setVolume,
-    currentTrackUrl,
-    setCurrentTrackUrl,
-    isLoopOne,
-    setIsLoopOne,
+    tracks,
+    index,
+    setIndex,
+    mode,
+    setMode,
+    PLAY_MODES,
   } = useBgm();
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  // Load danh sách bài hát
+  // Update time and duration
   useEffect(() => {
-    fetch("/bgm/bgm.json")
-      .then((res) => res.json())
-      .then(setTracks);
-  }, []);
-
-  // Cập nhật chế độ phát
-  useEffect(() => {
-    localStorage.setItem("bgm-mode", mode);
-    setIsLoopOne(mode === PLAY_MODES.LOOP_ONE);
-  }, [mode]);
-
-  // Khôi phục bài đã lưu hoặc chọn bài đầu
-  useEffect(() => {
-    if (tracks.length === 0) return;
-
-    const savedUrl = localStorage.getItem("bgm-current-url");
-    if (savedUrl) {
-      const name = savedUrl.replace("/bgm/", "");
-      const foundIndex = tracks.indexOf(name);
-      if (foundIndex !== -1) {
-        setIndex(foundIndex);
-        return;
-      }
-    }
-
-    setIndex(0);
-    setCurrentTrackUrl(`/bgm/${tracks[0]}`);
-  }, [tracks]);
-
-  // Cập nhật URL nếu index thay đổi
-  useEffect(() => {
-    if (!tracks[index]) return;
-    const url = `/bgm/${tracks[index]}`;
-    if (url !== currentTrackUrl) {
-      setCurrentTrackUrl(url);
-    }
-  }, [index, tracks]);
-
-  // Xử lý phát bài tiếp theo
-  useEffect(() => {
-    if (!audioRef.current) return;
     const audio = audioRef.current;
-    const handler = () => {
-      if (mode === PLAY_MODES.RANDOM) {
-        let next;
-        do {
-          next = Math.floor(Math.random() * tracks.length);
-        } while (next === index && tracks.length > 1);
-        setIndex(next);
-      } else {
-        setIndex((i) => (i + 1) % tracks.length);
-      }
+    const handleTimeUpdate = () => {
+      if (!audioRef.current) return;
+      setCurrentTime(audioRef.current.currentTime);
+      setDuration(audioRef.current.duration || 0);
     };
-    audio.addEventListener("ended", handler);
-    return () => audio.removeEventListener("ended", handler);
-  }, [mode, index, tracks]);
-
-  // Cập nhật thời gian phát
-  const handleTimeUpdate = () => {
-    if (!audioRef.current) return;
-    setCurrentTime(audioRef.current.currentTime);
-    setDuration(audioRef.current.duration || 0);
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
     audio.addEventListener("timeupdate", handleTimeUpdate);
     return () => audio.removeEventListener("timeupdate", handleTimeUpdate);
   }, []);
@@ -111,6 +43,11 @@ export default function BgmPlayer() {
       if (prev === PLAY_MODES.LOOP_ALL) return PLAY_MODES.RANDOM;
       return PLAY_MODES.LOOP_ONE;
     });
+  };
+
+  const handleTrackSelect = (i) => {
+    console.log(`Selecting track index: ${i}, track: ${tracks[i]}`); // Debug log
+    setIndex(i);
   };
 
   const formatTime = (sec) => {
@@ -133,7 +70,7 @@ export default function BgmPlayer() {
               className={`px-3 py-2 cursor-pointer hover:bg-gray-100 hover:text-black transition ${
                 i === index ? "bg-blue-100 font-semibold text-black" : ""
               }`}
-              onClick={() => setIndex(i)}
+              onClick={() => handleTrackSelect(i)}
             >
               {i + 1}. {track}
             </li>

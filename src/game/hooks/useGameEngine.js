@@ -6,9 +6,12 @@ import {
   bossEffectOptions,
   getInitialStats,
   applyStatusEffects,
+  applyDamage,
+  didDodge,
 } from "../utils/gameUtils";
 import { useAutoBattle } from "./useAutoBattle";
 import { useBattleLogs } from "./useBattleLogs";
+import { startTurn, playerTurn, enemyTurn, checkDefeated } from "./battlePhases";
 
 export function useGameEngine() {
   const [level, setLevel] = useState(1);
@@ -70,133 +73,37 @@ export function useGameEngine() {
     addLog([{ text: `A new ${newEnemy.name} appears!`, type: "normal" }]);
   };
 
-  const applyDamage = (target, damage) => {
-    const result = { ...target };
-
-    const reductionRatio = 100 / (100 + target.armor); // nếu armor = 0 → full damage
-    const effectiveDamage = Math.ceil(damage * reductionRatio);
-
-    result.health -= effectiveDamage;
-    return result;
-  };
-
-  const didDodge = (dodgeChance) => Math.random() * 100 < dodgeChance;
-
   const startBattle = () => {
     if (!enemy && !pendingUpgrades) {
       setEnemy(generateEnemy(level));
       setBattleStarted(true);
-    } else if (!pendingUpgrades) {
-      const roundLog = [];
-
-      roundLog.push({
-        text: `Turn ${turn.current}`,
-        type: "normal",
-      });
-
-      let newEnemy = { ...enemy };
-      let newStats = { ...stats };
-
-      if (newStats.regen > 0) {
-        newStats.health += newStats.regen;
-        roundLog.push({
-          text: `Player regenerates ${newStats.regen} HP.`,
-          type: "heal",
-        });
-      }
-      let baseDmg = getRandomInt(stats.minAttack, stats.maxAttack);
-      const isCrit = Math.random() * 100 < stats.critChance;
-      if (isCrit) baseDmg *= 2;
-
-      const beforeHP = newEnemy.health;
-      newEnemy = applyDamage(newEnemy, baseDmg);
-      const actualDamage = beforeHP - newEnemy.health;
-
-      roundLog.push({
-        text: `Player hits ${newEnemy.name}: ${actualDamage}(${baseDmg}) damage.`,
-        type: isCrit ? "crit" : "normal",
-      });
-
-      const heal = Math.floor((baseDmg * stats.lifeSteal) / 100);
-      if (heal > 0) {
-        newStats.health += heal;
-        roundLog.push({
-          text: `Player heals for ${heal} HP with life steal.`,
-          type: "heal",
-        });
-      }
-
-      // Apply effects
-      const {
-        updatedTarget: updatedEnemy,
-        stunned,
-        log: effectLog,
-      } = applyStatusEffects(newStats.effects, newEnemy, turn.current);
-      newEnemy = updatedEnemy;
-      roundLog.push(...effectLog);
-
-      if (stunned) {
-        setStats(newStats);
-        setEnemy(newEnemy);
-        addLog(roundLog);
-        return;
-      }
-
-      if (newEnemy.health <= 0) {
-        turn.current = 1;
-
-        roundLog.push({
-          text: `${newEnemy.name} is defeated!`,
-          type: "defeat",
-        });
-        const nextLevel = level + 1;
-        setLevel(nextLevel);
-
-        if (enemy.isBoss) {
-          setPendingUpgrades(bossEffectOptions);
-        } else {
-          const shuffled = upgradeOptions
-            .filter((opt) => {
-              if (opt.key === "minAttack" && stats.minAttack >= stats.maxAttack)
-                return false;
-              return true;
-            })
-            .sort(() => 0.5 - Math.random());
-
-          setPendingUpgrades(shuffled.slice(0, 3));
-        }
-      } else {
-        turn.current += 1;
-
-        const enemyDmg = getRandomInt(enemy.minAttack, enemy.maxAttack);
-        if (didDodge(newStats.dodge)) {
-          roundLog.push({ text: "Player dodged the attack!", type: "heal" });
-        } else {
-          const beforeHP = newStats.health;
-          newStats = applyDamage(newStats, enemyDmg);
-          const actualDamage = beforeHP - newStats.health;
-
-          roundLog.push({
-            text: `${enemy.name} hits player: ${actualDamage}(${enemyDmg}) damage.`,
-            type: "normal",
-          });
-        }
-        if (newStats.health <= 0) {
-          turn.current = 1;
-
-          roundLog.push({
-            text: "Player is defeated. Game Over.",
-            type: "defeat",
-          });
-          setGameOver(true);
-          setAutoBattle(false);
-        }
-      }
-
-      setStats(newStats);
-      setEnemy(newEnemy);
-      addLog(roundLog);
+      return;
     }
+    if (pendingUpgrades) return;
+
+    const roundLog = [];
+    let newEnemy = { ...enemy };
+    let newStats = startTurn(stats, turn, roundLog);
+
+    const { newStats: updatedStats, newEnemy: updatedEnemy } = playerTurn(newStats, newEnemy, getRandomInt, applyDamage, roundLog);
+    newStats = updatedStats;
+    newEnemy = updatedEnemy;
+
+    const { newStats: finalStats, newEnemy: finalEnemy, stunned } = enemyTurn(newStats, newEnemy, turn, getRandomInt, applyDamage, didDodge, roundLog);
+    newStats = finalStats;
+    newEnemy = finalEnemy;
+
+    if (!stunned) {
+      turn.current += 1;
+    }
+
+    // Update state before checking defeat to reflect final health values
+    setStats(newStats);
+    setEnemy(newEnemy);
+
+    checkDefeated(newStats, newEnemy, level, turn, setLevel, setPendingUpgrades, setGameOver, setAutoBattle, upgradeOptions, bossEffectOptions, roundLog);
+
+    addLog(roundLog);
   };
 
   return {

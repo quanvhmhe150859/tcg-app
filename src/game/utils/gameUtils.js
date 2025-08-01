@@ -36,7 +36,7 @@ export const generateEnemy = (level) => {
   return {
     name: `Enemy Lv.${level}`,
     isBoss: false,
-    health: random(80, 120) + Math.floor(scale * 5),
+    health: random(80, 120) + Math.floor(scale * 3),
     armor: random(Math.floor(level / 2), level),
     minAttack: random(3, 7) + Math.floor(scale * 0.3),
     maxAttack: random(8, 15) + Math.floor(scale * 0.7),
@@ -44,7 +44,7 @@ export const generateEnemy = (level) => {
 };
 
 const upgradeConfig = {
-  health: { name: "Health", value: 500 },
+  health: { name: "Health", value: 1000 },
   regen: { name: "Regen", value: 5 },
   minAttack: { name: "Min Attack", value: 5 },
   maxAttack: { name: "Max Attack", value: 5 },
@@ -135,3 +135,13 @@ export function applyStatusEffects(effects, target, turn = 1) {
 
   return { updatedTarget: target, stunned, log };
 }
+
+export const applyDamage = (target, damage) => {
+  const result = { ...target };
+  const reductionRatio = 100 / (100 + target.armor);
+  const effectiveDamage = Math.ceil(damage * reductionRatio);
+  result.health -= effectiveDamage;
+  return result;
+};
+
+export const didDodge = (dodgeChance) => Math.random() * 100 < dodgeChance;

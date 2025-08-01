@@ -1,22 +1,88 @@
-import {
-  createContext,
-  useContext,
-  useRef,
-  useState,
-  useEffect
-} from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
 
 const BgmContext = createContext(null);
 
+const PLAY_MODES = {
+  LOOP_ONE: "loop_one",
+  LOOP_ALL: "loop_all",
+  RANDOM: "random",
+};
+
 export const BgmProvider = ({ children }) => {
   const audioRef = useRef(new Audio());
-
   const [enabled, setEnabled] = useState(() => localStorage.getItem("bgm-enabled") === "true");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("bgm-volume")) || 0.8);
   const [currentTrackUrl, setCurrentTrackUrl] = useState(() => localStorage.getItem("bgm-current-url") || null);
   const [isLoopOne, setIsLoopOne] = useState(false);
+  const [tracks, setTracks] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [mode, setMode] = useState(() => localStorage.getItem("bgm-mode") || PLAY_MODES.LOOP_ALL);
 
-  // Cập nhật audio src khi có bài hát
+  // Load tracks from bgm.json
+  useEffect(() => {
+    fetch("/bgm/bgm.json")
+      .then((res) => res.json())
+      .then(setTracks);
+  }, []);
+
+  // Restore saved track or select first track
+  useEffect(() => {
+    if (tracks.length === 0) return;
+
+    const savedUrl = localStorage.getItem("bgm-current-url");
+    if (savedUrl) {
+      const name = savedUrl.replace("/bgm/", "");
+      const foundIndex = tracks.indexOf(name);
+      if (foundIndex !== -1) {
+        setIndex(foundIndex);
+        setCurrentTrackUrl(savedUrl);
+        return;
+      }
+    }
+
+    setIndex(0);
+    if (tracks[0]) {
+      setCurrentTrackUrl(`/bgm/${tracks[0]}`);
+    }
+  }, [tracks]);
+
+  // Update currentTrackUrl when index changes (e.g., manual track selection)
+  useEffect(() => {
+    if (!tracks[index] || tracks.length === 0) return;
+    const newUrl = `/bgm/${tracks[index]}`;
+    if (newUrl !== currentTrackUrl) {
+      setCurrentTrackUrl(newUrl);
+    }
+  }, [index, tracks]);
+
+  // Update mode and persist to localStorage
+  useEffect(() => {
+    localStorage.setItem("bgm-mode", mode);
+    setIsLoopOne(mode === PLAY_MODES.LOOP_ONE);
+  }, [mode]);
+
+  // Handle track advancement on end
+  useEffect(() => {
+    if (!audioRef.current || tracks.length === 0) return;
+    const audio = audioRef.current;
+    const handler = () => {
+      if (mode === PLAY_MODES.RANDOM) {
+        let next;
+        do {
+          next = Math.floor(Math.random() * tracks.length);
+        } while (next === index && tracks.length > 1);
+        setIndex(next);
+      } else if (mode === PLAY_MODES.LOOP_ALL) {
+        const next = (index + 1) % tracks.length;
+        setIndex(next);
+      }
+      // LOOP_ONE is handled by audio.loop
+    };
+    audio.addEventListener("ended", handler);
+    return () => audio.removeEventListener("ended", handler);
+  }, [mode, index, tracks]);
+
+  // Update audio src when track changes
   useEffect(() => {
     const audio = audioRef.current;
     if (currentTrackUrl) {
@@ -27,22 +93,21 @@ export const BgmProvider = ({ children }) => {
     }
   }, [currentTrackUrl]);
 
-  // Ghi nhớ bài hiện tại
+  // Persist current track URL
   useEffect(() => {
     if (currentTrackUrl) {
       localStorage.setItem("bgm-current-url", currentTrackUrl);
     }
   }, [currentTrackUrl]);
 
-  // Cập nhật loop mode
+  // Update loop mode
   useEffect(() => {
     audioRef.current.loop = isLoopOne;
   }, [isLoopOne]);
 
-  // Cập nhật volume và xử lý mute nếu = 0
+  // Update volume and handle mute
   useEffect(() => {
     localStorage.setItem("bgm-volume", volume.toString());
-
     const audio = audioRef.current;
     if (volume <= 0.001) {
       audio.pause();
@@ -52,9 +117,9 @@ export const BgmProvider = ({ children }) => {
         audio.play().catch(() => {});
       }
     }
-  }, [volume]);
+  }, [volume, enabled, currentTrackUrl]);
 
-  // Fade in/out khi bật tắt nhạc
+  // Fade in/out when enabling/disabling
   useEffect(() => {
     const audio = audioRef.current;
     let fadeInterval;
@@ -74,23 +139,29 @@ export const BgmProvider = ({ children }) => {
     };
 
     if (enabled) {
-      audio.volume = 0;
       if (currentTrackUrl && volume > 0) {
-        audio.play().catch(() => {});
+        if (audio.paused && audio.currentTime > 0) {
+          // Resume from current position
+          fadeTo(volume);
+          audio.play().catch(() => {});
+        } else {
+          // Start from beginning if no progress
+          audio.volume = 0;
+          audio.play().catch(() => {});
+          fadeTo(volume);
+        }
       }
-      fadeTo(volume);
     } else {
       fadeTo(0);
     }
 
     localStorage.setItem("bgm-enabled", enabled.toString());
     return () => clearInterval(fadeInterval);
-  }, [enabled]);
+  }, [enabled, volume, currentTrackUrl]);
 
-  // Tắt nhạc khi chuyển tab
+  // Pause when tab is hidden
   useEffect(() => {
     const audio = audioRef.current;
-
     const handleVisibility = () => {
       if (document.hidden) {
         audio.pause();
@@ -105,10 +176,9 @@ export const BgmProvider = ({ children }) => {
     };
   }, [enabled, volume, currentTrackUrl]);
 
-  // Thử autoplay khi load lần đầu
+  // Try autoplay on first load
   useEffect(() => {
     const audio = audioRef.current;
-
     const tryAutoplay = () => {
       if (!audio || !enabled || !currentTrackUrl || volume === 0) return;
       if (!audio.paused || audio.currentTime > 0) return;
@@ -136,6 +206,13 @@ export const BgmProvider = ({ children }) => {
         setCurrentTrackUrl,
         isLoopOne,
         setIsLoopOne,
+        tracks,
+        setTracks,
+        index,
+        setIndex,
+        mode,
+        setMode,
+        PLAY_MODES,
       }}
     >
       {children}
