@@ -23,6 +23,8 @@ export function useGameEngine() {
   const [pendingUpgrades, setPendingUpgrades] = useState(null);
   const [autoBattle, setAutoBattle] = useState(false);
 
+  const turn = useRef(1);
+
   useAutoBattle(
     autoBattle && !gameOver && !pendingUpgrades,
     [logs],
@@ -70,8 +72,10 @@ export function useGameEngine() {
 
   const applyDamage = (target, damage) => {
     const result = { ...target };
-    if (target.armor >= damage) return result;
-    const effectiveDamage = damage - target.armor;
+
+    const reductionRatio = 100 / (100 + target.armor); // nếu armor = 0 → full damage
+    const effectiveDamage = Math.ceil(damage * reductionRatio);
+
     result.health -= effectiveDamage;
     return result;
   };
@@ -84,6 +88,12 @@ export function useGameEngine() {
       setBattleStarted(true);
     } else if (!pendingUpgrades) {
       const roundLog = [];
+
+      roundLog.push({
+        text: `Turn ${turn.current}`,
+        type: "normal",
+      });
+
       let newEnemy = { ...enemy };
       let newStats = { ...stats };
 
@@ -94,36 +104,26 @@ export function useGameEngine() {
           type: "heal",
         });
       }
-      let playerDmg = getRandomInt(stats.minAttack, stats.maxAttack);
+      let baseDmg = getRandomInt(stats.minAttack, stats.maxAttack);
       const isCrit = Math.random() * 100 < stats.critChance;
-      if (isCrit) {
-        playerDmg *= 2;
-        roundLog.push({
-          text: `Player lands a CRITICAL hit for ${playerDmg} damage!`,
-          type: "crit",
-        });
-      } else {
-        roundLog.push({
-          text: `Player hits ${newEnemy.name} for ${playerDmg} damage.`,
-          type: "normal",
-        });
-      }
+      if (isCrit) baseDmg *= 2;
 
-      if (newEnemy.armor >= playerDmg) {
+      const beforeHP = newEnemy.health;
+      newEnemy = applyDamage(newEnemy, baseDmg);
+      const actualDamage = beforeHP - newEnemy.health;
+
+      roundLog.push({
+        text: `Player hits ${newEnemy.name}: ${actualDamage}(${baseDmg}) damage.`,
+        type: isCrit ? "crit" : "normal",
+      });
+
+      const heal = Math.floor((baseDmg * stats.lifeSteal) / 100);
+      if (heal > 0) {
+        newStats.health += heal;
         roundLog.push({
-          text: `${newEnemy.name}'s armor blocked the damage!`,
-          type: "normal",
+          text: `Player heals for ${heal} HP with life steal.`,
+          type: "heal",
         });
-      } else {
-        newEnemy = applyDamage(newEnemy, playerDmg);
-        const heal = Math.floor((playerDmg * stats.lifeSteal) / 100);
-        if (heal > 0) {
-          newStats.health += heal;
-          roundLog.push({
-            text: `Player heals for ${heal} HP with life steal.`,
-            type: "heal",
-          });
-        }
       }
 
       // Apply effects
@@ -131,7 +131,7 @@ export function useGameEngine() {
         updatedTarget: updatedEnemy,
         stunned,
         log: effectLog,
-      } = applyStatusEffects(newStats.effects, newEnemy);
+      } = applyStatusEffects(newStats.effects, newEnemy, turn.current);
       newEnemy = updatedEnemy;
       roundLog.push(...effectLog);
 
@@ -143,6 +143,8 @@ export function useGameEngine() {
       }
 
       if (newEnemy.health <= 0) {
+        turn.current = 1;
+
         roundLog.push({
           text: `${newEnemy.name} is defeated!`,
           type: "defeat",
@@ -164,22 +166,24 @@ export function useGameEngine() {
           setPendingUpgrades(shuffled.slice(0, 3));
         }
       } else {
+        turn.current += 1;
+
         const enemyDmg = getRandomInt(enemy.minAttack, enemy.maxAttack);
         if (didDodge(newStats.dodge)) {
           roundLog.push({ text: "Player dodged the attack!", type: "heal" });
-        } else if (newStats.armor >= enemyDmg) {
-          roundLog.push({
-            text: `Player's armor blocked the damage!`,
-            type: "normal",
-          });
         } else {
+          const beforeHP = newStats.health;
           newStats = applyDamage(newStats, enemyDmg);
+          const actualDamage = beforeHP - newStats.health;
+
           roundLog.push({
-            text: `${enemy.name} hits player for ${enemyDmg} damage.`,
+            text: `${enemy.name} hits player: ${actualDamage}(${enemyDmg}) damage.`,
             type: "normal",
           });
         }
         if (newStats.health <= 0) {
+          turn.current = 1;
+
           roundLog.push({
             text: "Player is defeated. Game Over.",
             type: "defeat",
