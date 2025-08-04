@@ -1,5 +1,6 @@
 import { applyStatusEffects } from "../utils/gameUtils";
 
+// Phase 1: Start Turn
 export const startTurn = (stats, turn, roundLog) => {
   roundLog.push({ text: `Turn ${turn.current}`, type: "normal" });
   let newStats = { ...stats };
@@ -10,7 +11,8 @@ export const startTurn = (stats, turn, roundLog) => {
   return newStats;
 };
 
-export const playerTurn = (stats, enemy, getRandomInt, applyDamage, roundLog) => {
+// Phase 2: Player Turn
+export const playerTurn = (stats, enemy, getRandomInt, applyDamage, roundLog, checkDefeatedPhase, defeatArgs) => {
   let newStats = { ...stats };
   let newEnemy = { ...enemy };
   let baseDmg = getRandomInt(stats.minAttack, stats.maxAttack);
@@ -28,17 +30,21 @@ export const playerTurn = (stats, enemy, getRandomInt, applyDamage, roundLog) =>
     newStats.health += heal;
     roundLog.push({ text: `Player heals for ${heal} HP with life steal.`, type: "heal" });
   }
-  return { newStats, newEnemy };
+
+  // ✅ Gọi check defeated sau player attack
+  const defeatedResult = checkDefeatedPhase(newStats, newEnemy, roundLog, defeatArgs);
+  return { newStats, newEnemy, defeatedResult };
 };
 
-export const enemyTurn = (stats, enemy, turn, getRandomInt, applyDamage, didDodge, roundLog) => {
+// Phase 3: Enemy Turn
+export const enemyTurn = (stats, enemy, turn, getRandomInt, applyDamage, didDodge, roundLog, checkDefeatedPhase, defeatArgs) => {
   let newStats = { ...stats };
   let newEnemy = { ...enemy };
   const { updatedTarget: updatedEnemy, stunned, log: effectLog } = applyStatusEffects(stats.effects, newEnemy, turn.current);
   newEnemy = updatedEnemy;
   roundLog.push(...effectLog);
   if (stunned) {
-    return { newStats, newEnemy, stunned: true };
+    return { newStats, newEnemy, stunned: true, defeatedResult: null };
   }
   const enemyDmg = getRandomInt(newEnemy.minAttack, newEnemy.maxAttack);
   if (didDodge(newStats.dodge)) {
@@ -52,36 +58,68 @@ export const enemyTurn = (stats, enemy, turn, getRandomInt, applyDamage, didDodg
       type: "normal",
     });
   }
-  return { newStats, newEnemy, stunned: false };
+
+  // ✅ Gọi check defeated sau enemy attack
+  const defeatedResult = checkDefeatedPhase(newStats, newEnemy, roundLog, defeatArgs);
+  return { newStats, newEnemy, stunned: false, defeatedResult };
 };
 
-export const checkDefeated = (stats, enemy, level, turn, setLevel, setPendingUpgrades, setGameOver, setAutoBattle, upgradeOptions, bossEffectOptions, roundLog) => {
+// Phase 4: Check Defeated (tách riêng)
+export const checkDefeatedPhase = (
+  stats,
+  enemy,
+  roundLog,
+  {
+    level,
+    turn,
+    setLevel,
+    setPendingUpgrades,
+    setGameOver,
+    setAutoBattle,
+    upgradeOptions,
+    bossEffectOptions
+  }
+) => {
   if (enemy.health <= 0) {
     turn.current = 1;
     roundLog.push({ text: `${enemy.name} is defeated!`, type: "defeat" });
+
+    const goldGained = enemy.goldReward || 0;
+    stats.gold = (stats.gold || 0) + goldGained;
+    roundLog.push({
+      text: `You gained ${goldGained} 💰.`,
+      type: "gold"
+    });
+
     const nextLevel = level + 1;
     setLevel(nextLevel);
-    if (enemy.isBoss) {
-      const shuffledBossEffects = bossEffectOptions
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
-      setPendingUpgrades(shuffledBossEffects);
-    } else {
-      const shuffled = upgradeOptions
-        .filter((opt) => {
-          if (opt.key === "minAttack" && stats.minAttack >= stats.maxAttack) return false;
-          return true;
-        })
-        .sort(() => 0.5 - Math.random());
-      setPendingUpgrades(shuffled.slice(0, 3));
-    }
+
+    const upgrades = enemy.isBoss
+      ? bossEffectOptions.sort(() => 0.5 - Math.random()).slice(0, 3)
+      : upgradeOptions
+          .filter((opt) => {
+            if (opt.key === "minAttack" && stats.minAttack >= stats.maxAttack) return false;
+            return true;
+          })
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3);
+
+    setPendingUpgrades(upgrades);
     return { defeated: "enemy" };
-  } else if (stats.health <= 0) {
+  }
+
+  if (stats.health <= 0) {
     turn.current = 1;
     roundLog.push({ text: "Player is defeated. Game Over.", type: "defeat" });
     setGameOver(true);
     setAutoBattle(false);
     return { defeated: "player" };
   }
+
   return { defeated: null };
+};
+
+// Phase 5: End Turn (chưa làm gì cả)
+export const endTurnPhase = () => {
+  // để trống, có thể dùng sau để xử lý relics "end of turn"
 };

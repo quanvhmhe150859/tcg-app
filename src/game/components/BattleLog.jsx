@@ -1,3 +1,5 @@
+import { getLogColor } from "../utils/logUtils";
+
 export default function BattleLog({ logs }) {
   return (
     <div className="max-h-96 overflow-y-auto bg-gray-800 p-2 rounded text-sm text-white">
@@ -8,15 +10,7 @@ export default function BattleLog({ logs }) {
             {turn.map((log, j) => (
               <div
                 key={j}
-                className={
-                  log.type === "heal"
-                    ? "text-green-400"
-                    : log.type === "crit"
-                    ? "text-yellow-300"
-                    : log.type === "defeat"
-                    ? "text-red-400"
-                    : "text-gray-300"
-                }
+                className={getLogColor(log.type)}
               >
                 • {log.text}
               </div>

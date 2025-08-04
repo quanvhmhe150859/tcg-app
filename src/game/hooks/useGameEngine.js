@@ -11,7 +11,13 @@ import {
 } from "../utils/gameUtils";
 import { useAutoBattle } from "./useAutoBattle";
 import { useBattleLogs } from "./useBattleLogs";
-import { startTurn, playerTurn, enemyTurn, checkDefeated } from "./battlePhases";
+import {
+  startTurn,
+  playerTurn,
+  enemyTurn,
+  endTurnPhase,
+  checkDefeatedPhase,
+} from "./battlePhases";
 
 export function useGameEngine() {
   const [level, setLevel] = useState(1);
@@ -85,24 +91,68 @@ export function useGameEngine() {
     let newEnemy = { ...enemy };
     let newStats = startTurn(stats, turn, roundLog);
 
-    const { newStats: updatedStats, newEnemy: updatedEnemy } = playerTurn(newStats, newEnemy, getRandomInt, applyDamage, roundLog);
-    newStats = updatedStats;
-    newEnemy = updatedEnemy;
+    const defeatArgs = {
+      level,
+      turn,
+      setLevel,
+      setPendingUpgrades,
+      setGameOver,
+      setAutoBattle,
+      upgradeOptions,
+      bossEffectOptions,
+    };
 
-    const { newStats: finalStats, newEnemy: finalEnemy, stunned } = enemyTurn(newStats, newEnemy, turn, getRandomInt, applyDamage, didDodge, roundLog);
-    newStats = finalStats;
-    newEnemy = finalEnemy;
+    const playerResult = playerTurn(
+      newStats,
+      newEnemy,
+      getRandomInt,
+      applyDamage,
+      roundLog,
+      checkDefeatedPhase,
+      defeatArgs
+    );
+    newStats = playerResult.newStats;
+    newEnemy = playerResult.newEnemy;
 
-    if (!stunned) {
+    // Nếu enemy chết, dừng tại đây
+    if (playerResult.defeatedResult?.defeated === "enemy") {
+      setStats(newStats);
+      setEnemy(newEnemy);
+      addLog(roundLog);
+      return;
+    }
+
+    const enemyResult = enemyTurn(
+      newStats,
+      newEnemy,
+      turn,
+      getRandomInt,
+      applyDamage,
+      didDodge,
+      roundLog,
+      checkDefeatedPhase,
+      defeatArgs
+    );
+    newStats = enemyResult.newStats;
+    newEnemy = enemyResult.newEnemy;
+
+    if (!enemyResult.stunned) {
       turn.current += 1;
     }
 
-    // Update state before checking defeat to reflect final health values
+    // Nếu player chết, dừng tại đây
+    if (enemyResult.defeatedResult?.defeated === "player") {
+      setStats(newStats);
+      setEnemy(newEnemy);
+      addLog(roundLog);
+      return;
+    }
+
+    // End turn phase (chưa làm gì)
+    endTurnPhase();
+
     setStats(newStats);
     setEnemy(newEnemy);
-
-    checkDefeated(newStats, newEnemy, level, turn, setLevel, setPendingUpgrades, setGameOver, setAutoBattle, upgradeOptions, bossEffectOptions, roundLog);
-
     addLog(roundLog);
   };
 

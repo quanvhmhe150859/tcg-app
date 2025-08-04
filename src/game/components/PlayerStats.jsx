@@ -34,6 +34,10 @@ export default function PlayerStats({ stats }) {
         <span>Life Steal:</span>
         <span>{stats.lifeSteal}%</span>
       </div>
+      <div className="flex justify-between text-yellow-300">
+        <span>Gold:</span>
+        <span>{stats.gold}</span>
+      </div>
       {Object.entries(stats.effects).some(([_, v]) => v > 0) && (
         <div>
           Effects:{" "}

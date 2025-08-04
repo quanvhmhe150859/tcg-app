@@ -3,43 +3,52 @@ export function getRandomInt(min, max) {
 }
 
 export const getInitialStats = () => ({
-  health: 500,
+  health: 1000,
   regen: 5,
   armor: 5,
   minAttack: 5,
   maxAttack: 15,
   lifeSteal: 5,
-  critChance: 7,
-  dodge: 7,
+  critChance: 5,
+  dodge: 5,
+  gold: 0,
   effects: { burn: 0, poison: 0, stun: 0 },
 });
 
 export const generateEnemy = (level) => {
   const isBoss = level % 10 === 0;
-
-  // Dùng hàm mũ nhẹ cho scaling
-  const scale = Math.pow(level, 1.25); // có thể chỉnh thành 1.2 - 1.4 tuỳ độ khó
+  const scale = Math.pow(level, 1.4);
   const random = (min, max) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-  if (isBoss) {
-    return {
-      name: `Boss Lv.${level}`,
-      isBoss: true,
-      health: random(200, 250) + Math.floor(scale * 10),
-      armor: random(level, level * 2),
-      minAttack: random(10, 15) + Math.floor(scale * 0.5),
-      maxAttack: random(20, 30) + Math.floor(scale * 1),
-    };
-  }
+  const name = `${isBoss ? "Boss" : "Enemy"} Lv.${level}`;
+
+  const baseHealth = isBoss ? random(200, 250) : random(80, 120);
+  const health = isBoss
+    ? baseHealth + Math.floor(scale * 10)
+    : baseHealth + Math.floor(scale * 3);
+
+  const armor = isBoss
+    ? random(level, level * 2)
+    : random(Math.floor(level / 2), level);
+
+  const baseMinAtk = isBoss ? random(10, 15) : random(3, 7);
+  const minAttack = baseMinAtk + Math.floor(scale * (isBoss ? 0.5 : 0.3));
+
+  const baseMaxAtk = isBoss ? random(20, 30) : random(8, 15);
+  const maxAttack = baseMaxAtk + Math.floor(scale * (isBoss ? 1 : 0.7));
+
+  const baseGold = isBoss ? random(40, 60) : random(10, 20);
+  const goldReward = baseGold + Math.floor(scale * (isBoss ? 2 : 1));
 
   return {
-    name: `Enemy Lv.${level}`,
-    isBoss: false,
-    health: random(80, 120) + Math.floor(scale * 3),
-    armor: random(Math.floor(level / 2), level),
-    minAttack: random(3, 7) + Math.floor(scale * 0.3),
-    maxAttack: random(8, 15) + Math.floor(scale * 0.7),
+    name,
+    isBoss,
+    health,
+    armor,
+    minAttack,
+    maxAttack,
+    goldReward,
   };
 };
 
@@ -48,9 +57,9 @@ const upgradeConfig = {
   regen: { name: "Regen", value: 5 },
   minAttack: { name: "Min Attack", value: 5 },
   maxAttack: { name: "Max Attack", value: 5 },
-  armor: { name: "Armor", value: 3 },
-  dodge: { name: "Dodge", value: 3 },
-  critChance: { name: "Crit Chance", value: 3 },
+  armor: { name: "Armor", value: 5 },
+  dodge: { name: "Dodge", value: 5 },
+  critChance: { name: "Crit Chance", value: 5 },
   lifeSteal: { name: "Life Steal", value: 5 },
 };
 
