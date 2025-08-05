@@ -5,7 +5,6 @@ import {
   upgradeOptions,
   bossEffectOptions,
   getInitialStats,
-  applyStatusEffects,
   applyDamage,
   didDodge,
 } from "../utils/gameUtils";
@@ -18,6 +17,7 @@ import {
   endTurnPhase,
   checkDefeatedPhase,
 } from "./battlePhases";
+import { generateShopChoices } from "./shopItems";
 
 export function useGameEngine() {
   const [level, setLevel] = useState(1);
@@ -32,10 +32,16 @@ export function useGameEngine() {
   const [pendingUpgrades, setPendingUpgrades] = useState(null);
   const [autoBattle, setAutoBattle] = useState(false);
 
+  const [shopPending, setShopPending] = useState(false);
+  const [shopSelection, setShopSelection] = useState([]);
+  const [shopLevelShown, setShopLevelShown] = useState(null);
+  const [boughtItems, setBoughtItems] = useState([]);
+  const [rerollCost, setRerollCost] = useState(10);
+
   const turn = useRef(1);
 
   useAutoBattle(
-    autoBattle && !gameOver && !pendingUpgrades,
+    autoBattle && !gameOver && !pendingUpgrades && !shopPending,
     [logs],
     () => startBattle(),
     125
@@ -53,6 +59,10 @@ export function useGameEngine() {
     setGameOver(false);
     setPendingUpgrades(null);
     setAutoBattle(false);
+    setBoughtItems([]);
+    setShopPending(false);
+    setShopSelection([]);
+    setShopLevelShown(null);
   };
 
   const applyUpgrade = (upgrade) => {
@@ -74,18 +84,71 @@ export function useGameEngine() {
       }));
     }
     setPendingUpgrades(null);
+    startNextBattle();
+  };
+
+  const handleReroll = () => {
+    if (stats.gold >= rerollCost) {
+      // Trừ tiền
+      setStats((prev) => ({
+        ...prev,
+        gold: prev.gold - rerollCost,
+      }));
+
+      // Tăng giá reroll cho lần sau
+      setRerollCost((prev) => Math.floor(prev * 1.5));
+      // Xóa các item đã mua
+      setBoughtItems([]);
+      // Reroll shop mới
+      const newShop = generateShopChoices(level)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+      setShopSelection(newShop);
+    }
+  };
+
+  const handleExitShop = () => {
+    setShopPending(false);
+    setBoughtItems([]);
+    setRerollCost(10 + Math.floor(level * 1.5)); // Reset reroll cost
+    startNextBattle();
+  };
+
+  const startNextBattle = () => {
     const newEnemy = generateEnemy(level);
     setEnemy(newEnemy);
+    setBattleStarted(true);
     addLog([{ text: `A new ${newEnemy.name} appears!`, type: "normal" }]);
   };
 
+  const handleBuy = (item) => {
+    if (stats.gold < item.cost) return;
+    if (boughtItems.includes(item.label)) return; // ✅ đã mua rồi
+
+    setStats((prev) => ({
+      ...prev,
+      gold: prev.gold - item.cost,
+      [item.key]: (prev[item.key] || 0) + item.value,
+    }));
+
+    setBoughtItems((prev) => [...prev, item.label]); // ✅ đánh dấu đã mua
+
+    addLog([
+      {
+        text: `You bought ${item.label} for ${item.cost} gold.`,
+        type: "upgrade",
+      },
+    ]);
+  };
+
   const startBattle = () => {
-    if (!enemy && !pendingUpgrades) {
+    if (pendingUpgrades || shopPending) return;
+
+    if (!enemy) {
       setEnemy(generateEnemy(level));
       setBattleStarted(true);
       return;
     }
-    if (pendingUpgrades) return;
 
     const roundLog = [];
     let newEnemy = { ...enemy };
@@ -96,10 +159,16 @@ export function useGameEngine() {
       turn,
       setLevel,
       setPendingUpgrades,
+      setShopPending,
+      setShopSelection,
+      setShopLevelShown,
       setGameOver,
       setAutoBattle,
       upgradeOptions,
       bossEffectOptions,
+      shopLevelShown,
+      generateShopChoices,
+      setRerollCost,
     };
 
     const playerResult = playerTurn(
@@ -169,5 +238,12 @@ export function useGameEngine() {
     restartGame,
     applyUpgrade,
     setAutoBattle,
+    shopPending,
+    shopSelection,
+    handleBuy,
+    boughtItems,
+    handleExitShop,
+    handleReroll,
+    rerollCost,
   };
 }

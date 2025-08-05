@@ -6,13 +6,24 @@ export const startTurn = (stats, turn, roundLog) => {
   let newStats = { ...stats };
   if (newStats.regen > 0) {
     newStats.health += newStats.regen;
-    roundLog.push({ text: `Player regenerates ${newStats.regen} HP.`, type: "heal" });
+    roundLog.push({
+      text: `Player regenerates ${newStats.regen} HP.`,
+      type: "heal",
+    });
   }
   return newStats;
 };
 
 // Phase 2: Player Turn
-export const playerTurn = (stats, enemy, getRandomInt, applyDamage, roundLog, checkDefeatedPhase, defeatArgs) => {
+export const playerTurn = (
+  stats,
+  enemy,
+  getRandomInt,
+  applyDamage,
+  roundLog,
+  checkDefeatedPhase,
+  defeatArgs
+) => {
   let newStats = { ...stats };
   let newEnemy = { ...enemy };
   let baseDmg = getRandomInt(stats.minAttack, stats.maxAttack);
@@ -28,19 +39,41 @@ export const playerTurn = (stats, enemy, getRandomInt, applyDamage, roundLog, ch
   const heal = Math.floor((actualDamage * stats.lifeSteal) / 100);
   if (heal > 0) {
     newStats.health += heal;
-    roundLog.push({ text: `Player heals for ${heal} HP with life steal.`, type: "heal" });
+    roundLog.push({
+      text: `Player heals for ${heal} HP with life steal.`,
+      type: "heal",
+    });
   }
 
   // ✅ Gọi check defeated sau player attack
-  const defeatedResult = checkDefeatedPhase(newStats, newEnemy, roundLog, defeatArgs);
+  const defeatedResult = checkDefeatedPhase(
+    newStats,
+    newEnemy,
+    roundLog,
+    defeatArgs
+  );
   return { newStats, newEnemy, defeatedResult };
 };
 
 // Phase 3: Enemy Turn
-export const enemyTurn = (stats, enemy, turn, getRandomInt, applyDamage, didDodge, roundLog, checkDefeatedPhase, defeatArgs) => {
+export const enemyTurn = (
+  stats,
+  enemy,
+  turn,
+  getRandomInt,
+  applyDamage,
+  didDodge,
+  roundLog,
+  checkDefeatedPhase,
+  defeatArgs
+) => {
   let newStats = { ...stats };
   let newEnemy = { ...enemy };
-  const { updatedTarget: updatedEnemy, stunned, log: effectLog } = applyStatusEffects(stats.effects, newEnemy, turn.current);
+  const {
+    updatedTarget: updatedEnemy,
+    stunned,
+    log: effectLog,
+  } = applyStatusEffects(stats.effects, newEnemy, turn.current);
   newEnemy = updatedEnemy;
   roundLog.push(...effectLog);
   if (stunned) {
@@ -60,7 +93,12 @@ export const enemyTurn = (stats, enemy, turn, getRandomInt, applyDamage, didDodg
   }
 
   // ✅ Gọi check defeated sau enemy attack
-  const defeatedResult = checkDefeatedPhase(newStats, newEnemy, roundLog, defeatArgs);
+  const defeatedResult = checkDefeatedPhase(
+    newStats,
+    newEnemy,
+    roundLog,
+    defeatArgs
+  );
   return { newStats, newEnemy, stunned: false, defeatedResult };
 };
 
@@ -74,37 +112,53 @@ export const checkDefeatedPhase = (
     turn,
     setLevel,
     setPendingUpgrades,
+    setShopPending,
+    setShopSelection,
+    setShopLevelShown,
     setGameOver,
     setAutoBattle,
     upgradeOptions,
-    bossEffectOptions
+    bossEffectOptions,
+    shopLevelShown,
+    generateShopChoices,
   }
 ) => {
   if (enemy.health <= 0) {
     turn.current = 1;
     roundLog.push({ text: `${enemy.name} is defeated!`, type: "defeat" });
 
+    // 🟡 Thưởng tiền
     const goldGained = enemy.goldReward || 0;
     stats.gold = (stats.gold || 0) + goldGained;
     roundLog.push({
       text: `You gained ${goldGained} 💰.`,
-      type: "gold"
+      type: "gold",
     });
 
     const nextLevel = level + 1;
     setLevel(nextLevel);
 
-    const upgrades = enemy.isBoss
-      ? bossEffectOptions.sort(() => 0.5 - Math.random()).slice(0, 3)
-      : upgradeOptions
-          .filter((opt) => {
-            if (opt.key === "minAttack" && stats.minAttack >= stats.maxAttack) return false;
-            return true;
-          })
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3);
+    // ✅ Nếu là chuẩn bị gặp boss (level % 10 === 0)
+    if (nextLevel % 10 === 0 && shopLevelShown !== nextLevel) {
+      const shopChoices = generateShopChoices(nextLevel);
+      setShopSelection(shopChoices.sort(() => 0.5 - Math.random()).slice(0, 3));
+      setShopPending(true);
+      setShopLevelShown(nextLevel);
+    } else {
+      // ✅ Nếu không thì mở nâng cấp như thường
+      const upgrades = enemy.isBoss
+        ? bossEffectOptions.sort(() => 0.5 - Math.random()).slice(0, 3)
+        : upgradeOptions
+            .filter((opt) => {
+              if (opt.key === "minAttack" && stats.minAttack >= stats.maxAttack)
+                return false;
+              return true;
+            })
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 3);
 
-    setPendingUpgrades(upgrades);
+      setPendingUpgrades(upgrades);
+    }
     return { defeated: "enemy" };
   }
 

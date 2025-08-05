@@ -6,6 +6,7 @@ export default function GameControls({
   onStart,
   onToggleAuto,
   onRestart,
+  shopPending,
 }) {
   return (
     <div className="flex gap-2 mt-4">
@@ -17,7 +18,7 @@ export default function GameControls({
           Restart
         </button>
       ) : (
-        !pendingUpgrades && (
+        !pendingUpgrades && !shopPending && (
           <>
             {!autoBattle && (
               <button

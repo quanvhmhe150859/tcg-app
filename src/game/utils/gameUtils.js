@@ -53,7 +53,7 @@ export const generateEnemy = (level) => {
 };
 
 const upgradeConfig = {
-  health: { name: "Health", value: 1000 },
+  health: { name: "Health", value: 500 },
   regen: { name: "Regen", value: 5 },
   minAttack: { name: "Min Attack", value: 5 },
   maxAttack: { name: "Max Attack", value: 5 },

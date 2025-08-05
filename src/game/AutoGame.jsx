@@ -4,6 +4,7 @@ import UpgradeOptions from "./components/UpgradeOptions";
 import PlayerStats from "./components/PlayerStats";
 import EnemyStats from "./components/EnemyStats";
 import GameControls from "./components/GameControls";
+import ShopOptions from "./components/ShopOptions";
 
 export default function TextStatGame() {
   const {
@@ -19,6 +20,13 @@ export default function TextStatGame() {
     restartGame,
     applyUpgrade,
     setAutoBattle,
+    shopPending,
+    shopSelection,
+    handleBuy,
+    boughtItems,
+    handleExitShop,
+    handleReroll,
+    rerollCost,
   } = useGameEngine();
 
   return (
@@ -36,14 +44,28 @@ export default function TextStatGame() {
           gameOver={gameOver}
           pendingUpgrades={pendingUpgrades}
           onStart={startBattle}
-          onToggleAuto={() => setAutoBattle(prev => !prev)}
+          onToggleAuto={() => setAutoBattle((prev) => !prev)}
           onRestart={restartGame}
+          shopPending={shopPending}
         />
       </div>
 
       <div className="w-full sm:w-1/2 flex flex-col gap-4">
         <BattleLog logs={logs} />
-        {pendingUpgrades && <UpgradeOptions upgrades={pendingUpgrades} onSelect={applyUpgrade} />}
+        {pendingUpgrades && (
+          <UpgradeOptions upgrades={pendingUpgrades} onSelect={applyUpgrade} />
+        )}
+        {shopPending && (
+          <ShopOptions
+            items={shopSelection}
+            gold={stats.gold}
+            onSelect={handleBuy}
+            onExit={handleExitShop}
+            boughtItems={boughtItems}
+            handleReroll={handleReroll}
+            rerollCost={rerollCost}
+          />
+        )}
       </div>
     </div>
   );
