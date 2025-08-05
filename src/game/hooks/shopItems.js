@@ -1,7 +1,7 @@
 // Danh sách chỉ số shop cơ bản (giá trị cố định, không scale)
 export const baseShopItems = [
-  { key: "health", value: 1000, cost: 100 },
-  { key: "regen", value: 10, cost: 50 },
+  { key: "health", value: 1000, cost: 120 },
+  { key: "regen", value: 5, cost: 70 },
   { key: "minAttack", value: 5, cost: 30 },
   { key: "maxAttack", value: 5, cost: 30 },
   { key: "armor", value: 5, cost: 40 },
