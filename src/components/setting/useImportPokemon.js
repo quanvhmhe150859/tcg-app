@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+import { getOrFetchAndSet } from "../../utils/cache";
+import api from "../../utils/api";
 
 export const useImportPokemon = () => {
   const [progress, setProgress] = useState(0);
@@ -18,27 +17,42 @@ export const useImportPokemon = () => {
   const repoName = "PokemonTCG/pokemon-tcg-data";
 
   useEffect(() => {
-    const fetchLastImport = async () => {
-      try {
-        const res = await axios.get("/ImportLog/last/pokemon");
-        if (res.data.lastImport) {
-          setLastImportTime(new Date(res.data.lastImport));
-        }
-      } catch {}
+    getOrFetchAndSet(
+      "lastImportPokemon",
+      () =>
+        api.get("/api/ImportLog/last/pokemon").then((res) => res.data.lastImport),
+      setLastImportTime,
+      (x) => new Date(x)
+    );
+
+    getOrFetchAndSet(
+      "lastUpdatedPokemon",
+      () =>
+        api
+          .get(`https://api.github.com/repos/${repoName}`)
+          .then((res) => res.data.pushed_at),
+      setLastUpdate,
+      (x) => new Date(x)
+    );
+
+    return () => {
+      if (connectionRef.current) connectionRef.current.stop();
     };
+  }, []);
 
-    const fetchDbVersion = async () => {
-      try {
-        const res = await axios.get(`https://api.github.com/repos/${repoName}`);
-        if (res.data.pushed_at) {
-          setLastUpdate(new Date(res.data.pushed_at));
-        }
-      } catch {}
-    };
+  const handleImport = async () => {
+    const confirmed = window.confirm(
+      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Pokémon?"
+    );
+    if (!confirmed) return;
 
-    fetchLastImport();
-    fetchDbVersion();
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      alert("Bạn chưa đăng nhập!");
+      return;
+    }
 
+    // Initialize SignalR connection
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_BASE_URL}/progressHub`, {
         withCredentials: true,
@@ -50,48 +64,55 @@ export const useImportPokemon = () => {
     connection.on("ProgressUpdate", (data) => {
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
-      setStatus(`📄 Đang xử lý file ${data.file} (${data.current}/${data.total})`);
+      setStatus(
+        `📄 Đang xử lý file ${data.file} (${data.current}/${data.total})`
+      );
     });
-
-    connection
-      .start()
-      .then(() => setConnected(true))
-      .catch((err) => console.error("SignalR start error:", err));
 
     connectionRef.current = connection;
 
-    return () => {
-      if (connectionRef.current) connectionRef.current.stop();
-    };
-  }, []);
-
-  const handleImport = async () => {
-    const confirmed = window.confirm("Bạn có chắc muốn cập nhật toàn bộ dữ liệu Pokémon?");
-    if (!confirmed) return;
-
-    const now = new Date();
-    setLoading(true);
-    setMessage("");
-    setProgress(0);
-    setStatus("🔄 Đồng bộ dữ liệu...");
-
     try {
-      const syncRes = await axios.post("/Sync/sync-pokemon");
+      await connection.start();
+      setConnected(true);
+
+      const now = new Date();
+      setLoading(true);
+      setMessage("");
+      setProgress(0);
+      setStatus("🔄 Đồng bộ dữ liệu...");
+
+      const authHeader = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const syncRes = await api.post("/api/Sync/sync-pokemon", null, authHeader);
       if (syncRes.data.message) {
         setSyncMessage(syncRes.data.message);
       }
 
       setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
-      const res = await axios.post("/Import/import-pokemon");
+      const res = await api.post("/api/Import/import-pokemon", null, authHeader);
       setMessage(res.data.message);
       setLastImportTime(now);
 
-      await axios.post("/ImportLog/log/pokemon", { time: now.toISOString() });
+      await api.post(
+        "/api/ImportLog/log/pokemon",
+        { time: now.toISOString() },
+        authHeader
+      );
     } catch (err) {
+      console.error(err);
       setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
     } finally {
       setLoading(false);
       setStatus("");
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        setConnected(false);
+      }
+      sessionStorage.removeItem("lastImportPokemon");
     }
   };
 

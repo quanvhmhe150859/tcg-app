@@ -1,11 +1,23 @@
 import api from "../../utils/api";
 
+let cachedCardSets = null;
+
 export const getAllCardSets = async () => {
-  const res = await api.get("/api/cardsyugioh/cardsets");
-  return res.data.map((item) => ({
-    value: item.setName,
-    label: item.displayName,
-  }));
+  if (cachedCardSets) return cachedCardSets;
+
+  try {
+    const res = await api.get("/api/cardsyugioh/cardsets");
+    const mapped = res.data.map((item) => ({
+      value: item.setName,
+      label: item.displayName,
+    }));
+
+    cachedCardSets = mapped; // ✅ Lưu cache trong RAM
+    return mapped;
+  } catch (error) {
+    console.error("Lỗi khi gọi API cardsets:", error);
+    throw error;
+  }
 };
 
 export const getCardsRandom = async (limit, setName, cardType) => {

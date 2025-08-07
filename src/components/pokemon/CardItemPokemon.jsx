@@ -8,7 +8,7 @@ import CardItemPokemonModal from "./CardItemPokemonModal";
 
 const CardItem = ({ card, index, darkMode }) => {
   const [showModal, setShowModal] = useState(false);
-  const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/images/pokemon/${card.id}.png`;
+  const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${card.id}.png`;
 
   const rarityStyle = getRarityStyle(card.rarity);
   const rarityClass = rarityStyle.className || "";

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import RandomCards from "./components/pokemon/RandomCardsPokemon";
+import PokemonCardList from "./components/pokemon/CardsListPokemon";
+
 import YugiohRoll from "./components/yugioh/RandomCardsYugioh";
+
+import AutoBouncingGame from "./game/AutoGame"
+
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
 import DarkModeToggle from "./components/common/DarkModeToggle";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 import MusicToggleButton from "./components/common/MusicToggleButton";
 import "./App.css";
-
-import AutoBouncingGame from "./game/AutoGame"
 
 function setFavicon(iconUrl) {
   const link =
@@ -53,6 +56,7 @@ function App() {
         <Routes>
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCards />} />
+          <Route path="/pokemonls" element={<PokemonCardList />} />
           <Route path="/yugioh" element={<YugiohRoll />} />
           <Route path="/game" element={<AutoBouncingGame />} />
         </Routes>

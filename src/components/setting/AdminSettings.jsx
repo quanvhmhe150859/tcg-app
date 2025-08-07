@@ -6,6 +6,7 @@ import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 import BgmPlayer from "./BgmPlayer";
+import ProtectedSection from "./ProtectedSection";
 
 const AdminSettings = () => {
   const [tab, setTab] = useState("general");
@@ -72,14 +73,15 @@ const AdminSettings = () => {
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
-        
         <BgmPlayer />
 
-        <div className="section">
-          <h3>Import Data</h3>
-          <ImportDataPokemon />
-          <ImportDataYugioh />
-        </div>
+        <ProtectedSection>
+          <div className="section">
+            <h3>Import Data</h3>
+            <ImportDataPokemon />
+            <ImportDataYugioh />
+          </div>
+        </ProtectedSection>
       </div>
 
       {tab !== "general" && <button onClick={handleSave}>Save</button>}

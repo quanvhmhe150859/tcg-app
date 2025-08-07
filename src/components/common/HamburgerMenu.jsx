@@ -54,8 +54,18 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/pokemonls" onClick={() => setOpen(false)}>
+                    📋 Pokémon List
+                  </Link>
+                </li>
+                <li>
                   <Link to="/yugioh" onClick={() => setOpen(false)}>
                     🏠 Yu-Gi-Oh!
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/yugiohls" onClick={() => setOpen(false)}>
+                    📋 Yu-Gi-Oh! List
                   </Link>
                 </li>
                 <li>

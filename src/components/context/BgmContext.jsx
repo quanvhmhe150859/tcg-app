@@ -1,4 +1,5 @@
 import { createContext, useContext, useRef, useState, useEffect } from "react";
+import { getOrFetchAndSet } from "../../utils/cache";
 
 const BgmContext = createContext(null);
 
@@ -10,19 +11,29 @@ const PLAY_MODES = {
 
 export const BgmProvider = ({ children }) => {
   const audioRef = useRef(new Audio());
-  const [enabled, setEnabled] = useState(() => localStorage.getItem("bgm-enabled") === "true");
-  const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("bgm-volume")) || 0.8);
-  const [currentTrackUrl, setCurrentTrackUrl] = useState(() => localStorage.getItem("bgm-current-url") || null);
+  const [enabled, setEnabled] = useState(
+    () => localStorage.getItem("bgm-enabled") === "true"
+  );
+  const [volume, setVolume] = useState(
+    () => parseFloat(localStorage.getItem("bgm-volume")) || 0.8
+  );
+  const [currentTrackUrl, setCurrentTrackUrl] = useState(
+    () => localStorage.getItem("bgm-current-url") || null
+  );
   const [isLoopOne, setIsLoopOne] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState(() => localStorage.getItem("bgm-mode") || PLAY_MODES.LOOP_ALL);
+  const [mode, setMode] = useState(
+    () => localStorage.getItem("bgm-mode") || PLAY_MODES.LOOP_ALL
+  );
 
   // Load tracks from bgm.json
   useEffect(() => {
-    fetch("/bgm/bgm.json")
-      .then((res) => res.json())
-      .then(setTracks);
+    getOrFetchAndSet(
+      "bgm_tracks",
+      () => fetch("/bgm/bgm.json").then((res) => res.json()),
+      setTracks
+    );
   }, []);
 
   // Restore saved track or select first track

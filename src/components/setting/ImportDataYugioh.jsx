@@ -8,7 +8,6 @@ const ImportDataYugioh = () => {
     status,
     loading,
     message,
-    connected,
     lastImportTime,
     lastUpdate,
     syncMessage,
@@ -23,7 +22,7 @@ const ImportDataYugioh = () => {
     <div className="import-container">
       <button
         onClick={handleImport}
-        disabled={!connected || loading}
+        disabled={loading}
         className={`import-button${loading ? " loading" : ""}`}
       >
         {loading ? "Đang nhập dữ liệu..." : "📥 Cập nhật dữ liệu Yu-Gi-Oh!"}

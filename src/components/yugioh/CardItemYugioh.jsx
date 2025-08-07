@@ -9,7 +9,7 @@ const CardItemYugioh = ({ card, index }) => {
   const cardId = card.cardId || card.card_id || "unknown";
   const smallImageUrl = `${
     import.meta.env.VITE_API_BASE_URL
-  }/images/yugioh/${cardId}_small.jpg`;
+  }/api/images/yugioh/${cardId}_small.jpg`;
 
   const [showModal, setShowModal] = useState(false);
   const tooltipId = `tooltip-${card.id}`;

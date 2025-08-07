@@ -4,7 +4,7 @@ import "../common/CardItem.css";
 const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
 
-  const hiresUrl = `${import.meta.env.VITE_API_BASE_URL}/images/pokemon/${card.id}_hires.png`;
+  const hiresUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${card.id}_hires.png`;
 
   return (
     <div className="modal-overlay" onClick={onClose}>

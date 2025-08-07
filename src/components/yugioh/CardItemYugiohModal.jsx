@@ -4,7 +4,7 @@ import "../common/CardItem.css";
 const CardItemYugiohModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
 
-  const bigImageUrl = `${import.meta.env.VITE_API_BASE_URL}/images/yugioh/${card.cardId}.jpg`;
+  const bigImageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/yugioh/${card.cardId}.jpg`;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
