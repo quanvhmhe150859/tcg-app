@@ -33,7 +33,7 @@ export default function ProtectedSection({ children }) {
       {!unlocked && (
         <form
           onSubmit={handleLogin}
-          className="absolute left-1/2 top-1/2 w-1/2 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm flex 
+          className="absolute left-1/2 top-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm flex 
           flex-col justify-center items-center p-4 gap-3 rounded shadow-md"
         >
           <p className="font-semibold text-black">Nhập mật khẩu:</p>

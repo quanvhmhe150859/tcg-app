@@ -12,6 +12,7 @@ import {
   getRaritiesInPack,
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_OPTIONS = [
   { value: "", label: "🌐 All Pack" },
@@ -20,7 +21,7 @@ const DEFAULT_OPTIONS = [
 
 const defaultSet = DEFAULT_OPTIONS[0];
 
-const YugiohRoll = () => {
+const RandomCardsYugioh = () => {
   const [allSets, setAllSets] = useState([]);
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [selectedSet, setSelectedSet] = useState(defaultSet);
@@ -31,6 +32,17 @@ const YugiohRoll = () => {
 
   const [typeOptions, setTypeOptions] = useState([]);
   const [selectedType, setSelectedType] = useState(""); // "" = All types
+  const [raw] = useState(localStorage.getItem("allowedRaritiesYugiohWeights"));
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
+    if (!raw || raw === "null" || raw.trim() === "") {
+      alert("Chưa thiết lập Allowed Rarities Yugioh Weights!");
+      navigate("/", { state: { defaultTab: "yugioh" } });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (selectedSet?.value !== "") {
@@ -99,8 +111,8 @@ const YugiohRoll = () => {
     try {
       let result = [];
 
-      const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
-      if (!raw) throw new Error("Không có dữ liệu allowedRaritiesYugiohWeights");
+      // const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
+      // if (!raw) throw new Error("Không có dữ liệu allowedRaritiesYugiohWeights");
 
       const fullWeights = JSON.parse(raw);
 
@@ -192,7 +204,7 @@ const YugiohRoll = () => {
 
           <Tooltip id="select-pack-tooltip" place="top" />
 
-          {selectedSet?.value === "" && (
+          {selectedSet?.value === "" && typeOptions.length > 1 && (
             <SelectBox
               options={typeOptions}
               value={selectedType}
@@ -243,4 +255,4 @@ const YugiohRoll = () => {
   );
 };
 
-export default YugiohRoll;
+export default RandomCardsYugioh;

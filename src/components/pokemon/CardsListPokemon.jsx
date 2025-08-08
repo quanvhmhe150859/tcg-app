@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import Select from "react-select";
 import api from "../../utils/api";
+import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
+import customSelectStyles from "../../utils/customSelectStyles";
 
 export default function PokemonCardList() {
   const [search, setSearch] = useState("");
@@ -10,11 +13,34 @@ export default function PokemonCardList() {
   const [totalPages, setTotalPages] = useState(1);
   const [showSidebar, setShowSidebar] = useState(true);
 
-  // detect initial screen size for sidebar default state
+  // Bộ lọc mới
+  const [superType, setSuperType] = useState(null);
+  const [rarity, setRarity] = useState(null);
+  const [type, setType] = useState(null);
+  const [dexNumber, setDexNumber] = useState("");
+  const [orderBy, setOrderBy] = useState("asc");
+
+  // react-select options
+  const superTypeOptions = [
+    { value: "", label: "All SuperTypes" },
+    { value: "Pokémon", label: "Pokémon" },
+    { value: "Trainer", label: "Trainer" },
+    { value: "Energy", label: "Energy" },
+  ];
+
+  const rarityOptions = [
+    { value: "", label: "All Rarities" },
+    ...allRaritiesPokemon.map((r) => ({ value: r, label: r })),
+  ];
+
+  const typeOptions = [
+    { value: "", label: "All Types" },
+    ...allTypesPokemon.map((t) => ({ value: t, label: t })),
+  ];
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const isLargeScreen = window.innerWidth >= 1024;
-      setShowSidebar(isLargeScreen);
+      setShowSidebar(window.innerWidth >= 1024);
     }
   }, []);
 
@@ -22,7 +48,7 @@ export default function PokemonCardList() {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -32,9 +58,14 @@ export default function PokemonCardList() {
       try {
         const res = await api.get("/api/CardsPokemon", {
           params: {
-            search: debouncedSearch,
-            page: page,
+            name: debouncedSearch,
+            page,
             pageSize: 10,
+            superType: superType?.value || undefined,
+            rarity: rarity?.value || undefined,
+            type: type?.value || undefined,
+            dexNumber: dexNumber || undefined,
+            orderBy,
           },
         });
 
@@ -50,11 +81,7 @@ export default function PokemonCardList() {
     };
 
     fetchCards();
-  }, [debouncedSearch, page]);
-
-  //   const gridCols = showSidebar
-  //     ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
-  //     : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5";
+  }, [debouncedSearch, page, superType, rarity, type, dexNumber, orderBy]);
 
   return (
     <div className="flex gap-4 p-4">
@@ -69,6 +96,7 @@ export default function PokemonCardList() {
             {showSidebar ? "Hide Filters" : "Show Filters"}
           </button>
         </div>
+
         {loading ? (
           <p className="italic text-gray-500">Loading cards...</p>
         ) : cards.length === 0 ? (
@@ -102,7 +130,9 @@ export default function PokemonCardList() {
             ))}
           </div>
         )}
-        <div className="flex justify-between items-center mt-4">
+
+        {/* Pagination */}
+        <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
           <button
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
             disabled={page <= 1}
@@ -110,9 +140,66 @@ export default function PokemonCardList() {
           >
             Prev
           </button>
-          <span>
-            Page {page} / {totalPages}
-          </span>
+
+          {/* Trang đầu */}
+          {[1, 2, 3].map(
+            (p) =>
+              p <= totalPages && (
+                <button
+                  key={p}
+                  className={`px-3 py-1 rounded ${
+                    p === page
+                      ? "selected-tab"
+                      : ""
+                  }`}
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </button>
+              )
+          )}
+
+          {/* Dấu ... sau trang đầu */}
+          {page > 5 && <span className="px-2">...</span>}
+
+          {/* Các trang quanh trang hiện tại */}
+          {Array.from({ length: 7 }, (_, i) => page - 3 + i)
+            .filter((p) => p > 3 && p < totalPages - 2)
+            .map((p) => (
+              <button
+                key={p}
+                className={`px-3 py-1 rounded ${
+                  p === page
+                    ? "selected-tab"
+                      : ""
+                }`}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </button>
+            ))}
+
+          {/* Dấu ... trước trang cuối */}
+          {page < totalPages - 4 && <span className="px-2">...</span>}
+
+          {/* 3 trang cuối */}
+          {[totalPages - 2, totalPages - 1, totalPages].map(
+            (p) =>
+              p > 3 && (
+                <button
+                  key={p}
+                  className={`px-3 py-1 rounded ${
+                    p === page
+                      ? "selected-tab"
+                      : ""
+                  }`}
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </button>
+              )
+          )}
+
           <button
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
             disabled={page >= totalPages}
@@ -127,6 +214,7 @@ export default function PokemonCardList() {
       {showSidebar && (
         <div className="w-60 shrink-0">
           <h2 className="text-lg font-bold mb-2">Search & Filters</h2>
+
           <input
             type="text"
             placeholder="Search cards..."
@@ -134,9 +222,73 @@ export default function PokemonCardList() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <select className="border p-2 rounded w-full text-gray-500" disabled>
-            <option>Filter (coming soon)</option>
-          </select>
+
+          {/* SuperType */}
+          <Select
+            className="mb-3"
+            options={superTypeOptions}
+            value={
+              superTypeOptions.find((o) => o.value === superType?.value) ||
+              superTypeOptions[0]
+            }
+            onChange={(selected) => setSuperType(selected)}
+            styles={customSelectStyles}
+          />
+
+          {/* Rarity */}
+          <Select
+            className="mb-3"
+            options={rarityOptions}
+            value={
+              rarityOptions.find((o) => o.value === rarity?.value) ||
+              rarityOptions[0]
+            }
+            onChange={(selected) => setRarity(selected)}
+            styles={customSelectStyles}
+          />
+
+          {/* Type */}
+          <Select
+            className="mb-3"
+            options={typeOptions}
+            value={
+              typeOptions.find((o) => o.value === type?.value) || typeOptions[0]
+            }
+            onChange={(selected) => setType(selected)}
+            styles={customSelectStyles}
+          />
+
+          {/* DexNumber */}
+          <input
+            type="number"
+            placeholder="Dex Number"
+            className="border p-2 rounded w-full mb-3"
+            value={dexNumber}
+            onChange={(e) => setDexNumber(e.target.value)}
+          />
+
+          {/* OrderBy */}
+          <div className="mb-3">
+            <p className="font-medium mb-1">Order By Name</p>
+            <label className="mr-3">
+              <input
+                type="radio"
+                value="asc"
+                checked={orderBy === "asc"}
+                onChange={(e) => setOrderBy(e.target.value)}
+              />{" "}
+              Ascending
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="desc"
+                checked={orderBy === "desc"}
+                onChange={(e) => setOrderBy(e.target.value)}
+              />{" "}
+              Descending
+            </label>
+          </div>
         </div>
       )}
     </div>

@@ -109,15 +109,8 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
   return (
     <div className="section">
       <Tooltip id="tooltip" />
-      <Tooltip id="titleTip" />
 
-      <h3
-        data-tooltip-id="titleTip"
-        data-tooltip-content="Chỉ áp dụng khi quay 🌐 Tất cả"
-        className="text-lg font-bold"
-      >
-        Allowed Rarities
-      </h3>
+      <h3 className="text-lg font-bold">Allowed Rarities</h3>
 
       <div className="flex justify-center items-center gap-2">
         <label>Common:</label>

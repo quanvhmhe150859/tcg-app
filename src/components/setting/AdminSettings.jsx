@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./AdminSettings.css";
 import ImportDataPokemon from "./ImportDataPokemon";
 import ImportDataYugioh from "./ImportDataYugioh";
@@ -7,9 +7,30 @@ import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 import BgmPlayer from "./BgmPlayer";
 import ProtectedSection from "./ProtectedSection";
+import { useLocation } from "react-router-dom";
 
 const AdminSettings = () => {
+  const location = useLocation();
+
   const [tab, setTab] = useState("general");
+
+  useEffect(() => {
+    if (location.state?.defaultTab) {
+      setTab(location.state.defaultTab);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (location.state?.defaultTab && tab === location.state.defaultTab) {
+      const timer = setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight - 200,
+          behavior: "smooth",
+        });
+      }, 500); // chờ render 0.5s
+      return () => clearTimeout(timer);
+    }
+  }, [tab, location.state]);
 
   const yugiohTypes = useRef();
   const pokemonTypes = useRef();

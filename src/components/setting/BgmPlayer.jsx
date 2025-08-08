@@ -98,7 +98,7 @@ export default function BgmPlayer() {
         step={0.01}
         value={volume}
         onChange={(e) => setVolume(parseFloat(e.target.value))}
-        className="w-full"
+        className="w-1/2"
       />
     </div>
   );

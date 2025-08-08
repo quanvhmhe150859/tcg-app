@@ -130,3 +130,13 @@ export const allRaritiesYugioh = [
   "European debut",
   "10000 Secret Rare",
 ];
+
+export const allAttributesYugioh = [
+  "Dark",
+  "Earth",
+  "Light",
+  "Water",
+  "Wind",
+  "Fire",
+  "Divine",
+]

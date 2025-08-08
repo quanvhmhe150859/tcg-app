@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import RandomCards from "./components/pokemon/RandomCardsPokemon";
+import RandomCardsPokemon from "./components/pokemon/RandomCardsPokemon";
 import PokemonCardList from "./components/pokemon/CardsListPokemon";
 
-import YugiohRoll from "./components/yugioh/RandomCardsYugioh";
+import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
+import YugiohCardList from "./components/yugioh/CardsListYugioh";
 
-import AutoBouncingGame from "./game/AutoGame"
+import TextStatGame from "./game/AutoGame"
 
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
@@ -55,10 +56,11 @@ function App() {
         <MusicToggleButton />
         <Routes>
           <Route path="/" element={<AdminSettings />} />
-          <Route path="/pokemon" element={<RandomCards />} />
+          <Route path="/pokemon" element={<RandomCardsPokemon />} />
           <Route path="/pokemonls" element={<PokemonCardList />} />
-          <Route path="/yugioh" element={<YugiohRoll />} />
-          <Route path="/game" element={<AutoBouncingGame />} />
+          <Route path="/yugioh" element={<RandomCardsYugioh />} />
+          <Route path="/yugiohls" element={<YugiohCardList />} />
+          <Route path="/game" element={<TextStatGame />} />
         </Routes>
       </div>
     </Router>

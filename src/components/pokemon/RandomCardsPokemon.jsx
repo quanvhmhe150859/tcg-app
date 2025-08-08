@@ -7,7 +7,7 @@ import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
 import SelectBox from "../common/SelectBox";
 
-const RandomCards = () => {
+const RandomCardsPokemon = () => {
   const [cards, setCards] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
 
@@ -154,4 +154,4 @@ const RandomCards = () => {
   );
 };
 
-export default RandomCards;
+export default RandomCardsPokemon;
