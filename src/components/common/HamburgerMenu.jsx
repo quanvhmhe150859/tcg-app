@@ -5,6 +5,17 @@ import "./HamburgerMenu.css";
 
 const HamburgerMenu = () => {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState({
+    pokemon: false,
+    yugioh: false,
+  });
+
+  const toggleExpand = (section) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
   return (
     <>
@@ -49,24 +60,88 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/pokemon" onClick={() => setOpen(false)}>
-                    🏠 Pokémon
+                  <Link
+                    to=""
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleExpand("pokemon");
+                    }}
+                    className="flex items-center"
+                  >
+                    🏠 Pokémon {expanded.pokemon ? "▼" : "▶"}
                   </Link>
+                  <AnimatePresence>
+                    {expanded.pokemon && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="submenu"
+                      >
+                        <li>
+                          <Link
+                            to="/pokemon"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item"
+                          >
+                            🎰 Pokémon Gacha
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/pokemonls"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item"
+                          >
+                            📋 Pokémon List
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li>
-                  <Link to="/pokemonls" onClick={() => setOpen(false)}>
-                    📋 Pokémon List
+                  <Link
+                    to=""
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleExpand("yugioh");
+                    }}
+                    className="flex items-center"
+                  >
+                    🏠 Yu-Gi-Oh! {expanded.yugioh ? "▼" : "▶"}
                   </Link>
-                </li>
-                <li>
-                  <Link to="/yugioh" onClick={() => setOpen(false)}>
-                    🏠 Yu-Gi-Oh!
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/yugiohls" onClick={() => setOpen(false)}>
-                    📋 Yu-Gi-Oh! List
-                  </Link>
+                  <AnimatePresence>
+                    {expanded.yugioh && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="submenu"
+                      >
+                        <li>
+                          <Link
+                            to="/yugioh"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item"
+                          >
+                            🎰 Yu-Gi-Oh! Gacha
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/yugiohls"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item"
+                          >
+                            📋 Yu-Gi-Oh! List
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li>
                   <Link to="/game" onClick={() => setOpen(false)}>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import Select from "react-select";
 import api from "../../utils/api";
+import Pagination from "../common/Pagination";
+import Sidebar from "./SidebarPokemon";
 import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
-import customSelectStyles from "../../utils/customSelectStyles";
 
 export default function PokemonCardList() {
   const [search, setSearch] = useState("");
@@ -93,7 +93,39 @@ export default function PokemonCardList() {
             className="text-sm text-blue-500 underline"
             onClick={() => setShowSidebar((prev) => !prev)}
           >
-            {showSidebar ? "Hide Filters" : "Show Filters"}
+            {showSidebar ? (
+              // Icon đóng
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              // Icon phễu
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 4h18l-7 8v4l-4 4v-8L3 4z"
+                />
+              </svg>
+            )}
           </button>
         </div>
 
@@ -131,165 +163,33 @@ export default function PokemonCardList() {
           </div>
         )}
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
-          <button
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Prev
-          </button>
-
-          {/* Trang đầu */}
-          {[1, 2, 3].map(
-            (p) =>
-              p <= totalPages && (
-                <button
-                  key={p}
-                  className={`px-3 py-1 rounded ${
-                    p === page
-                      ? "selected-tab"
-                      : ""
-                  }`}
-                  onClick={() => setPage(p)}
-                >
-                  {p}
-                </button>
-              )
-          )}
-
-          {/* Dấu ... sau trang đầu */}
-          {page > 5 && <span className="px-2">...</span>}
-
-          {/* Các trang quanh trang hiện tại */}
-          {Array.from({ length: 7 }, (_, i) => page - 3 + i)
-            .filter((p) => p > 3 && p < totalPages - 2)
-            .map((p) => (
-              <button
-                key={p}
-                className={`px-3 py-1 rounded ${
-                  p === page
-                    ? "selected-tab"
-                      : ""
-                }`}
-                onClick={() => setPage(p)}
-              >
-                {p}
-              </button>
-            ))}
-
-          {/* Dấu ... trước trang cuối */}
-          {page < totalPages - 4 && <span className="px-2">...</span>}
-
-          {/* 3 trang cuối */}
-          {[totalPages - 2, totalPages - 1, totalPages].map(
-            (p) =>
-              p > 3 && (
-                <button
-                  key={p}
-                  className={`px-3 py-1 rounded ${
-                    p === page
-                      ? "selected-tab"
-                      : ""
-                  }`}
-                  onClick={() => setPage(p)}
-                >
-                  {p}
-                </button>
-              )
-          )}
-
-          <button
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          setPage={setPage}
+          isLoading={loading}
+        />
       </div>
 
-      {/* Sidebar */}
       {showSidebar && (
-        <div className="w-60 shrink-0">
-          <h2 className="text-lg font-bold mb-2">Search & Filters</h2>
-
-          <input
-            type="text"
-            placeholder="Search cards..."
-            className="border p-2 rounded w-full mb-3"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {/* SuperType */}
-          <Select
-            className="mb-3"
-            options={superTypeOptions}
-            value={
-              superTypeOptions.find((o) => o.value === superType?.value) ||
-              superTypeOptions[0]
-            }
-            onChange={(selected) => setSuperType(selected)}
-            styles={customSelectStyles}
-          />
-
-          {/* Rarity */}
-          <Select
-            className="mb-3"
-            options={rarityOptions}
-            value={
-              rarityOptions.find((o) => o.value === rarity?.value) ||
-              rarityOptions[0]
-            }
-            onChange={(selected) => setRarity(selected)}
-            styles={customSelectStyles}
-          />
-
-          {/* Type */}
-          <Select
-            className="mb-3"
-            options={typeOptions}
-            value={
-              typeOptions.find((o) => o.value === type?.value) || typeOptions[0]
-            }
-            onChange={(selected) => setType(selected)}
-            styles={customSelectStyles}
-          />
-
-          {/* DexNumber */}
-          <input
-            type="number"
-            placeholder="Dex Number"
-            className="border p-2 rounded w-full mb-3"
-            value={dexNumber}
-            onChange={(e) => setDexNumber(e.target.value)}
-          />
-
-          {/* OrderBy */}
-          <div className="mb-3">
-            <p className="font-medium mb-1">Order By Name</p>
-            <label className="mr-3">
-              <input
-                type="radio"
-                value="asc"
-                checked={orderBy === "asc"}
-                onChange={(e) => setOrderBy(e.target.value)}
-              />{" "}
-              Ascending
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="desc"
-                checked={orderBy === "desc"}
-                onChange={(e) => setOrderBy(e.target.value)}
-              />{" "}
-              Descending
-            </label>
-          </div>
-        </div>
+        <Sidebar
+          search={search}
+          setSearch={setSearch}
+          superType={superType}
+          setSuperType={setSuperType}
+          rarity={rarity}
+          setRarity={setRarity}
+          type={type}
+          setType={setType}
+          dexNumber={dexNumber}
+          setDexNumber={setDexNumber}
+          orderBy={orderBy}
+          setOrderBy={setOrderBy}
+          superTypeOptions={superTypeOptions}
+          rarityOptions={rarityOptions}
+          typeOptions={typeOptions}
+          setPage={setPage}
+        />
       )}
     </div>
   );

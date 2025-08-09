@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import Select from "react-select";
 import api from "../../utils/api";
 import { allTypesYugioh, allAttributesYugioh } from "../../utils/constants";
-import customSelectStyles from "../../utils/customSelectStyles";
+import Pagination from "../common/Pagination";
+import Sidebar from "./SidebarYugioh";
 
 export default function YugiohCardList() {
   const [search, setSearch] = useState("");
@@ -14,7 +14,6 @@ export default function YugiohCardList() {
   const [showSidebar, setShowSidebar] = useState(true);
 
   // Bộ lọc
-  const [marketPrice, setMarketPrice] = useState("");
   const [atkMin, setAtkMin] = useState("");
   const [atkMax, setAtkMax] = useState("");
   const [defMin, setDefMin] = useState("");
@@ -93,7 +92,6 @@ export default function YugiohCardList() {
             type: type?.value || undefined,
             archetype: archetype?.value || undefined,
             attribute: attribute?.value || undefined,
-            marketPrice: marketPrice || undefined,
             atkMin: atkMin || undefined,
             atkMax: atkMax || undefined,
             defMin: defMin || undefined,
@@ -123,7 +121,6 @@ export default function YugiohCardList() {
     type,
     archetype,
     attribute,
-    marketPrice,
     atkMin,
     atkMax,
     defMin,
@@ -144,7 +141,39 @@ export default function YugiohCardList() {
             className="text-sm text-blue-500 underline"
             onClick={() => setShowSidebar((prev) => !prev)}
           >
-            {showSidebar ? "Hide Filters" : "Show Filters"}
+            {showSidebar ? (
+              // Icon đóng
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              // Icon phễu
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 4h18l-7 8v4l-4 4v-8L3 4z"
+                />
+              </svg>
+            )}
           </button>
         </div>
 
@@ -182,224 +211,45 @@ export default function YugiohCardList() {
           </div>
         )}
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
-          <button
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Prev
-          </button>
-
-          {[1, 2, 3].map(
-            (p) =>
-              p <= totalPages && (
-                <button
-                  key={p}
-                  className={`px-3 py-1 rounded ${
-                    p === page ? "bg-blue-500 text-white" : ""
-                  }`}
-                  onClick={() => setPage(p)}
-                >
-                  {p}
-                </button>
-              )
-          )}
-
-          {page > 5 && <span className="px-2">...</span>}
-
-          {Array.from({ length: 7 }, (_, i) => page - 3 + i)
-            .filter((p) => p > 3 && p < totalPages - 2)
-            .map((p) => (
-              <button
-                key={p}
-                className={`px-3 py-1 rounded ${
-                  p === page ? "bg-blue-500 text-white" : ""
-                }`}
-                onClick={() => setPage(p)}
-              >
-                {p}
-              </button>
-            ))}
-
-          {page < totalPages - 4 && <span className="px-2">...</span>}
-
-          {[totalPages - 2, totalPages - 1, totalPages].map(
-            (p) =>
-              p > 3 && (
-                <button
-                  key={p}
-                  className={`px-3 py-1 rounded ${
-                    p === page ? "bg-blue-500 text-white" : ""
-                  }`}
-                  onClick={() => setPage(p)}
-                >
-                  {p}
-                </button>
-              )
-          )}
-
-          <button
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          setPage={setPage}
+          isLoading={loading}
+        />
       </div>
 
-      {/* Sidebar */}
       {showSidebar && (
-        <div className="w-60 shrink-0">
-          <h2 className="text-lg font-bold mb-2">Search & Filters</h2>
-
-          <input
-            type="text"
-            placeholder="Search cards..."
-            className="border p-2 rounded w-full mb-3"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          <Select
-            className="mb-3"
-            options={typeOptions}
-            value={type}
-            onChange={setType}
-            placeholder="Select Type"
-            styles={customSelectStyles}
-          />
-          <Select
-            className="mb-3"
-            options={archetypeOptions}
-            value={archetype}
-            onChange={setArchetype}
-            placeholder="Select Archetype"
-            styles={customSelectStyles}
-          />
-          <Select
-            className="mb-3"
-            options={attributeOptions}
-            value={attribute}
-            onChange={setAttribute}
-            placeholder="Select Attribute"
-            styles={customSelectStyles}
-          />
-
-          <input
-            type="number"
-            placeholder="Price"
-            className="border p-2 rounded w-full mb-3"
-            value={marketPrice}
-            onChange={(e) => setMarketPrice(e.target.value)}
-          />
-
-          <div className="mb-3">
-            <p className="font-medium">ATK Range</p>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                placeholder="Min"
-                className="border p-1 rounded w-full"
-                value={atkMin}
-                onChange={(e) => setAtkMin(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                className="border p-1 rounded w-full"
-                value={atkMax}
-                onChange={(e) => setAtkMax(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <p className="font-medium">DEF Range</p>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                placeholder="Min"
-                className="border p-1 rounded w-full"
-                value={defMin}
-                onChange={(e) => setDefMin(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                className="border p-1 rounded w-full"
-                value={defMax}
-                onChange={(e) => setDefMax(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <p className="font-medium">Level Range</p>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                placeholder="Min"
-                className="border p-1 rounded w-full"
-                value={levelMin}
-                onChange={(e) => setLevelMin(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                className="border p-1 rounded w-full"
-                value={levelMax}
-                onChange={(e) => setLevelMax(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <p className="font-medium mb-1">Order Field</p>
-            <label className="mr-3">
-              <input
-                type="radio"
-                value="name"
-                checked={orderField === "name"}
-                onChange={(e) => setOrderField(e.target.value)}
-              />{" "}
-              Name
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="price"
-                checked={orderField === "price"}
-                onChange={(e) => setOrderField(e.target.value)}
-              />{" "}
-              Price
-            </label>
-          </div>
-
-          <div className="mb-3">
-            <p className="font-medium mb-1">Order By</p>
-            <label className="mr-3">
-              <input
-                type="radio"
-                value="asc"
-                checked={orderBy === "asc"}
-                onChange={(e) => setOrderBy(e.target.value)}
-              />{" "}
-              Asc
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="desc"
-                checked={orderBy === "desc"}
-                onChange={(e) => setOrderBy(e.target.value)}
-              />{" "}
-              Desc
-            </label>
-          </div>
-        </div>
+        <Sidebar
+          search={search}
+          setSearch={setSearch}
+          type={type}
+          setType={setType}
+          archetype={archetype}
+          setArchetype={setArchetype}
+          attribute={attribute}
+          setAttribute={setAttribute}
+          atkMin={atkMin}
+          setAtkMin={setAtkMin}
+          atkMax={atkMax}
+          setAtkMax={setAtkMax}
+          defMin={defMin}
+          setDefMin={setDefMin}
+          defMax={defMax}
+          setDefMax={setDefMax}
+          levelMin={levelMin}
+          setLevelMin={setLevelMin}
+          levelMax={levelMax}
+          setLevelMax={setLevelMax}
+          orderField={orderField}
+          setOrderField={setOrderField}
+          orderBy={orderBy}
+          setOrderBy={setOrderBy}
+          typeOptions={typeOptions}
+          archetypeOptions={archetypeOptions}
+          attributeOptions={attributeOptions}
+          setPage={setPage}
+        />
       )}
     </div>
   );

@@ -38,16 +38,40 @@
   margin-top: 3rem;
 }
 
-.hamburger-menu ul {
+.hamburger-menu-content ul {
   list-style: none;
   padding: 0;
 }
 
-.hamburger-menu a {
-  color: inherit;
-  text-decoration: none;
+.hamburger-menu-content ul li {
+  margin-top: 0.5rem;
 }
 
-.hamburger-menu li {
-  margin-top: 1rem;
+.hamburger-menu-content ul li a,
+.hamburger-menu-content ul li button {
+  color: var(--color-text);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.hamburger-menu-content ul li a:hover,
+.hamburger-menu-content ul li button:hover {
+  background-color: var(--color-button-hover);
+  color: var(--color-background);
+  border-radius: 4px;
+}
+
+.submenu {
+  list-style: none;
+  padding: 0 0 0 1.5rem; /* Thụt đầu dòng cho mục con */
+  margin: 0;
+  overflow: hidden; /* Hỗ trợ hiệu ứng thu gọn của framer-motion */
+}
+
+.submenu-item {
+  padding-left: 1rem; /* Thụt thêm cho mục con */
+  font-size: 14px; /* Nhỏ hơn một chút so với mục cha */
 }

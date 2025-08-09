@@ -25,18 +25,18 @@ export const generateEnemy = (level) => {
 
   const baseHealth = isBoss ? random(200, 250) : random(80, 120);
   const health = isBoss
-    ? baseHealth + Math.floor(scale * 10)
+    ? baseHealth + Math.floor(scale * 10.2)
     : baseHealth + Math.floor(scale * 3);
 
   const armor = isBoss
-    ? random(level, level * 2)
+    ? random(level, level * 2.2)
     : random(Math.floor(level / 2), level);
 
   const baseMinAtk = isBoss ? random(10, 15) : random(3, 7);
-  const minAttack = baseMinAtk + Math.floor(scale * (isBoss ? 0.5 : 0.3));
+  const minAttack = baseMinAtk + Math.floor(scale * (isBoss ? 0.7 : 0.3));
 
   const baseMaxAtk = isBoss ? random(20, 30) : random(8, 15);
-  const maxAttack = baseMaxAtk + Math.floor(scale * (isBoss ? 1 : 0.7));
+  const maxAttack = baseMaxAtk + Math.floor(scale * (isBoss ? 1.2 : 0.7));
 
   const baseGold = isBoss ? random(40, 60) : random(10, 20);
   const goldReward = baseGold + Math.floor(scale * (isBoss ? 2 : 1));
