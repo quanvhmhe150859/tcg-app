@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import { getOrFetchAndSet } from "../../utils/cache";
 import api from "../../utils/api";
+import { useTranslation } from "react-i18next";
 
 export const useImportYugioh = () => {
+  const { t } = useTranslation();
+
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,13 +48,13 @@ export const useImportYugioh = () => {
 
   const handleImport = async () => {
     const confirmed = window.confirm(
-      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Yu-Gi-Oh!?"
+      t("areYouSureYouWantToUpdateYugiohData")
     );
     if (!confirmed) return;
 
     const token = localStorage.getItem("jwt");
     if (!token) {
-      alert("Bạn chưa đăng nhập!");
+      alert(t("youAreNotLoggedIn"));
       return;
     }
 
@@ -67,7 +70,7 @@ export const useImportYugioh = () => {
     connection.on("ProgressUpdate", (data) => {
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
-      setStatus(`📄 Đang xử lý file (${data.current}/${data.total})`);
+      setStatus(`📄 ${t("processingFile")} (${data.current}/${data.total})`);
     });
 
     connectionRef.current = connection;
@@ -80,7 +83,7 @@ export const useImportYugioh = () => {
       setLoading(true);
       setMessage("");
       setProgress(0);
-      setStatus("🔄 Đồng bộ dữ liệu...");
+      setStatus("🔄 "+t("dataSynchronization")+"...");
 
       const authHeader = {
         headers: {
@@ -93,7 +96,7 @@ export const useImportYugioh = () => {
         setSyncMessage(syncRes.data.message);
       }
 
-      setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
+      setStatus("📥 "+t("sendingDataImportRequest")+"...");
       const res = await api.post("/api/Import/import-yugioh", null, authHeader);
       setMessage(res.data.message);
       setLastImportTime(now);
@@ -105,7 +108,7 @@ export const useImportYugioh = () => {
       );
     } catch (err) {
       console.error(err);
-      setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
+      setMessage("❌ "+t("errorCallingImportOrSyncAPI"));
     } finally {
       setLoading(false);
       setStatus("");

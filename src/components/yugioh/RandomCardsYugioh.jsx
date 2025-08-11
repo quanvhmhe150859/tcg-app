@@ -13,15 +13,17 @@ import {
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
 import { useNavigate } from "react-router-dom";
-
-const DEFAULT_OPTIONS = [
-  { value: "", label: "🌐 All Pack" },
-  { value: "__random_pack__", label: "🔀 Random Pack" },
-];
-
-const defaultSet = DEFAULT_OPTIONS[0];
+import { useTranslation } from "react-i18next";
 
 const RandomCardsYugioh = () => {
+  const { t } = useTranslation();
+
+  const DEFAULT_OPTIONS = [
+    { value: "", label: "🌐 " + t("all") + " Pack" },
+    { value: "__random_pack__", label: "🔀 " + t("random") + " Pack" },
+  ];
+
+  const defaultSet = DEFAULT_OPTIONS[0];
   const [allSets, setAllSets] = useState([]);
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [selectedSet, setSelectedSet] = useState(defaultSet);
@@ -62,7 +64,7 @@ const RandomCardsYugioh = () => {
       }
     };
     fetchCardSets();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const raw = localStorage.getItem("allowedTypesYugioh");
@@ -70,7 +72,7 @@ const RandomCardsYugioh = () => {
       try {
         const types = JSON.parse(raw);
         const options = [
-          { value: "", label: "All Types" },
+          { value: "", label: t("all")+" Types" },
           ...types.map((t) => ({ value: t, label: t })),
         ];
         setTypeOptions(options);
@@ -78,7 +80,7 @@ const RandomCardsYugioh = () => {
         console.error("Không thể parse typesYugioh:", err);
       }
     }
-  }, []);
+  }, [t]);
 
   const handleInputChange = (value) => {
     setInputValue(value);
@@ -110,9 +112,6 @@ const RandomCardsYugioh = () => {
 
     try {
       let result = [];
-
-      // const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
-      // if (!raw) throw new Error("Không có dữ liệu allowedRaritiesYugiohWeights");
 
       const fullWeights = JSON.parse(raw);
 
@@ -174,14 +173,14 @@ const RandomCardsYugioh = () => {
       <div className={styles.rollContainer}>
         <h1 className="text-4xl font-bold mt-4 mb-8">
           <span className="hidden md:inline">🃏 </span>
-          Yu-Gi-Oh! Card
+          Yu-Gi-Oh! Gacha
         </h1>
 
         {/* Dropdown chọn pack */}
         <div
           className={styles.comboControls}
           data-tooltip-id="select-pack-tooltip"
-          data-tooltip-content="🔍 Nhập từ 3 ký tự để tìm pack..."
+          data-tooltip-content={`🔍 ${t("enter3CharatersToSearch")} pack...`}
         >
           <SelectBox
             options={filteredOptions}
@@ -196,8 +195,8 @@ const RandomCardsYugioh = () => {
             onInputChange={handleInputChange}
             noOptionsMessage={() =>
               inputValue.length < 3
-                ? "Nhập ít nhất 3 ký tự để tìm pack"
-                : "Không tìm thấy pack nào"
+                ? t("enter3CharatersToSearch")+" pack"
+                : t("noPacksFound")
             }
             placeholder={placeholder}
           />
@@ -222,18 +221,18 @@ const RandomCardsYugioh = () => {
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />
-          <span>⏳ Đang roll card, vui lòng chờ...</span>
+          <span>⏳ {t("rollingCard")}, {t("pleaseWait")}...</span>
         </div>
       )}
 
       {!isRolling && noResultWarning && (
         <p className={styles.warningMessage}>
-          ⚠️ Không có thẻ nào phù hợp với lựa chọn hiện tại.
+          ⚠️ {t("noCardsMatchTheCurrentSelection")}.
         </p>
       )}
 
       {!isRolling && cards.length > 0 && (
-        <p className={styles.totalPrice}>💰 Tổng giá trị : ${totalPrice}</p>
+        <p className={styles.totalPrice}>💰 {t("totalPrice")} : ${totalPrice}</p>
       )}
 
       <div className={styles.cardList}>

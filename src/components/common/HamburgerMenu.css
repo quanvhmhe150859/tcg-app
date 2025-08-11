@@ -60,7 +60,6 @@
 .hamburger-menu-content ul li a:hover,
 .hamburger-menu-content ul li button:hover {
   background-color: var(--color-button-hover);
-  color: var(--color-background);
   border-radius: 4px;
 }
 

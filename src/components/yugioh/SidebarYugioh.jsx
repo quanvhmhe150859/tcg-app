@@ -1,5 +1,7 @@
 import Select from "react-select";
 import customSelectStyles from "../../utils/customSelectStyles";
+import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function Sidebar({
   search,
@@ -31,6 +33,8 @@ export default function Sidebar({
   attributeOptions,
   setPage,
 }) {
+  const { t } = useTranslation();
+
   const clearYugiohFilters = () => {
     setSearch("");
     setType(typeOptions[0]);
@@ -50,18 +54,21 @@ export default function Sidebar({
   return (
     <div className="w-60 shrink-0">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-bold">Filters</h2>
+        <h2 className="text-lg font-bold">{t("filters")}</h2>
         <button
-          className="text-[12px] leading-none"
+          className="text-[20px] leading-none py-1! px-2!"
           onClick={clearYugiohFilters}
+          data-tooltip-id="clear-filters-tooltip"
+          data-tooltip-content={t("clearFilters")}
         >
           🧹
         </button>
+        <Tooltip id="clear-filters-tooltip" place="top" effect="solid" />
       </div>
 
       <input
         type="text"
-        placeholder="Search cards..."
+        placeholder={t("search") + "..."}
         className="border p-2 rounded w-full mb-3"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -93,18 +100,18 @@ export default function Sidebar({
       />
 
       <div className="mb-3">
-        <p className="font-medium">ATK Range</p>
+        <p className="font-bold italic">{t("atkRange")}</p>
         <div className="flex gap-2">
           <input
             type="number"
-            placeholder="Min"
+            placeholder={t("min")}
             className="border p-1 rounded w-full"
             value={atkMin}
             onChange={(e) => setAtkMin(e.target.value)}
           />
           <input
             type="number"
-            placeholder="Max"
+            placeholder={t("max")}
             className="border p-1 rounded w-full"
             value={atkMax}
             onChange={(e) => setAtkMax(e.target.value)}
@@ -113,18 +120,18 @@ export default function Sidebar({
       </div>
 
       <div className="mb-3">
-        <p className="font-medium">DEF Range</p>
+        <p className="font-bold italic">{t("defRange")}</p>
         <div className="flex gap-2">
           <input
             type="number"
-            placeholder="Min"
+            placeholder={t("min")}
             className="border p-1 rounded w-full"
             value={defMin}
             onChange={(e) => setDefMin(e.target.value)}
           />
           <input
             type="number"
-            placeholder="Max"
+            placeholder={t("max")}
             className="border p-1 rounded w-full"
             value={defMax}
             onChange={(e) => setDefMax(e.target.value)}
@@ -133,18 +140,18 @@ export default function Sidebar({
       </div>
 
       <div className="mb-3">
-        <p className="font-medium">Level Range</p>
+        <p className="font-bold italic">{t("levelRange")}</p>
         <div className="flex gap-2">
           <input
             type="number"
-            placeholder="Min"
+            placeholder={t("min")}
             className="border p-1 rounded w-full"
             value={levelMin}
             onChange={(e) => setLevelMin(e.target.value)}
           />
           <input
             type="number"
-            placeholder="Max"
+            placeholder={t("max")}
             className="border p-1 rounded w-full"
             value={levelMax}
             onChange={(e) => setLevelMax(e.target.value)}
@@ -153,7 +160,7 @@ export default function Sidebar({
       </div>
 
       <div className="mb-3">
-        <p className="font-medium mb-1">Order Field</p>
+        <p className="font-bold italic mb-1">{t("orderField")}</p>
         <label className="mr-3">
           <input
             type="radio"
@@ -161,7 +168,7 @@ export default function Sidebar({
             checked={orderField === "name"}
             onChange={(e) => setOrderField(e.target.value)}
           />{" "}
-          Name
+          {t("name")}
         </label>
         <label>
           <input
@@ -170,12 +177,12 @@ export default function Sidebar({
             checked={orderField === "price"}
             onChange={(e) => setOrderField(e.target.value)}
           />{" "}
-          Price
+          {t("price")}
         </label>
       </div>
 
       <div className="mb-3">
-        <p className="font-medium mb-1">Order By</p>
+        <p className="font-bold italic mb-1">{t("orderBy")}</p>
         <label className="mr-3">
           <input
             type="radio"
@@ -183,7 +190,7 @@ export default function Sidebar({
             checked={orderBy === "asc"}
             onChange={(e) => setOrderBy(e.target.value)}
           />{" "}
-          Asc
+          {t("ascending")}
         </label>
         <label>
           <input
@@ -192,7 +199,7 @@ export default function Sidebar({
             checked={orderBy === "desc"}
             onChange={(e) => setOrderBy(e.target.value)}
           />{" "}
-          Desc
+          {t("descending")}
         </label>
       </div>
     </div>

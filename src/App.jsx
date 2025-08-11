@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import RandomCardsPokemon from "./components/pokemon/RandomCardsPokemon";
-import PokemonCardList from "./components/pokemon/CardsListPokemon";
+import ListCardsPokemon from "./components/pokemon/ListCardsPokemon";
 
 import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
-import YugiohCardList from "./components/yugioh/CardsListYugioh";
+import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 
 import TextStatGame from "./game/AutoGame"
 
@@ -14,6 +14,8 @@ import DarkModeToggle from "./components/common/DarkModeToggle";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 import MusicToggleButton from "./components/common/MusicToggleButton";
 import "./App.css";
+import LanguageSwitcher from "./components/common/LanguageSwitcher";
+import "./i18n";
 
 function setFavicon(iconUrl) {
   const link =
@@ -49,17 +51,19 @@ function App() {
   return (
     <Router>
       <div className="app">
+        <FaviconUpdater />
         <HamburgerMenu />
         <DarkModeToggle />
-        <FaviconUpdater />
         <ScrollToTopButton />
         <MusicToggleButton />
+        <LanguageSwitcher />
+        
         <Routes>
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCardsPokemon />} />
-          <Route path="/pokemonls" element={<PokemonCardList />} />
+          <Route path="/pokemonls" element={<ListCardsPokemon />} />
           <Route path="/yugioh" element={<RandomCardsYugioh />} />
-          <Route path="/yugiohls" element={<YugiohCardList />} />
+          <Route path="/yugiohls" element={<ListCardsYugioh />} />
           <Route path="/game" element={<TextStatGame />} />
         </Routes>
       </div>

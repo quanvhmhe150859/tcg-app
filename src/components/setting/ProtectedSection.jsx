@@ -1,7 +1,10 @@
 import { useState } from "react";
 import api from "../../utils/api";
+import { useTranslation } from "react-i18next";
 
 export default function ProtectedSection({ children }) {
+  const { t } = useTranslation();
+
   const [unlocked, setUnlocked] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -14,7 +17,7 @@ export default function ProtectedSection({ children }) {
       localStorage.setItem("jwt", data.token);
       setUnlocked(true);
     } catch (err) {
-      alert("Đăng nhập thất bại");
+      alert(t("loginFailed"));
     }
   };
 
@@ -36,7 +39,7 @@ export default function ProtectedSection({ children }) {
           className="absolute left-1/2 top-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm flex 
           flex-col justify-center items-center p-4 gap-3 rounded shadow-md"
         >
-          <p className="font-semibold text-black">Nhập mật khẩu:</p>
+          <p className="font-semibold text-black">{t("enterPassword")}:</p>
           <input
             type="password"
             value={password}
@@ -48,7 +51,7 @@ export default function ProtectedSection({ children }) {
             type="submit"
             className="bg-black text-white px-4 py-1 rounded"
           >
-            Xác nhận
+            {t("confirm")}
           </button>
         </form>
       )}

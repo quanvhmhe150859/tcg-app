@@ -1,16 +1,19 @@
 import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
 import { allTypesPokemon, allTypesYugioh } from "../../utils/constants";
 import "./AdminSettings.css";
+import { useTranslation } from "react-i18next";
 
 const AllowedTypesSelector = forwardRef(({ type = "pokemon" }, ref) => {
+  const { t } = useTranslation();
+  
   const config = {
     pokemon: {
-      title: "Allowed Types",
+      title: "Types "+t("allowed"),
       allTypes: allTypesPokemon,
       localKey: "allowedTypesPokemon",
     },
     yugioh: {
-      title: "Allowed Types",
+      title: "Types "+t("allowed"),
       allTypes: allTypesYugioh,
       localKey: "allowedTypesYugioh",
     },

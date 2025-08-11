@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { useBgm } from "../context/BgmContext";
+import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 const getLabel = (mode) => {
   switch (mode) {
-    case "loop_one": return "🔂";
-    case "loop_all": return "🔁";
-    case "random": return "🔀";
-    default: return "";
+    case "loop_one":
+      return "🔂";
+    case "loop_all":
+      return "🔁";
+    case "random":
+      return "🔀";
+    default:
+      return "";
   }
 };
 
 export default function BgmPlayer() {
+  const { t } = useTranslation();
+
   const {
     audioRef,
     volume,
@@ -53,15 +61,19 @@ export default function BgmPlayer() {
   const formatTime = (sec) => {
     if (!sec) return "0:00";
     const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60).toString().padStart(2, "0");
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
     return `${m}:${s}`;
   };
 
   return (
     <div className="section">
-      <h3 className="font-bold mb-2">Background Music</h3>
+      <h3 className="font-bold mb-2">{t("backgroundMusic")}</h3>
 
-      <label className="block mb-2 text-sm font-medium">🎵 Chọn bài hát:</label>
+      <label className="block mb-2 text-sm font-medium">
+        🎵 {t("selectSongs")}:
+      </label>
       <div className="border rounded max-h-64 overflow-y-auto mb-4">
         <ul className="divide-y divide-gray-200 text-sm">
           {tracks.map((track, i) => (
@@ -81,16 +93,18 @@ export default function BgmPlayer() {
       <button
         onClick={handleChangeMode}
         className="text-xl mb-4 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
-        title="Chế độ phát"
+        data-tooltip-id="mode-tooltip"
+        data-tooltip-content={`${t(getLabel(mode))}`}
       >
-        Chế độ: {getLabel(mode)}
+        {t("playMode")}: {getLabel(mode)}
       </button>
+      <Tooltip id="mode-tooltip" place="bottom" effect="solid" />
 
       <div className="text-sm mb-4">
         {formatTime(currentTime)} / {formatTime(duration)}
       </div>
 
-      <label className="block mb-1 text-sm font-medium">Âm lượng:</label>
+      <label className="block mb-1 text-sm font-medium">{t("volume")}:</label>
       <input
         type="range"
         min={0}

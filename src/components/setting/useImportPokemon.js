@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import { getOrFetchAndSet } from "../../utils/cache";
 import api from "../../utils/api";
+import { useTranslation } from "react-i18next";
 
 export const useImportPokemon = () => {
+  const { t } = useTranslation();
+
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,13 +45,13 @@ export const useImportPokemon = () => {
 
   const handleImport = async () => {
     const confirmed = window.confirm(
-      "Bạn có chắc muốn cập nhật toàn bộ dữ liệu Pokémon?"
+      t("areYouSureYouWantToUpdatePokemonData")
     );
     if (!confirmed) return;
 
     const token = localStorage.getItem("jwt");
     if (!token) {
-      alert("Bạn chưa đăng nhập!");
+      alert(t("youAreNotLoggedIn"));
       return;
     }
 
@@ -65,7 +68,7 @@ export const useImportPokemon = () => {
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
       setStatus(
-        `📄 Đang xử lý file ${data.file} (${data.current}/${data.total})`
+        `📄 ${t("processingFile")} ${data.file} (${data.current}/${data.total})`
       );
     });
 
@@ -79,7 +82,7 @@ export const useImportPokemon = () => {
       setLoading(true);
       setMessage("");
       setProgress(0);
-      setStatus("🔄 Đồng bộ dữ liệu...");
+      setStatus("🔄 "+t("dataSynchronization")+"...");
 
       const authHeader = {
         headers: {
@@ -92,7 +95,7 @@ export const useImportPokemon = () => {
         setSyncMessage(syncRes.data.message);
       }
 
-      setStatus("📥 Đang gửi yêu cầu nhập dữ liệu...");
+      setStatus("📥 "+t("sendingDataImportRequest")+"...");
       const res = await api.post("/api/Import/import-pokemon", null, authHeader);
       setMessage(res.data.message);
       setLastImportTime(now);
@@ -104,7 +107,7 @@ export const useImportPokemon = () => {
       );
     } catch (err) {
       console.error(err);
-      setMessage("❌ Lỗi khi gọi API import hoặc đồng bộ.");
+      setMessage("❌ "+t("errorCallingImportOrSyncAPI"));
     } finally {
       setLoading(false);
       setStatus("");

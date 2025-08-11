@@ -6,11 +6,14 @@ import React, {
 } from "react";
 import { allRaritiesYugioh } from "../../utils/constants";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 const LOCAL_KEY = "allowedRaritiesYugiohWeights";
 const TOTAL_WEIGHT = 10000;
 
 const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
+  const { t } = useTranslation();
+
   const [weights, setWeights] = useState({});
   const [fixedFirstPercent, setFixedFirstPercent] = useState("");
 
@@ -110,7 +113,7 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
     <div className="section">
       <Tooltip id="tooltip" />
 
-      <h3 className="text-lg font-bold">Allowed Rarities</h3>
+      <h3 className="text-lg font-bold">Rarities {t("allowed")}</h3>
 
       <div className="flex justify-center items-center gap-2">
         <label>Common:</label>
@@ -129,9 +132,9 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
           onClick={handleRandom}
           className="bg-blue-500 text-white px-2 py-1 rounded"
         >
-          Randomize
+          {t("randomize")}
         </button>
-        <label>Total Weights: (Total = {total})</label>
+        <label>{t("total")} Weights: ({t("total")} = {total})</label>
       </div>
 
       <div className="overflow-y-auto max-h-[500px] m-1 p-1">

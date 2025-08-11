@@ -1,8 +1,11 @@
 import React from "react";
 import { useImportPokemon } from "./useImportPokemon";
 import "../common/ImportData.css";
+import { useTranslation } from "react-i18next";
 
 const ImportDataPokemon = () => {
+  const { t } = useTranslation();
+  
   const {
     progress,
     status,
@@ -24,25 +27,25 @@ const ImportDataPokemon = () => {
         disabled={loading}
         className={`import-button${loading ? " loading" : ""}`}
       >
-        {loading ? "Đang nhập dữ liệu..." : "📥 Cập nhật dữ liệu Pokémon"}
+        {loading ? t("importingData")+"..." : "📥 "+t("updatePokemonData")}
       </button>
 
       {lastImportTime && (
         <p className="last-import-time">
-          🕒 Lần import gần nhất: <strong>{lastImportTime.toLocaleString()}</strong>
+          🕒 {t("lastImport")}: <strong>{lastImportTime.toLocaleString()}</strong>
         </p>
       )}
 
       {lastUpdate && (
         <p className="repo-update-time">
-          📦 Repo <code>{repoName}</code> cập nhật gần nhất:{" "}
+          📦 Repo <code>{repoName}</code> {t("lastImport")}:{" "}
           <strong>{lastUpdate.toLocaleString()}</strong>
         </p>
       )}
 
       {repoWarning && (
         <p className="repo-warning">
-          ⚠️ Dữ liệu đã được cập nhật sau lần import. Bạn nên cập nhật lại dữ liệu.
+          ⚠️ {t("theDataHasBeenUpdated")} {t("youShouldUpdateTheDataAgain")}
         </p>
       )}
 

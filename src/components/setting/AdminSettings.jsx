@@ -8,8 +8,11 @@ import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 import BgmPlayer from "./BgmPlayer";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const AdminSettings = () => {
+  const { t } = useTranslation();
+
   const location = useLocation();
 
   const [tab, setTab] = useState("general");
@@ -48,14 +51,14 @@ const AdminSettings = () => {
       pokemonRarities.current?.save();
     }
 
-    alert("All settings saved!");
+    alert(t("allSettingsSaved")+"!");
   };
 
   return (
     <div className="admin-settings">
       <h1 className="text-4xl font-bold mt-4 mb-8">
         <span className="hidden md:inline">🛠️ </span>
-        Settings
+        {t("settings")}
       </h1>
 
       {/* Tab Buttons */}
@@ -64,7 +67,7 @@ const AdminSettings = () => {
           className={tab === "general" ? "selected-tab" : ""}
           onClick={() => setTab("general")}
         >
-          General
+          {t("general")}
         </button>
         <button
           className={tab === "pokemon" ? "selected-tab" : ""}
@@ -98,14 +101,14 @@ const AdminSettings = () => {
 
         <ProtectedSection>
           <div className="section">
-            <h3>Import Data</h3>
+            <h3>{t("importData")}</h3>
             <ImportDataPokemon />
             <ImportDataYugioh />
           </div>
         </ProtectedSection>
       </div>
 
-      {tab !== "general" && <button onClick={handleSave}>Save</button>}
+      {tab !== "general" && <button onClick={handleSave}>{t("save")}</button>}
     </div>
   );
 };

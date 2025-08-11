@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Pagination({ page, totalPages, setPage, isLoading }) {
+  const { t } = useTranslation();
+
   const [showInput, setShowInput] = useState({ start: false, end: false });
   const [inputPage, setInputPage] = useState("");
 
@@ -29,7 +32,7 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
         disabled={page <= 1 || isLoading}
         onClick={() => setPage(page - 1)}
       >
-        Prev
+        {t("prev")}
       </button>
 
       {/* Trang đầu */}
@@ -133,7 +136,7 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
         disabled={page >= totalPages || isLoading}
         onClick={() => setPage(page + 1)}
       >
-        Next
+        {t("next")}
       </button>
     </div>
   );

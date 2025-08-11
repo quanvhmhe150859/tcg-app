@@ -6,8 +6,11 @@ import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
 import SelectBox from "../common/SelectBox";
+import { useTranslation } from "react-i18next";
 
 const RandomCardsPokemon = () => {
+  const { t } = useTranslation();
+
   const [cards, setCards] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
 
@@ -58,20 +61,20 @@ const RandomCardsPokemon = () => {
   };
 
   const optionsSuperType = [
-    { label: "🌐 All Super Types", value: "" },
+    { label: "🌐 " +t("all")+ " Supertypes", value: "" },
     { label: "🔥 Pokémon", value: "Pokémon" },
     { label: "📘 Trainer", value: "Trainer" },
     { label: "⚡ Energy", value: "Energy" },
   ];
 
-  const optionsRarity = [{ label: "All Rarity", value: "" }].concat(
+  const optionsRarity = [{ label: t("all")+" Rarity", value: "" }].concat(
     filteredRarities.map((r) => ({
       label: r,
       value: r,
     }))
   );
 
-  const optionsType = [{ label: "All Type", value: "" }].concat(
+  const optionsType = [{ label: t("all")+" Type", value: "" }].concat(
     filteredTypes.map((t) => ({
       label: t,
       value: t,
@@ -89,7 +92,7 @@ const RandomCardsPokemon = () => {
       <div className={styles.rollContainer}>
         <h1 className="text-4xl font-bold mt-4 mb-8">
           <span className="hidden md:inline">🎴 </span>
-          Pokémon Card
+          Pokémon Gacha
         </h1>
         <div className={styles.comboControls}>
           <SelectBox
@@ -125,13 +128,13 @@ const RandomCardsPokemon = () => {
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />
-          <span>⏳ Đang roll card, vui lòng chờ...</span>
+          <span>⏳ {t("rollingCard")}, {t("pleaseWait")}...</span>
         </div>
       )}
 
       {!isRolling && noResultWarning && (
         <p className="m-4">
-          ⚠️ Không có thẻ nào phù hợp với lựa chọn hiện tại.
+          ⚠️ {t("noCardsMatchTheCurrentSelection")}.
         </p>
       )}
 

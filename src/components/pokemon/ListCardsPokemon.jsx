@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
-import { allTypesYugioh, allAttributesYugioh } from "../../utils/constants";
 import Pagination from "../common/Pagination";
-import Sidebar from "./SidebarYugioh";
+import Sidebar from "./SidebarPokemon";
+import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
+import { useTranslation } from "react-i18next";
 
-export default function YugiohCardList() {
+export default function ListCardsPokemon() {
+  const { t } = useTranslation();
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [cards, setCards] = useState([]);
@@ -13,58 +16,30 @@ export default function YugiohCardList() {
   const [totalPages, setTotalPages] = useState(1);
   const [showSidebar, setShowSidebar] = useState(true);
 
-  // Bộ lọc
-  const [atkMin, setAtkMin] = useState("");
-  const [atkMax, setAtkMax] = useState("");
-  const [defMin, setDefMin] = useState("");
-  const [defMax, setDefMax] = useState("");
-  const [levelMin, setLevelMin] = useState("");
-  const [levelMax, setLevelMax] = useState("");
-
-  // Order
-  const [orderField, setOrderField] = useState("name");
+  // Bộ lọc mới
+  const [superType, setSuperType] = useState(null);
+  const [rarity, setRarity] = useState(null);
+  const [type, setType] = useState(null);
+  const [dexNumber, setDexNumber] = useState("");
   const [orderBy, setOrderBy] = useState("asc");
 
-  // Option mặc định
-  const allTypeOption = { value: "", label: "All Type" };
-  const allArchetypeOption = { value: "", label: "All Archetype" };
-  const allAttributeOption = { value: "", label: "All Attribute" };
+  // react-select options
+  const superTypeOptions = [
+    { value: "", label: t("all")+" Supertypes" },
+    { value: "Pokémon", label: "Pokémon" },
+    { value: "Trainer", label: "Trainer" },
+    { value: "Energy", label: "Energy" },
+  ];
 
-  // State mặc định là "All"
-  const [type, setType] = useState(allTypeOption);
-  const [archetype, setArchetype] = useState(allArchetypeOption);
-  const [attribute, setAttribute] = useState(allAttributeOption);
+  const rarityOptions = [
+    { value: "", label: t("all")+" Rarities" },
+    ...allRaritiesPokemon.map((r) => ({ value: r, label: r })),
+  ];
 
-  // Options cho dropdown
   const typeOptions = [
-    allTypeOption,
-    ...allTypesYugioh.map((t) => ({ value: t, label: t })),
+    { value: "", label: t("all")+" Types" },
+    ...allTypesPokemon.map((t) => ({ value: t, label: t })),
   ];
-  const attributeOptions = [
-    allAttributeOption,
-    ...allAttributesYugioh.map((a) => ({ value: a, label: a })),
-  ];
-  const [archetypeOptions, setArchetypeOptions] = useState([
-    allArchetypeOption,
-  ]);
-
-  // Fetch archetypes từ API
-  useEffect(() => {
-    const fetchArchetypes = async () => {
-      try {
-        const res = await api.get("/api/CardsYugioh/archetypes");
-        if (Array.isArray(res.data)) {
-          setArchetypeOptions([
-            allArchetypeOption,
-            ...res.data.map((item) => ({ value: item, label: item })),
-          ]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch archetypes", err);
-      }
-    };
-    fetchArchetypes();
-  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -76,7 +51,7 @@ export default function YugiohCardList() {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -84,21 +59,15 @@ export default function YugiohCardList() {
     const fetchCards = async () => {
       setLoading(true);
       try {
-        const res = await api.get("/api/CardsYugioh", {
+        const res = await api.get("/api/CardsPokemon", {
           params: {
             name: debouncedSearch,
             page,
             pageSize: 10,
+            superType: superType?.value || undefined,
+            rarity: rarity?.value || undefined,
             type: type?.value || undefined,
-            archetype: archetype?.value || undefined,
-            attribute: attribute?.value || undefined,
-            atkMin: atkMin || undefined,
-            atkMax: atkMax || undefined,
-            defMin: defMin || undefined,
-            defMax: defMax || undefined,
-            levelMin: levelMin || undefined,
-            levelMax: levelMax || undefined,
-            orderField,
+            dexNumber: dexNumber || undefined,
             orderBy,
           },
         });
@@ -115,28 +84,14 @@ export default function YugiohCardList() {
     };
 
     fetchCards();
-  }, [
-    debouncedSearch,
-    page,
-    type,
-    archetype,
-    attribute,
-    atkMin,
-    atkMax,
-    defMin,
-    defMax,
-    levelMin,
-    levelMax,
-    orderField,
-    orderBy,
-  ]);
+  }, [debouncedSearch, page, superType, rarity, type, dexNumber, orderBy]);
 
   return (
     <div className="flex gap-4 p-4">
       {/* Main content */}
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">Yugioh Cards</h2>
+          <h2 className="text-xl font-bold">{t("listCards")} Pokémon</h2>
           <button
             className="text-sm text-blue-500 underline"
             onClick={() => setShowSidebar((prev) => !prev)}
@@ -178,9 +133,9 @@ export default function YugiohCardList() {
         </div>
 
         {loading ? (
-          <p className="italic text-gray-500">Loading cards...</p>
+          <p className="italic text-gray-500">{t("loadingCards")}...</p>
         ) : cards.length === 0 ? (
-          <p>No results found.</p>
+          <p>{t("notResultsFound")}.</p>
         ) : (
           <div
             className="grid gap-4"
@@ -190,7 +145,7 @@ export default function YugiohCardList() {
           >
             {cards.map((card) => (
               <div
-                key={card.cardId}
+                key={card.id}
                 className="border p-3 rounded shadow-sm hover:shadow-md transition bg-white"
               >
                 {card.imageUrl && (
@@ -204,7 +159,7 @@ export default function YugiohCardList() {
                   {card.name}
                 </h3>
                 <p className="text-sm text-center text-gray-500">
-                  Price: {card.price ?? "N/A"}
+                  {card.rarity}
                 </p>
               </div>
             ))}
@@ -223,31 +178,19 @@ export default function YugiohCardList() {
         <Sidebar
           search={search}
           setSearch={setSearch}
+          superType={superType}
+          setSuperType={setSuperType}
+          rarity={rarity}
+          setRarity={setRarity}
           type={type}
           setType={setType}
-          archetype={archetype}
-          setArchetype={setArchetype}
-          attribute={attribute}
-          setAttribute={setAttribute}
-          atkMin={atkMin}
-          setAtkMin={setAtkMin}
-          atkMax={atkMax}
-          setAtkMax={setAtkMax}
-          defMin={defMin}
-          setDefMin={setDefMin}
-          defMax={defMax}
-          setDefMax={setDefMax}
-          levelMin={levelMin}
-          setLevelMin={setLevelMin}
-          levelMax={levelMax}
-          setLevelMax={setLevelMax}
-          orderField={orderField}
-          setOrderField={setOrderField}
+          dexNumber={dexNumber}
+          setDexNumber={setDexNumber}
           orderBy={orderBy}
           setOrderBy={setOrderBy}
+          superTypeOptions={superTypeOptions}
+          rarityOptions={rarityOptions}
           typeOptions={typeOptions}
-          archetypeOptions={archetypeOptions}
-          attributeOptions={attributeOptions}
           setPage={setPage}
         />
       )}

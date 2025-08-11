@@ -1,8 +1,11 @@
 import React from "react";
 import { useImportYugioh } from "./useImportYugioh";
 import "../common/ImportData.css";
+import { useTranslation } from "react-i18next";
 
 const ImportDataYugioh = () => {
+  const { t } = useTranslation();
+
   const {
     progress,
     status,
@@ -25,26 +28,26 @@ const ImportDataYugioh = () => {
         disabled={loading}
         className={`import-button${loading ? " loading" : ""}`}
       >
-        {loading ? "Đang nhập dữ liệu..." : "📥 Cập nhật dữ liệu Yu-Gi-Oh!"}
+        {loading ? t("importingData")+"..." : "📥 "+t("updateYugiohData")}
       </button>
 
       {lastImportTime && (
         <p className="last-import-time">
-          🕒 Lần import gần nhất:{" "}
+          🕒 {t("lastImport")}:{" "}
           <strong>{lastImportTime.toLocaleString()}</strong>
         </p>
       )}
 
       {lastUpdate && (
         <p className="repo-update-time">
-          📦 <code>ygoprodeck.com</code> cập nhật gần nhất:{" "}
+          📦 <code>ygoprodeck.com</code> {t("lastImport")}:{" "}
           <strong>{lastUpdate.toLocaleString()}</strong>
         </p>
       )}
 
       {repoWarning && (
         <p className="repo-warning">
-          ⚠️ Dữ liệu đã được cập nhật sau lần import. Bạn nên cập nhật lại dữ liệu.
+          ⚠️ {t("theDataHasBeenUpdated")} {t("youShouldUpdateTheDataAgain")}
         </p>
       )}
 

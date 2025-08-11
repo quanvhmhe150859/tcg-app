@@ -1,10 +1,13 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { allRaritiesPokemon } from "../../utils/constants";
 import "./AdminSettings.css";
+import { useTranslation } from "react-i18next";
 
 const LOCAL_KEY = "allowedRaritiesPokemon";
 
 const AllowedRaritiesPokemon = forwardRef((_, ref) => {
+  const { t } = useTranslation();
+
   const [selected, setSelected] = useState([]);
 
   useEffect(() => {
@@ -26,7 +29,7 @@ const AllowedRaritiesPokemon = forwardRef((_, ref) => {
 
   return (
     <div className="section">
-      <h3>Allowed Rarities</h3>
+      <h3>Rarities {t("allowed")}</h3>
       <div className="toggle-group">
         {allRaritiesPokemon.map((rarity) => (
           <button

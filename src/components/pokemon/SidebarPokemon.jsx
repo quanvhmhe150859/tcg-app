@@ -1,5 +1,7 @@
 import Select from "react-select";
 import customSelectStyles from "../../utils/customSelectStyles";
+import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function Sidebar({
   search,
@@ -19,6 +21,8 @@ export default function Sidebar({
   typeOptions,
   setPage,
 }) {
+  const { t } = useTranslation();
+
   const clearPokemonFilters = () => {
     setSearch("");
     setSuperType(superTypeOptions[0]);
@@ -32,18 +36,21 @@ export default function Sidebar({
   return (
     <div className="w-60 shrink-0">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-bold">Filters</h2>
+        <h2 className="text-lg font-bold">{t("filters")}</h2>
         <button
-          className="text-[12px] leading-none"
+          className="text-[20px] leading-none py-1! px-2!"
           onClick={clearPokemonFilters}
+          data-tooltip-id="clear-filters-tooltip"
+          data-tooltip-content={t("clearFilters")}
         >
           🧹
         </button>
+        <Tooltip id="clear-filters-tooltip" place="top" effect="solid" />
       </div>
 
       <input
         type="text"
-        placeholder="Search cards..."
+        placeholder={t("search")+"..."}
         className="border p-2 rounded w-full mb-3"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -87,7 +94,7 @@ export default function Sidebar({
       {/* DexNumber */}
       <input
         type="number"
-        placeholder="Dex Number"
+        placeholder={t("dexNumber")}
         className="border p-2 rounded w-full mb-3"
         value={dexNumber}
         onChange={(e) => setDexNumber(e.target.value)}
@@ -95,7 +102,7 @@ export default function Sidebar({
 
       {/* OrderBy */}
       <div className="mb-3">
-        <p className="font-medium mb-1">Order By Name</p>
+        <p className="font-bold italic mb-1">{t("orderBy")} {t("name")}</p>
         <label className="mr-3">
           <input
             type="radio"
@@ -103,7 +110,7 @@ export default function Sidebar({
             checked={orderBy === "asc"}
             onChange={(e) => setOrderBy(e.target.value)}
           />{" "}
-          Ascending
+          {t("ascending")}
         </label>
         <label>
           <input
@@ -112,7 +119,7 @@ export default function Sidebar({
             checked={orderBy === "desc"}
             onChange={(e) => setOrderBy(e.target.value)}
           />{" "}
-          Descending
+          {t("descending")}
         </label>
       </div>
     </div>
