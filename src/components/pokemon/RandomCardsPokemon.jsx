@@ -91,8 +91,9 @@ const RandomCardsPokemon = () => {
     <div className={styles.container}>
       <div className={styles.rollContainer}>
         <h1 className="text-4xl font-bold mt-4 mb-8">
-          <span className="hidden md:inline">🎴 </span>
-          Pokémon Gacha
+          <span className="hidden sm:inline">🎴 </span>
+          Pokémon
+          <span className="hidden sm:inline"> Gacha</span>
         </h1>
         <div className={styles.comboControls}>
           <SelectBox

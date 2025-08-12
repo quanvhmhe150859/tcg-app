@@ -37,8 +37,10 @@ function FaviconUpdater() {
     } else if (location.pathname.startsWith("/yugioh")) {
       setFavicon("/yugioh-icon.png");
       document.title = "Yu-Gi-Oh! TCG";
-    } else {
-      // fallback
+    } else if (location.pathname.startsWith("/game")) {
+      setFavicon("/game-icon.png");
+      document.title = "Game";
+    }else {
       setFavicon("/vite.svg");
       document.title = "TCG";
     }
@@ -53,8 +55,9 @@ function App() {
       <div className="app">
         <FaviconUpdater />
         <HamburgerMenu />
-        <DarkModeToggle />
         <ScrollToTopButton />
+        
+        <DarkModeToggle />
         <MusicToggleButton />
         <LanguageSwitcher />
         

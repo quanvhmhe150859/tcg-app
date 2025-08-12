@@ -39,8 +39,21 @@ const RandomCardsYugioh = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // const raw = localStorage.getItem("allowedRaritiesYugiohWeights");
-    if (!raw || raw === "null" || raw.trim() === "") {
+    let parsedRaw;
+    try {
+      parsedRaw = raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      parsedRaw = null;
+    }
+
+    if (
+      !parsedRaw ||
+      parsedRaw === "null" ||
+      (typeof parsedRaw === "string" && parsedRaw.trim() === "") ||
+      (typeof parsedRaw === "object" &&
+        parsedRaw !== null &&
+        Object.keys(parsedRaw).length === 0)
+    ) {
       alert("Chưa thiết lập Allowed Rarities Yugioh Weights!");
       navigate("/", { state: { defaultTab: "yugioh" } });
     }
@@ -72,7 +85,7 @@ const RandomCardsYugioh = () => {
       try {
         const types = JSON.parse(raw);
         const options = [
-          { value: "", label: t("all")+" Types" },
+          { value: "", label: t("all") + " Types" },
           ...types.map((t) => ({ value: t, label: t })),
         ];
         setTypeOptions(options);
@@ -172,8 +185,9 @@ const RandomCardsYugioh = () => {
     <div className={styles.container}>
       <div className={styles.rollContainer}>
         <h1 className="text-4xl font-bold mt-4 mb-8">
-          <span className="hidden md:inline">🃏 </span>
-          Yu-Gi-Oh! Gacha
+          <span className="hidden sm:inline">🃏 </span>
+          Yu-Gi-Oh!
+          <span className="hidden sm:inline"> Gacha</span>
         </h1>
 
         {/* Dropdown chọn pack */}
@@ -195,7 +209,7 @@ const RandomCardsYugioh = () => {
             onInputChange={handleInputChange}
             noOptionsMessage={() =>
               inputValue.length < 3
-                ? t("enter3CharatersToSearch")+" pack"
+                ? t("enter3CharatersToSearch") + " pack"
                 : t("noPacksFound")
             }
             placeholder={placeholder}
@@ -221,7 +235,9 @@ const RandomCardsYugioh = () => {
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />
-          <span>⏳ {t("rollingCard")}, {t("pleaseWait")}...</span>
+          <span>
+            ⏳ {t("rollingCard")}, {t("pleaseWait")}...
+          </span>
         </div>
       )}
 
@@ -232,7 +248,9 @@ const RandomCardsYugioh = () => {
       )}
 
       {!isRolling && cards.length > 0 && (
-        <p className={styles.totalPrice}>💰 {t("totalPrice")} : ${totalPrice}</p>
+        <p className={styles.totalPrice}>
+          💰 {t("totalPrice")} : ${totalPrice}
+        </p>
       )}
 
       <div className={styles.cardList}>

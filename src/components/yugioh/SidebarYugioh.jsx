@@ -32,8 +32,23 @@ export default function Sidebar({
   archetypeOptions,
   attributeOptions,
   setPage,
+  loading,
 }) {
   const { t } = useTranslation();
+
+  const isFiltersChanged =
+    search !== "" ||
+    type?.value !== typeOptions[0]?.value ||
+    archetype?.value !== archetypeOptions[0]?.value ||
+    attribute?.value !== attributeOptions[0]?.value ||
+    atkMin !== "" ||
+    atkMax !== "" ||
+    defMin !== "" ||
+    defMax !== "" ||
+    levelMin !== "" ||
+    levelMax !== "" ||
+    orderField !== "name" ||
+    orderBy !== "asc";
 
   const clearYugiohFilters = () => {
     setSearch("");
@@ -52,12 +67,13 @@ export default function Sidebar({
   };
 
   return (
-    <div className="w-60 shrink-0">
+    <div className="w-60 shrink-0 sidebar">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-bold">{t("filters")}</h2>
         <button
           className="text-[20px] leading-none py-1! px-2!"
           onClick={clearYugiohFilters}
+          disabled={!isFiltersChanged || loading}
           data-tooltip-id="clear-filters-tooltip"
           data-tooltip-content={t("clearFilters")}
         >
@@ -72,6 +88,7 @@ export default function Sidebar({
         className="border p-2 rounded w-full mb-3"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        disabled={loading}
       />
 
       <Select
@@ -79,6 +96,7 @@ export default function Sidebar({
         options={typeOptions}
         value={type}
         onChange={setType}
+        isDisabled={loading}
         placeholder="Select Type"
         styles={customSelectStyles}
       />
@@ -87,6 +105,7 @@ export default function Sidebar({
         options={archetypeOptions}
         value={archetype}
         onChange={setArchetype}
+        isDisabled={loading}
         placeholder="Select Archetype"
         styles={customSelectStyles}
       />
@@ -95,6 +114,7 @@ export default function Sidebar({
         options={attributeOptions}
         value={attribute}
         onChange={setAttribute}
+        isDisabled={loading}
         placeholder="Select Attribute"
         styles={customSelectStyles}
       />
@@ -108,6 +128,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={atkMin}
             onChange={(e) => setAtkMin(e.target.value)}
+            disabled={loading}
           />
           <input
             type="number"
@@ -115,6 +136,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={atkMax}
             onChange={(e) => setAtkMax(e.target.value)}
+            disabled={loading}
           />
         </div>
       </div>
@@ -128,6 +150,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={defMin}
             onChange={(e) => setDefMin(e.target.value)}
+            disabled={loading}
           />
           <input
             type="number"
@@ -135,6 +158,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={defMax}
             onChange={(e) => setDefMax(e.target.value)}
+            disabled={loading}
           />
         </div>
       </div>
@@ -148,6 +172,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={levelMin}
             onChange={(e) => setLevelMin(e.target.value)}
+            disabled={loading}
           />
           <input
             type="number"
@@ -155,6 +180,7 @@ export default function Sidebar({
             className="border p-1 rounded w-full"
             value={levelMax}
             onChange={(e) => setLevelMax(e.target.value)}
+            disabled={loading}
           />
         </div>
       </div>
@@ -167,6 +193,7 @@ export default function Sidebar({
             value="name"
             checked={orderField === "name"}
             onChange={(e) => setOrderField(e.target.value)}
+            disabled={loading}
           />{" "}
           {t("name")}
         </label>
@@ -176,6 +203,7 @@ export default function Sidebar({
             value="price"
             checked={orderField === "price"}
             onChange={(e) => setOrderField(e.target.value)}
+            disabled={loading}
           />{" "}
           {t("price")}
         </label>
@@ -189,6 +217,7 @@ export default function Sidebar({
             value="asc"
             checked={orderBy === "asc"}
             onChange={(e) => setOrderBy(e.target.value)}
+            disabled={loading}
           />{" "}
           {t("ascending")}
         </label>
@@ -198,6 +227,7 @@ export default function Sidebar({
             value="desc"
             checked={orderBy === "desc"}
             onChange={(e) => setOrderBy(e.target.value)}
+            disabled={loading}
           />{" "}
           {t("descending")}
         </label>

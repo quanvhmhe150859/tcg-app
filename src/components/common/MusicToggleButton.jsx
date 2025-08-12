@@ -8,7 +8,7 @@ export default function MusicToggleButton() {
       onClick={() => setEnabled(!enabled)}
       className="floating-button"
       style={{ top: "135px" }}
-      title={enabled ? "Mute" : "Unmute"}
+      title={enabled ? "Switch to Mute" : "Switch to Unmute"}
     >
       {enabled ? "🔊" : "🔇"}
     </button>

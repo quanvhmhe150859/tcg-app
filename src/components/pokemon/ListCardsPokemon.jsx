@@ -25,19 +25,19 @@ export default function ListCardsPokemon() {
 
   // react-select options
   const superTypeOptions = [
-    { value: "", label: t("all")+" Supertypes" },
+    { value: "", label: t("all") + " Supertypes" },
     { value: "Pokémon", label: "Pokémon" },
     { value: "Trainer", label: "Trainer" },
     { value: "Energy", label: "Energy" },
   ];
 
   const rarityOptions = [
-    { value: "", label: t("all")+" Rarities" },
+    { value: "", label: t("all") + " Rarities" },
     ...allRaritiesPokemon.map((r) => ({ value: r, label: r })),
   ];
 
   const typeOptions = [
-    { value: "", label: t("all")+" Types" },
+    { value: "", label: t("all") + " Types" },
     ...allTypesPokemon.map((t) => ({ value: t, label: t })),
   ];
 
@@ -91,7 +91,10 @@ export default function ListCardsPokemon() {
       {/* Main content */}
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">{t("listCards")} Pokémon</h2>
+          <h2 className="text-xl font-bold">
+            <span className="hidden sm:inline">{t("listCards")} </span>
+            Pokémon
+          </h2>
           <button
             className="text-sm text-blue-500 underline"
             onClick={() => setShowSidebar((prev) => !prev)}
@@ -135,7 +138,7 @@ export default function ListCardsPokemon() {
         {loading ? (
           <p className="italic text-gray-500">{t("loadingCards")}...</p>
         ) : cards.length === 0 ? (
-          <p>{t("notResultsFound")}.</p>
+          <p>{t("noResultsFound")}.</p>
         ) : (
           <div
             className="grid gap-4"
@@ -192,6 +195,7 @@ export default function ListCardsPokemon() {
           rarityOptions={rarityOptions}
           typeOptions={typeOptions}
           setPage={setPage}
+          loading={loading}
         />
       )}
     </div>

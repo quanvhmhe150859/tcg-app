@@ -22,6 +22,7 @@
   "errorCallingImportOrSyncAPI": "Lỗi khi gọi API import hoặc đồng bộ.",
   "allowed": "cho phép",
   "save": "Lưu",
+  "randomizeBasedOnCommon": "Ngẫu nhiên độ hiếm còn lại dựa vào Common",
   "randomize": "Ngẫu nhiên",
   "random": "Ngẫu nhiên",
   "total": "Tổng",

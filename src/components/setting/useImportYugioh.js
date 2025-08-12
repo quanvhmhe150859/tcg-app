@@ -52,7 +52,7 @@ export const useImportYugioh = () => {
     );
     if (!confirmed) return;
 
-    const token = localStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     if (!token) {
       alert(t("youAreNotLoggedIn"));
       return;

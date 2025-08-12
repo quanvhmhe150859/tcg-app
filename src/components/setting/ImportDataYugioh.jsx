@@ -41,7 +41,7 @@ const ImportDataYugioh = () => {
       {lastUpdate && (
         <p className="repo-update-time">
           📦 <code>ygoprodeck.com</code> {t("lastImport")}:{" "}
-          <strong>{lastUpdate.toLocaleString()}</strong>
+          <strong className="whitespace-nowrap">{lastUpdate.toLocaleString()}</strong>
         </p>
       )}
 

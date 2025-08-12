@@ -57,7 +57,7 @@ export const BgmProvider = ({ children }) => {
     }
   }, [tracks]);
 
-  // Update currentTrackUrl when index changes (e.g., manual track selection)
+  // Update currentTrackUrl when index changes
   useEffect(() => {
     if (!tracks[index] || tracks.length === 0) return;
     const newUrl = `/bgm/${tracks[index]}`;
@@ -72,9 +72,9 @@ export const BgmProvider = ({ children }) => {
     setIsLoopOne(mode === PLAY_MODES.LOOP_ONE);
   }, [mode]);
 
-  // Handle track advancement on end
+  // Handle track advancement
   useEffect(() => {
-    if (!audioRef.current || tracks.length === 0) return;
+    if (tracks.length === 0) return;
     const audio = audioRef.current;
     const handler = () => {
       if (mode === PLAY_MODES.RANDOM) {
@@ -87,7 +87,6 @@ export const BgmProvider = ({ children }) => {
         const next = (index + 1) % tracks.length;
         setIndex(next);
       }
-      // LOOP_ONE is handled by audio.loop
     };
     audio.addEventListener("ended", handler);
     return () => audio.removeEventListener("ended", handler);
@@ -116,10 +115,11 @@ export const BgmProvider = ({ children }) => {
     audioRef.current.loop = isLoopOne;
   }, [isLoopOne]);
 
-  // Update volume and handle mute
+  // Update volume and handle pause/resume during volume adjustment
   useEffect(() => {
     localStorage.setItem("bgm-volume", volume.toString());
     const audio = audioRef.current;
+
     if (volume <= 0.001) {
       audio.pause();
     } else {
@@ -130,7 +130,7 @@ export const BgmProvider = ({ children }) => {
     }
   }, [volume, enabled, currentTrackUrl]);
 
-  // Fade in/out when enabling/disabling
+  // Fade in/out when enabling/disabling (không chạy khi đổi volume)
   useEffect(() => {
     const audio = audioRef.current;
     let fadeInterval;
@@ -152,11 +152,9 @@ export const BgmProvider = ({ children }) => {
     if (enabled) {
       if (currentTrackUrl && volume > 0) {
         if (audio.paused && audio.currentTime > 0) {
-          // Resume from current position
           fadeTo(volume);
           audio.play().catch(() => {});
         } else {
-          // Start from beginning if no progress
           audio.volume = 0;
           audio.play().catch(() => {});
           fadeTo(volume);
@@ -168,7 +166,7 @@ export const BgmProvider = ({ children }) => {
 
     localStorage.setItem("bgm-enabled", enabled.toString());
     return () => clearInterval(fadeInterval);
-  }, [enabled, volume, currentTrackUrl]);
+  }, [enabled, currentTrackUrl]); // ❗ Bỏ volume và isAdjustingVolume ra dependency
 
   // Pause when tab is hidden
   useEffect(() => {
@@ -176,7 +174,11 @@ export const BgmProvider = ({ children }) => {
     const handleVisibility = () => {
       if (document.hidden) {
         audio.pause();
-      } else if (enabled && volume > 0 && currentTrackUrl) {
+      } else if (
+        enabled &&
+        volume > 0 &&
+        currentTrackUrl
+      ) {
         audio.play().catch(() => {});
       }
     };
@@ -191,7 +193,13 @@ export const BgmProvider = ({ children }) => {
   useEffect(() => {
     const audio = audioRef.current;
     const tryAutoplay = () => {
-      if (!audio || !enabled || !currentTrackUrl || volume === 0) return;
+      if (
+        !audio ||
+        !enabled ||
+        !currentTrackUrl ||
+        volume === 0
+      )
+        return;
       if (!audio.paused || audio.currentTime > 0) return;
 
       const resumeAudio = () => {

@@ -17,7 +17,7 @@ export default function LanguageSwitcher() {
       onClick={toggleLang}
       className="floating-button"
       style={{ top: "75px" }}
-      title={lang === "en" ? "Vietnamese" : "English"}
+      title={lang === "en" ? "Switch to Vietnamese" : "Switch to English"}
     >
       <img
         src={lang === "en" ? "/flags/en.png" : "/flags/vi.png"}

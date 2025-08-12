@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../utils/api";
 import { useTranslation } from "react-i18next";
 
@@ -8,13 +8,20 @@ export default function ProtectedSection({ children }) {
   const [unlocked, setUnlocked] = useState(false);
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const token = sessionStorage.getItem("jwt");
+    if (token) {
+      setUnlocked(true);
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post("/api/auth/login", { password });
 
       const data = res.data;
-      localStorage.setItem("jwt", data.token);
+      sessionStorage.setItem("jwt", data.token);
       setUnlocked(true);
     } catch (err) {
       alert(t("loginFailed"));

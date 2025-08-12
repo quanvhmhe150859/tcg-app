@@ -131,10 +131,16 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
         <button
           onClick={handleRandom}
           className="bg-blue-500 text-white px-2 py-1 rounded"
+          data-tooltip-id="randomize-tooltip"
+          data-tooltip-content={t("randomizeBasedOnCommon")}
         >
           {t("randomize")}
         </button>
-        <label>{t("total")} Weights: ({t("total")} = {total})</label>
+        <Tooltip id="randomize-tooltip" place="top" effect="solid" />
+
+        <label>
+          {t("total")} Weights: ({t("total")} = {total})
+        </label>
       </div>
 
       <div className="overflow-y-auto max-h-[500px] m-1 p-1">

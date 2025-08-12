@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --color-light-bg: #E4EAF2;
-  --color-dark-bg: #2A4359;
-  --color-light: #E4CEF2;
-  --color-center: #DFC2F2;
-  --color-dark: #A884BF;
+  --color-light-bg: #e4eaf2;
+  --color-dark-bg: #2a4359;
+  --color-light: #e4cef2;
+  --color-center: #dfc2f2;
+  --color-dark: #a884bf;
 
   --color-card-bg: #000;
   --color-card-text: #fff;
@@ -65,7 +65,7 @@ button:hover {
   --color-button-bg: var(--color-light);
   --color-button-selected: var(--color-dark);
 
-  --color-card-bg:#fff;
+  --color-card-bg: #fff;
   --color-card-text: #000;
 }
 
@@ -95,5 +95,21 @@ button:hover {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.sidebar {
+  border: 2px solid var(--color-text);
+  padding: 5px;
+  border-radius: 5px;
+  height: fit-content;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    background: var(--color-background);
+    right: 75px;
+    top: 115px;
   }
 }

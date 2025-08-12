@@ -13,6 +13,14 @@ import { useTranslation } from "react-i18next";
 const AdminSettings = () => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    document.body.style.minWidth = "640px";
+
+    return () => {
+      document.body.style.minWidth = ""; // reset khi rời trang
+    };
+  }, []);
+
   const location = useLocation();
 
   const [tab, setTab] = useState("general");
@@ -57,7 +65,7 @@ const AdminSettings = () => {
   return (
     <div className="admin-settings">
       <h1 className="text-4xl font-bold mt-4 mb-8">
-        <span className="hidden md:inline">🛠️ </span>
+        <span className="hidden sm:inline">🛠️ </span>
         {t("settings")}
       </h1>
 

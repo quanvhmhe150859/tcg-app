@@ -39,7 +39,7 @@ const ImportDataPokemon = () => {
       {lastUpdate && (
         <p className="repo-update-time">
           📦 Repo <code>{repoName}</code> {t("lastImport")}:{" "}
-          <strong>{lastUpdate.toLocaleString()}</strong>
+          <strong className="whitespace-nowrap">{lastUpdate.toLocaleString()}</strong>
         </p>
       )}
 

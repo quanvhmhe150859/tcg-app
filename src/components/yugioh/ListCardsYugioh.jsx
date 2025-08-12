@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 export default function ListCardsYugioh() {
   const { t } = useTranslation();
-  
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [cards, setCards] = useState([]);
@@ -29,9 +29,9 @@ export default function ListCardsYugioh() {
   const [orderBy, setOrderBy] = useState("asc");
 
   // Option mặc định
-  const allTypeOption = { value: "", label: t("all")+" Type" };
-  const allArchetypeOption = { value: "", label: t("all")+" Archetype" };
-  const allAttributeOption = { value: "", label: t("all")+" Attribute" };
+  const allTypeOption = { value: "", label: t("all") + " Type" };
+  const allArchetypeOption = { value: "", label: t("all") + " Archetype" };
+  const allAttributeOption = { value: "", label: t("all") + " Attribute" };
 
   // State mặc định là "All"
   const [type, setType] = useState(allTypeOption);
@@ -139,7 +139,10 @@ export default function ListCardsYugioh() {
       {/* Main content */}
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">{t("listCards")} Yu-Gi-Oh!</h2>
+          <h2 className="text-xl font-bold">
+            <span className="hidden sm:inline">{t("listCards")} </span>
+            Yu-Gi-Oh!
+          </h2>
           <button
             className="text-sm text-blue-500 underline"
             onClick={() => setShowSidebar((prev) => !prev)}
@@ -183,7 +186,7 @@ export default function ListCardsYugioh() {
         {loading ? (
           <p className="italic text-gray-500">{t("loadingCards")}...</p>
         ) : cards.length === 0 ? (
-          <p>{t("notResultsFound")}.</p>
+          <p>{t("noResultsFound")}.</p>
         ) : (
           <div
             className="grid gap-4"
@@ -252,6 +255,7 @@ export default function ListCardsYugioh() {
           archetypeOptions={archetypeOptions}
           attributeOptions={attributeOptions}
           setPage={setPage}
+          loading={loading}
         />
       )}
     </div>

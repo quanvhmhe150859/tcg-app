@@ -22,6 +22,7 @@
   "errorCallingImportOrSyncAPI": "Error calling import or sync API.",
   "allowed": "Allowed",
   "save": "Save",
+  "randomizeBasedOnCommon": "Randomize remaining rarities based on Common",
   "randomize": "Randomize",
   "random": "Random",
   "total": "Total",
