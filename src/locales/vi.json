@@ -61,5 +61,8 @@
   "noCardsMatchTheCurrentSelection": "Không có thẻ nào phù hợp với lựa chọn hiện tại",
   "🔂": "Lặp lại một bài hát",
   "🔁": "Lặp lại tất cả bài hát",
-  "🔀": "Ngẫu nhiên bài hát"
+  "🔀": "Ngẫu nhiên bài hát",
+  "position": "Vị trí",
+  "floatingActionButtons": "nút hành động nổi",
+  "clearWeights": "Xóa Weights"
 }

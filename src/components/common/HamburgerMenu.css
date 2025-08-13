@@ -74,3 +74,21 @@
   padding-left: 1rem; /* Thụt thêm cho mục con */
   font-size: 14px; /* Nhỏ hơn một chút so với mục cha */
 }
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+.rainbow-text {
+  background: linear-gradient(
+    90deg,
+    red, orange, yellow, green, blue, indigo, violet, red
+  );
+  background-size: 400% 400%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 5s linear infinite reverse;
+}
+
+

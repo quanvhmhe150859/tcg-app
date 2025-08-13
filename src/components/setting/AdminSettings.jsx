@@ -5,6 +5,7 @@ import ImportDataYugioh from "./ImportDataYugioh";
 import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
+import ControlButtons from "./ControlButtons";
 import BgmPlayer from "./BgmPlayer";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
@@ -105,6 +106,7 @@ const AdminSettings = () => {
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
+        <ControlButtons/>
         <BgmPlayer />
 
         <ProtectedSection>

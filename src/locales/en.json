@@ -61,5 +61,8 @@
   "noCardsMatchTheCurrentSelection": "No cards match the current selection",
   "🔂": "Loop One Song",
   "🔁": "Loop All Song",
-  "🔀": "Random Song"
+  "🔀": "Random Song",
+  "position": "Position",
+  "floatingActionButtons": "Floating Action Buttons",
+  "clearWeights": "Clear Weights"
 }

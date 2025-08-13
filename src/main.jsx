@@ -1,13 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import { BgmProvider } from './components/context/BgmContext.jsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { AppProviders } from "./components/context/AppProviders";
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <BgmProvider>
+  <AppProviders>
     <App />
-  </BgmProvider>
+  </AppProviders>
   // </StrictMode>,
-)
+);

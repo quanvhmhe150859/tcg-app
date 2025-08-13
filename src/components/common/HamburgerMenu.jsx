@@ -68,7 +68,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🏠 Pokémon {expanded.pokemon ? "▼" : "▶"}
+                    🏠 <span className="rainbow-text font-bold">Pokémon</span> {expanded.pokemon ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.pokemon && (
@@ -110,7 +110,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🏠 Yu-Gi-Oh! {expanded.yugioh ? "▼" : "▶"}
+                    🏠 <span className="rainbow-text font-bold">Yu-Gi-Oh!</span> {expanded.yugioh ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.yugioh && (

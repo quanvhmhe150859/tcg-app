@@ -130,17 +130,33 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
         <label>%</label>
         <button
           onClick={handleRandom}
-          className="bg-blue-500 text-white px-2 py-1 rounded"
+          className="px-2 py-1 rounded text-sm sm:text-base"
           data-tooltip-id="randomize-tooltip"
           data-tooltip-content={t("randomizeBasedOnCommon")}
         >
           {t("randomize")}
         </button>
         <Tooltip id="randomize-tooltip" place="top" effect="solid" />
-
         <label>
-          {t("total")} Weights: ({t("total")} = {total})
+          {t("total")} Weights:{" "}
+          <span className="whitespace-nowrap">
+            ({t("total")} = {total})
+          </span>
         </label>
+
+        {/* Nút clear */}
+        <button
+          onClick={() => {
+            setFixedFirstPercent("");
+            setWeights({});
+          }}
+          className="px-2 py-1 rounded flex items-center justify-center"
+          data-tooltip-id="clear-tooltip"
+          data-tooltip-content={t("clearWeights")}
+        >
+          🧹
+        </button>
+        <Tooltip id="clear-tooltip" place="top" effect="solid" />
       </div>
 
       <div className="overflow-y-auto max-h-[500px] m-1 p-1">
