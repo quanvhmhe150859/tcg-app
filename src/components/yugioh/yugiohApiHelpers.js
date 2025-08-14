@@ -1,5 +1,6 @@
 import api from "../../utils/api";
 
+const yugiohCache = new Map();
 let cachedCardSets = null;
 
 export const getAllCardSets = async () => {
@@ -76,3 +77,47 @@ export const getRaritiesInPack = async (setName = null, cardType = null) => {
   return Array.isArray(res.data) ? res.data : [];
 };
 
+/**
+ * Lấy danh sách archetypes Yu-Gi-Oh!
+ */
+export async function fetchYugiohArchetypes() {
+  const cacheKey = "archetypes";
+  if (yugiohCache.has(cacheKey)) {
+    return yugiohCache.get(cacheKey);
+  }
+  const res = await api.get("/api/CardsYugioh/archetypes");
+  yugiohCache.set(cacheKey, res.data);
+  return res.data;
+}
+
+/**
+ * Lấy danh sách card Yu-Gi-Oh! với filter
+ */
+export async function fetchYugiohCards(params) {
+  const cacheKey = JSON.stringify(params);
+  if (yugiohCache.has(cacheKey)) {
+    return yugiohCache.get(cacheKey);
+  }
+
+  const res = await api.get("/api/CardsYugioh", {
+    params: {
+      name: params.name,
+      page: params.page,
+      pageSize: params.pageSize || 10,
+      type: params.type || undefined,
+      archetype: params.archetype || undefined,
+      attribute: params.attribute || undefined,
+      atkMin: params.atkMin || undefined,
+      atkMax: params.atkMax || undefined,
+      defMin: params.defMin || undefined,
+      defMax: params.defMax || undefined,
+      levelMin: params.levelMin || undefined,
+      levelMax: params.levelMax || undefined,
+      orderField: params.orderField,
+      orderBy: params.orderBy,
+    },
+  });
+
+  yugiohCache.set(cacheKey, res.data);
+  return res.data;
+}

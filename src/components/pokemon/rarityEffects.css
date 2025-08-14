@@ -1,6 +1,7 @@
 .card-glow {
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
 }
 .card-glow::after {
   content: "";

@@ -40,7 +40,7 @@ const CardItem = ({ card, index, darkMode }) => {
       <Tooltip id={`tooltip-${card.id}-name`} place="top" />
 
       <p className="card-info-line rarity-line">
-        <strong className="rarity-label">Rarity:</strong>
+        {/* <strong className="rarity-label">Rarity:</strong> */}
         <span
           className="rarity-value"
           data-tooltip-id={`tooltip-${card.id}-rarity`}

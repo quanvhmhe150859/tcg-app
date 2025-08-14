@@ -5,7 +5,7 @@ import ImportDataYugioh from "./ImportDataYugioh";
 import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
-import ControlButtons from "./ControlButtons";
+import ControlButtons from "../common/ControlButtons";
 import BgmPlayer from "./BgmPlayer";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
@@ -60,7 +60,7 @@ const AdminSettings = () => {
       pokemonRarities.current?.save();
     }
 
-    alert(t("allSettingsSaved")+"!");
+    alert(t("allSettingsSaved") + "!");
   };
 
   return (
@@ -106,7 +106,12 @@ const AdminSettings = () => {
 
       {/* Import Data Tab */}
       <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
-        <ControlButtons/>
+        <div className="section">
+          <h3 className="text-center">
+            {t("position")} {t("floatingActionButtons")}
+          </h3>
+          <ControlButtons />
+        </div>
         <BgmPlayer />
 
         <ProtectedSection>

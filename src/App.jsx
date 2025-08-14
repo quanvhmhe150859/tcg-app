@@ -39,16 +39,16 @@ function FaviconUpdater() {
 
   useEffect(() => {
     if (location.pathname.startsWith("/pokemon")) {
-      setFavicon("/pokemon-icon.svg");
+      setFavicon("/icons/pokemon-icon.svg");
       document.title = "Pokémon TCG";
     } else if (location.pathname.startsWith("/yugioh")) {
-      setFavicon("/yugioh-icon.png");
+      setFavicon("/icons/yugioh-icon.png");
       document.title = "Yu-Gi-Oh! TCG";
     } else if (location.pathname.startsWith("/game")) {
-      setFavicon("/game-icon.png");
+      setFavicon("/icons/game-icon.png");
       document.title = "Game";
     } else {
-      setFavicon("/vite.svg");
+      setFavicon("/icons/vite-icon.svg");
       document.title = "TCG";
     }
   }, [location.pathname]);

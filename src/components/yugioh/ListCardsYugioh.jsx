@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import api from "../../utils/api";
 import { allTypesYugioh, allAttributesYugioh } from "../../utils/constants";
 import Pagination from "../common/Pagination";
 import Sidebar from "./SidebarYugioh";
+import { fetchYugiohCards, fetchYugiohArchetypes } from "./yugiohApiHelpers";
+import CardItemYugioh from "./CardItemYugioh";
+import { AnimatePresence, motion } from "framer-motion";
+import styles from "../common/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function ListCardsYugioh() {
@@ -51,28 +54,21 @@ export default function ListCardsYugioh() {
     allArchetypeOption,
   ]);
 
-  // Fetch archetypes từ API
   useEffect(() => {
-    const fetchArchetypes = async () => {
+    async function loadArchetypes() {
       try {
-        const res = await api.get("/api/CardsYugioh/archetypes");
-        if (Array.isArray(res.data)) {
+        const data = await fetchYugiohArchetypes();
+        if (Array.isArray(data)) {
           setArchetypeOptions([
             allArchetypeOption,
-            ...res.data.map((item) => ({ value: item, label: item })),
+            ...data.map((item) => ({ value: item, label: item })),
           ]);
         }
       } catch (err) {
         console.error("Failed to fetch archetypes", err);
       }
-    };
-    fetchArchetypes();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setShowSidebar(window.innerWidth >= 1024);
     }
+    loadArchetypes();
   }, []);
 
   useEffect(() => {
@@ -84,29 +80,24 @@ export default function ListCardsYugioh() {
   }, [search]);
 
   useEffect(() => {
-    const fetchCards = async () => {
+    async function loadCards() {
       setLoading(true);
       try {
-        const res = await api.get("/api/CardsYugioh", {
-          params: {
-            name: debouncedSearch,
-            page,
-            pageSize: 10,
-            type: type?.value || undefined,
-            archetype: archetype?.value || undefined,
-            attribute: attribute?.value || undefined,
-            atkMin: atkMin || undefined,
-            atkMax: atkMax || undefined,
-            defMin: defMin || undefined,
-            defMax: defMax || undefined,
-            levelMin: levelMin || undefined,
-            levelMax: levelMax || undefined,
-            orderField,
-            orderBy,
-          },
+        const data = await fetchYugiohCards({
+          name: debouncedSearch,
+          page,
+          type: type?.value,
+          archetype: archetype?.value,
+          attribute: attribute?.value,
+          atkMin,
+          atkMax,
+          defMin,
+          defMax,
+          levelMin,
+          levelMax,
+          orderField,
+          orderBy,
         });
-
-        const data = res.data;
         setCards(data.data);
         setTotalPages(data.totalPages);
       } catch (err) {
@@ -115,9 +106,8 @@ export default function ListCardsYugioh() {
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchCards();
+    }
+    loadCards();
   }, [
     debouncedSearch,
     page,
@@ -134,8 +124,22 @@ export default function ListCardsYugioh() {
     orderBy,
   ]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShowSidebar(window.innerWidth >= 1024);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   return (
-    <div className="flex gap-4 p-4">
+    <div className="flex gap-4 p-4 justify-center">
       {/* Main content */}
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
@@ -188,32 +192,20 @@ export default function ListCardsYugioh() {
         ) : cards.length === 0 ? (
           <p>{t("noResultsFound")}.</p>
         ) : (
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            }}
-          >
-            {cards.map((card) => (
-              <div
-                key={card.cardId}
-                className="border p-3 rounded shadow-sm hover:shadow-md transition bg-white"
-              >
-                {card.imageUrl && (
-                  <img
-                    src={card.imageUrl}
-                    alt={card.name}
-                    className="w-full h-40 object-contain mb-2"
-                  />
-                )}
-                <h3 className="font-semibold text-center text-black">
-                  {card.name}
-                </h3>
-                <p className="text-sm text-center text-gray-500">
-                  Price: {card.price ?? "N/A"}
-                </p>
-              </div>
-            ))}
+          <div className={styles.cardList}>
+            <AnimatePresence>
+              {cards.filter(Boolean).map((card, index) => (
+                <motion.div
+                  key={`${card.cardId}-${index}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <CardItemYugioh card={card} index={index} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 

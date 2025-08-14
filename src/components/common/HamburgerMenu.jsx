@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import ControlButtons from "./ControlButtons";
 import "./HamburgerMenu.css";
 
 const HamburgerMenu = () => {
@@ -68,7 +69,8 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🏠 <span className="rainbow-text font-bold">Pokémon</span> {expanded.pokemon ? "▼" : "▶"}
+                    🏠 <span className="rainbow-text font-bold">Pokémon</span>{" "}
+                    {expanded.pokemon ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.pokemon && (
@@ -110,7 +112,8 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🏠 <span className="rainbow-text font-bold">Yu-Gi-Oh!</span> {expanded.yugioh ? "▼" : "▶"}
+                    🏠 <span className="rainbow-text font-bold">Yu-Gi-Oh!</span>{" "}
+                    {expanded.yugioh ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.yugioh && (
@@ -149,6 +152,9 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
               </ul>
+            </div>            
+            <div className="absolute inset-x-0 bottom-0 p-3">
+              <ControlButtons />
             </div>
           </motion.div>
         )}

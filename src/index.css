@@ -103,9 +103,10 @@ button:hover {
   padding: 5px;
   border-radius: 5px;
   height: fit-content;
+  z-index: 3;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 880px) {
   .sidebar {
     position: absolute;
     background: var(--color-background);

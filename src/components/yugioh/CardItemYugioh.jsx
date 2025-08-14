@@ -5,7 +5,7 @@ import CardItemYugiohModal from "./CardItemYugiohModal";
 import "../common/CardItem.css";
 import { motion } from "framer-motion";
 
-const CardItemYugioh = ({ card, index }) => {
+const CardItemYugioh = ({ card, index, type }) => {
   const cardId = card.cardId || card.card_id || "unknown";
   const smallImageUrl = `${
     import.meta.env.VITE_API_BASE_URL
@@ -31,11 +31,8 @@ const CardItemYugioh = ({ card, index }) => {
           src={smallImageUrl}
           alt={card.name}
           className={`card-image`}
-          style={
-            card.frameType === "skill"
-              ? { width: "200px", height: "291.79px" }
-              : undefined
-          }
+          // style={ {width: "200px", height: "291.79px" }}
+          style={ {width: "184px", height: "268.44px" }}
         />
         <span className="zoom-icon">🔍</span>
       </div>
@@ -49,37 +46,43 @@ const CardItemYugioh = ({ card, index }) => {
           {card.name}
         </h4>
 
-        <p
-          className={`card-info-line`}
-          data-tooltip-id={tooltipId}
-          data-tooltip-content={`${card.archetype ?? "None"}`}
-        >
-          🏷️ Archetype: {card.archetype ?? "None"}
-        </p>
+        {type === "gacha" && (
+          <>
+            <p
+              className={`card-info-line`}
+              data-tooltip-id={tooltipId}
+              data-tooltip-content={`Archetype: ${card.archetype ?? "None"}`}
+            >
+              🏷️: {card.archetype ?? "None"}
+            </p>
+
+            <p
+              className={`card-info-line`}
+              data-tooltip-id={tooltipId}
+              data-tooltip-content={`Set: ${card.setName}`}
+            >
+              📦: {card.setName}
+            </p>
+
+            <p
+              className={`card-info-line`}
+              data-tooltip-id={tooltipId}
+              data-tooltip-content={`Rarity: ${rarity}`}
+            >
+              ⭐: 
+              <RarityDot rarity={card.rarity} code={card.setRarityCode} />
+              {rarity}
+            </p>
+          </>
+        )}
 
         <p
           className={`card-info-line`}
           data-tooltip-id={tooltipId}
-          data-tooltip-content={`${card.setName}`}
+          data-tooltip-content={`Price: ${price.toFixed(2)} $`}
         >
-          📦 Set: {card.setName}
+          💰: {price.toFixed(2)} <span className="text-green-400">$</span>
         </p>
-
-        <p
-          className={`card-info-line`}
-          data-tooltip-id={tooltipId}
-          data-tooltip-content={`${rarity}`}
-        >
-          ⭐ Rarity:
-          <RarityDot rarity={card.rarity} code={card.setRarityCode} />
-          {rarity}
-        </p>
-
-        <p
-          className={`card-info-line`}
-          data-tooltip-id={tooltipId}
-          data-tooltip-content={`${price.toFixed(2)}`}
-        >💰 Price: ${price.toFixed(2)}</p>
 
         <ReactTooltip id={tooltipId} place="top" />
       </div>

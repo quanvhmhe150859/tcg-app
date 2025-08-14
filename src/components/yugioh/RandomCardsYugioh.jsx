@@ -263,7 +263,7 @@ const RandomCardsYugioh = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <CardItemYugioh card={card} index={index} />
+              <CardItemYugioh card={card} index={index} type={"gacha"}/>
             </motion.div>
           ))}
         </AnimatePresence>

@@ -3,6 +3,10 @@ import api from "../../utils/api";
 import Pagination from "../common/Pagination";
 import Sidebar from "./SidebarPokemon";
 import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
+import { fetchPokemonCards } from "./pokemonApiHelpers";
+import CardItem from "./CardItemPokemon";
+import { AnimatePresence, motion } from "framer-motion";
+import styles from "../common/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function ListCardsPokemon() {
@@ -56,23 +60,18 @@ export default function ListCardsPokemon() {
   }, [search]);
 
   useEffect(() => {
-    const fetchCards = async () => {
+    const getCards = async () => {
       setLoading(true);
       try {
-        const res = await api.get("/api/CardsPokemon", {
-          params: {
-            name: debouncedSearch,
-            page,
-            pageSize: 10,
-            superType: superType?.value || undefined,
-            rarity: rarity?.value || undefined,
-            type: type?.value || undefined,
-            dexNumber: dexNumber || undefined,
-            orderBy,
-          },
+        const data = await fetchPokemonCards({
+          name: debouncedSearch,
+          page,
+          superType: superType?.value,
+          rarity: rarity?.value,
+          type: type?.value,
+          dexNumber,
+          orderBy,
         });
-
-        const data = res.data;
         setCards(data.data);
         setTotalPages(data.totalPages);
       } catch (err) {
@@ -83,11 +82,11 @@ export default function ListCardsPokemon() {
       }
     };
 
-    fetchCards();
+    getCards();
   }, [debouncedSearch, page, superType, rarity, type, dexNumber, orderBy]);
 
   return (
-    <div className="flex gap-4 p-4">
+    <div className="flex gap-4 p-4 justify-center">
       {/* Main content */}
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
@@ -140,32 +139,20 @@ export default function ListCardsPokemon() {
         ) : cards.length === 0 ? (
           <p>{t("noResultsFound")}.</p>
         ) : (
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            }}
-          >
-            {cards.map((card) => (
-              <div
-                key={card.id}
-                className="border p-3 rounded shadow-sm hover:shadow-md transition bg-white"
-              >
-                {card.imageUrl && (
-                  <img
-                    src={card.imageUrl}
-                    alt={card.name}
-                    className="w-full h-40 object-contain mb-2"
-                  />
-                )}
-                <h3 className="font-semibold text-center text-black">
-                  {card.name}
-                </h3>
-                <p className="text-sm text-center text-gray-500">
-                  {card.rarity}
-                </p>
-              </div>
-            ))}
+          <div className={styles.cardList}>
+            <AnimatePresence>
+              {cards.filter(Boolean).map((card, index) => (
+                <motion.div
+                  key={`${card.id}-${index}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <CardItem card={card} index={index} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 
