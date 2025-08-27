@@ -10,7 +10,9 @@ export default function ProtectedSection({ children }) {
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
-    if (token) {
+    const exp = sessionStorage.getItem("jwt_exp");
+    
+    if (token && exp && Date.now() < parseInt(exp)) {
       setUnlocked(true);
     }
   }, []);
@@ -21,6 +23,8 @@ export default function ProtectedSection({ children }) {
       const res = await api.post("/api/auth/login", { password });
 
       const data = res.data;
+      const expiresAt = Date.now() + 15 * 60 * 1000; // 15 phút
+      sessionStorage.setItem("jwt_exp", expiresAt);
       sessionStorage.setItem("jwt", data.token);
       setUnlocked(true);
     } catch (err) {

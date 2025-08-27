@@ -68,7 +68,7 @@ export const useImportPokemon = () => {
       const percent = Math.round((data.current / data.total) * 100);
       setProgress(percent);
       setStatus(
-        `📄 ${t("processingFile")} ${data.file} (${data.current}/${data.total})`
+        `📄 ${t("processingFile")} (${data.current}/${data.total})` //${data.file}
       );
     });
 
