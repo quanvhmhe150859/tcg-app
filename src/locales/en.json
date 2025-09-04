@@ -46,7 +46,7 @@
   "enterPassword": "Enter Password",
   "confirm": "Confirm",
   "allSettingsSaved": "All settings saved",
-  "listCards": "List cards",
+  "list": "List",
   "prev": "Prev",
   "next": "Next",
   "loadingCards": "Loading Cards",
@@ -64,5 +64,6 @@
   "🔀": "Random Song",
   "position": "Position",
   "floatingActionButtons": "Floating Action Buttons",
-  "clearWeights": "Clear Weights"
+  "clearWeights": "Clear Weights",
+  "game": "Game"
 }

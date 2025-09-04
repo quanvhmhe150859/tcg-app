@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import ControlButtons from "./ControlButtons";
 import "./HamburgerMenu.css";
+import { useTranslation } from "react-i18next";
 
 const HamburgerMenu = () => {
+  const { t } = useTranslation();
+
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState({
-    pokemon: false,
-    yugioh: false,
+    gacha: false,
+    list: false,
   });
 
   const toggleExpand = (section) => {
@@ -57,7 +60,7 @@ const HamburgerMenu = () => {
               <ul>
                 <li>
                   <Link to="/" onClick={() => setOpen(false)}>
-                    ⚙️ Settings
+                    ⚙️ {t("settings")}
                   </Link>
                 </li>
                 <li>
@@ -65,15 +68,15 @@ const HamburgerMenu = () => {
                     to=""
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleExpand("pokemon");
+                      toggleExpand("gacha");
                     }}
                     className="flex items-center"
                   >
-                    🏠 <span className="rainbow-text font-bold">Pokémon</span>{" "}
-                    {expanded.pokemon ? "▼" : "▶"}
+                    🎰 <span className="rainbow-text font-bold">Gacha</span>{" "}
+                    {expanded.gacha ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
-                    {expanded.pokemon && (
+                    {expanded.gacha && (
                       <motion.ul
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -85,18 +88,18 @@ const HamburgerMenu = () => {
                           <Link
                             to="/pokemon"
                             onClick={() => setOpen(false)}
-                            className="submenu-item"
+                            className="submenu-item ml-4"
                           >
-                            🎰 Pokémon Gacha
+                            🐛 Pokémon
                           </Link>
                         </li>
                         <li>
                           <Link
-                            to="/pokemonls"
+                            to="/yugioh"
                             onClick={() => setOpen(false)}
-                            className="submenu-item"
+                            className="submenu-item ml-4"
                           >
-                            📋 Pokémon List
+                            🌲 Yu-Gi-Oh!
                           </Link>
                         </li>
                       </motion.ul>
@@ -108,15 +111,15 @@ const HamburgerMenu = () => {
                     to=""
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleExpand("yugioh");
+                      toggleExpand("list");
                     }}
                     className="flex items-center"
                   >
-                    🏠 <span className="rainbow-text font-bold">Yu-Gi-Oh!</span>{" "}
-                    {expanded.yugioh ? "▼" : "▶"}
+                    📋 <span>{t("list")}</span>{" "}
+                    {expanded.list ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
-                    {expanded.yugioh && (
+                    {expanded.list && (
                       <motion.ul
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -126,20 +129,20 @@ const HamburgerMenu = () => {
                       >
                         <li>
                           <Link
-                            to="/yugioh"
+                            to="/pokemonls"
                             onClick={() => setOpen(false)}
-                            className="submenu-item"
+                            className="submenu-item ml-4"
                           >
-                            🎰 Yu-Gi-Oh! Gacha
+                            🦋 Pokémon
                           </Link>
                         </li>
                         <li>
                           <Link
                             to="/yugiohls"
                             onClick={() => setOpen(false)}
-                            className="submenu-item"
+                            className="submenu-item ml-4"
                           >
-                            📋 Yu-Gi-Oh! List
+                            🌳 Yu-Gi-Oh!
                           </Link>
                         </li>
                       </motion.ul>
@@ -148,7 +151,7 @@ const HamburgerMenu = () => {
                 </li>
                 <li>
                   <Link to="/game" onClick={() => setOpen(false)}>
-                    🧩 Game
+                    🧩 {t("game")}
                   </Link>
                 </li>
               </ul>

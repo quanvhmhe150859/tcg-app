@@ -46,7 +46,7 @@
   "enterPassword": "Nhập mật khẩu",
   "confirm": "Xác nhận",
   "allSettingsSaved": "Tất cả cài đặt đã được lưu",
-  "listCards": "Danh sách thẻ",
+  "list": "Danh sách",
   "prev": "Trước",
   "next": "Sau",
   "loadingCards": "Đang tải thẻ",
@@ -64,5 +64,6 @@
   "🔀": "Ngẫu nhiên bài hát",
   "position": "Vị trí",
   "floatingActionButtons": "nút hành động nổi",
-  "clearWeights": "Xóa Weights"
+  "clearWeights": "Xóa Weights",
+  "game": "Trò chơi"
 }

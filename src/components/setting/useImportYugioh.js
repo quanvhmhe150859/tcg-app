@@ -23,7 +23,9 @@ export const useImportYugioh = () => {
     getOrFetchAndSet(
       "lastImportYugioh",
       () =>
-        api.get("/api/ImportLog/last/yugioh").then((res) => res.data.lastImport),
+        api
+          .get("/api/ImportLog/last/yugioh")
+          .then((res) => res.data.lastImport),
       setLastImportTime,
       (x) => new Date(x)
     );
@@ -47,9 +49,7 @@ export const useImportYugioh = () => {
   }, []);
 
   const handleImport = async () => {
-    const confirmed = window.confirm(
-      t("areYouSureYouWantToUpdateYugiohData")
-    );
+    const confirmed = window.confirm(t("areYouSureYouWantToUpdateYugiohData"));
     if (!confirmed) return;
 
     const token = sessionStorage.getItem("jwt");
@@ -83,7 +83,7 @@ export const useImportYugioh = () => {
       setLoading(true);
       setMessage("");
       setProgress(0);
-      setStatus("🔄 "+t("dataSynchronization")+"...");
+      setStatus("🔄 " + t("dataSynchronization") + "...");
 
       const authHeader = {
         headers: {
@@ -91,13 +91,25 @@ export const useImportYugioh = () => {
         },
       };
 
-      const syncRes = await api.post("/api/Sync/sync-yugioh", null, authHeader);
+      // Lấy giá trị lang từ localStorage, mặc định là 'en' nếu không có
+      const lang = localStorage.getItem("lang") || "en";
+
+      const syncRes = await api.post(
+        `/api/Sync/sync-yugioh?lang=${lang}`,
+        null,
+        authHeader
+      );
       if (syncRes.data.message) {
         setSyncMessage(syncRes.data.message);
       }
 
-      setStatus("📥 "+t("sendingDataImportRequest")+"...");
-      const res = await api.post("/api/Import/import-yugioh", null, authHeader);
+      setStatus("📥 " + t("sendingDataImportRequest") + "...");
+
+      const res = await api.post(
+        `/api/Import/import-yugioh?lang=${lang}`,
+        null,
+        authHeader
+      );
       setMessage(res.data.message);
       setLastImportTime(now);
 
@@ -108,7 +120,7 @@ export const useImportYugioh = () => {
       );
     } catch (err) {
       console.error(err);
-      setMessage("❌ "+t("errorCallingImportOrSyncAPI"));
+      setMessage("❌ " + t("errorCallingImportOrSyncAPI"));
     } finally {
       setLoading(false);
       setStatus("");
