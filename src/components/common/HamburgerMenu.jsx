@@ -154,6 +154,11 @@ const HamburgerMenu = () => {
                     🧩 {t("game")}
                   </Link>
                 </li>
+                <li>
+                  <Link to="/chatbot" onClick={() => setOpen(false)}>
+                    🤖 Chatbot
+                  </Link>
+                </li>
               </ul>
             </div>            
             <div className="absolute inset-x-0 bottom-0 p-3">

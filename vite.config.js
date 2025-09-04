@@ -14,6 +14,14 @@ export default defineConfig(({ command }) => {
         },
         host: "localhost",
         port: 5173,
+        proxy: {
+          // tất cả request bắt đầu bằng /ollama sẽ được proxy sang localhost:11434
+          "/ollama": {
+            target: "http://localhost:11434",
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/ollama/, ""),
+          },
+        },
       },
     };
   }

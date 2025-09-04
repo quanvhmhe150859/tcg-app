@@ -13,6 +13,8 @@ import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 
 import TextStatGame from "./game/AutoGame";
 
+import Chatbot from "./components/common/Chatbot";
+
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
 import DarkModeToggle from "./components/common/DarkModeToggle";
@@ -99,6 +101,7 @@ function App() {
           <Route path="/yugioh" element={<RandomCardsYugioh />} />
           <Route path="/yugiohls" element={<ListCardsYugioh />} />
           <Route path="/game" element={<TextStatGame />} />
+          <Route path="/chatbot" element={<Chatbot />} />
         </Routes>
       </div>
     </Router>
