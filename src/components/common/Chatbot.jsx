@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Chatbot() {
+  const { t } = useTranslation();
+  
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Xin chào! Bạn muốn hỏi gì?" }
+    { role: "assistant", content: t("helloWhatWouldYouLikeToAsk") }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,12 +31,12 @@ export default function Chatbot() {
       });
 
       const data = await res.json();
-      const reply = data.response || "Xin lỗi, tôi chưa hiểu ý bạn.";
+      const reply = data.response || t("sorryIDontUnderstandYou");
 
       setMessages([...newMessages, { role: "assistant", content: reply }]);
     } catch (err) {
-      console.error("Lỗi gọi Ollama:", err);
-      setMessages([...newMessages, { role: "assistant", content: "⚠️ Lỗi kết nối" }]);
+      console.error(t("errorCalling") + " Ollama:", err);
+      setMessages([...newMessages, { role: "assistant", content: "⚠️ " + t("connectionError") }]);
     } finally {
       setLoading(false);
     }
@@ -46,23 +49,23 @@ export default function Chatbot() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`p-2 rounded-lg max-w-[80%] ${
+            className={`p-2 rounded-lg max-w-fit ${
               msg.role === "user"
-                ? "bg-blue-500 text-white self-end ml-auto"
-                : "bg-gray-200 text-black self-start"
+                ? "bg-blue-500 text-white self-end ml-auto text-right"
+                : "bg-gray-200 text-black self-start text-left"
             }`}
           >
             {msg.content}
           </div>
         ))}
-        {loading && <div className="text-gray-500 text-sm">Đang gõ...</div>}
+        {loading && <div className="text-gray-500 text-sm">{t("typing")}...</div>}
       </div>
 
       {/* Ô nhập */}
       <div className="p-3 border-t flex gap-2 border-black">
         <input
           className="flex-1 border rounded-lg px-3 py-2 focus:outline-none text-black"
-          placeholder="Nhập tin nhắn..."
+          placeholder={t("enteringMessage") + "..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -72,7 +75,7 @@ export default function Chatbot() {
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           disabled={loading}
         >
-          Gửi
+          {t("send")}
         </button>
       </div>
     </div>

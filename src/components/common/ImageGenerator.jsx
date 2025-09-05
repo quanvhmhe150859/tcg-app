@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ImageGenerator() {
+  const { t } = useTranslation();
+
   const [prompt, setPrompt] = useState("");
   const [negative, setNegative] = useState("");
   const [steps, setSteps] = useState(20);
@@ -77,7 +80,8 @@ export default function ImageGenerator() {
       }
 
       if (!res.ok) {
-        throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+        // throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+        throw new Error(t("connectionError"));
       }
 
       const data = await res.json();
@@ -86,12 +90,12 @@ export default function ImageGenerator() {
         ? data?.imageBase64
         : data?.images?.[0];
 
-      if (!base64) throw new Error("No image returned. Check server logs.");
+      if (!base64) throw new Error(t("noImageReturnedCheckServerLogs"));
 
       setImgBase64(base64);
     } catch (e) {
       if (e.name === "AbortError") return;
-      setError(e.message || "Something went wrong");
+      setError(e.message || t("somethingWentWrong"));
     } finally {
       setLoading(false);
     }
@@ -110,12 +114,12 @@ export default function ImageGenerator() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
-      <h1 className="text-2xl md:text-3xl font-semibold">Text → Image Generator</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold">{t("TextToImage")}</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-3">
           <label className="block">
-            <span className="text-sm font-medium">Prompt</span>
+            <span className="text-sm font-medium">{t("prompt")}</span>
             <textarea
               className="mt-1 w-full rounded-2xl border p-3 focus:outline-none focus:ring"
               rows={4}
@@ -126,7 +130,7 @@ export default function ImageGenerator() {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium">Negative Prompt (optional)</span>
+            <span className="text-sm font-medium">{t("negativePrompt")} ({t("optional")})</span>
             <textarea
               className="mt-1 w-full rounded-2xl border p-3 focus:outline-none focus:ring"
               rows={2}
@@ -136,9 +140,9 @@ export default function ImageGenerator() {
             />
           </label>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-sm">Steps</span>
+              <span className="text-sm">{t("steps")}</span>
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
@@ -149,7 +153,7 @@ export default function ImageGenerator() {
               />
             </label>
             <label className="block">
-              <span className="text-sm">Width</span>
+              <span className="text-sm">{t("width")}</span>
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
@@ -160,7 +164,7 @@ export default function ImageGenerator() {
               />
             </label>
             <label className="block">
-              <span className="text-sm">Height</span>
+              <span className="text-sm">{t("height")}</span>
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
@@ -171,7 +175,7 @@ export default function ImageGenerator() {
               />
             </label>
             <label className="block">
-              <span className="text-sm">CFG</span>
+              <span className="text-sm">{t("cfg")}</span>
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
@@ -185,12 +189,12 @@ export default function ImageGenerator() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 items-end">
-            <label className="block">
-              <span className="text-sm">Seed (blank = random)</span>
+            <label className="block md:col-span-2">
+              <span className="text-sm">{t("seedBlankRandom")}</span>
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
-                placeholder="leave empty for random"
+                placeholder={t("leaveEmptyForRandom")}
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
               />
@@ -206,13 +210,13 @@ export default function ImageGenerator() {
                 disabled
               />
               <label htmlFor="use-backend" className="text-sm">
-                Use backend proxy (/api/generate-image)
+                {t("use")} backend proxy (/api/generate-image)
               </label>
             </div>
 
             {!useBackendProxy && (
               <label className="block md:col-span-2">
-                <span className="text-sm">SD API Base</span>
+                <span className="text-sm">{t("sdApiBase")}</span>
                 <input
                   type="text"
                   className="mt-1 w-full rounded-xl border p-2"
@@ -235,14 +239,14 @@ export default function ImageGenerator() {
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {loading ? "Generating…" : "Generate"}
+              {loading ? t("generating") + "..." : t("generate")}
             </button>
             {imgBase64 && (
               <button
                 onClick={handleDownload}
                 className="rounded-2xl px-4 py-2 font-medium shadow border"
               >
-                Download PNG
+                {t("download")} PNG
               </button>
             )}
             {loading && (
@@ -250,7 +254,7 @@ export default function ImageGenerator() {
                 onClick={() => abortRef.current?.abort()}
                 className="rounded-2xl px-4 py-2 font-medium shadow border"
               >
-                Cancel
+                {t("cancel")}
               </button>
             )}
           </div>
@@ -273,7 +277,7 @@ export default function ImageGenerator() {
                 />
               ) : (
                 <div className="text-sm text-gray-500 p-6 text-center">
-                  {loading ? "Rendering image…" : "Your image will appear here"}
+                  {loading ? t("renderingImage") : t("yourImageWillAppearHere")}
                 </div>
               )}
             </div>
