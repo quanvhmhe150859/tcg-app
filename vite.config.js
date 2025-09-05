@@ -15,18 +15,24 @@ export default defineConfig(({ command }) => {
         host: "localhost",
         port: 5173,
         proxy: {
-          // tất cả request bắt đầu bằng /ollama sẽ được proxy sang localhost:11434
+          // Proxy for Ollama API
           "/ollama": {
             target: "http://localhost:11434",
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/ollama/, ""),
+          },
+          // Proxy for Automatic1111 API (Stable Diffusion)
+          "/sdapi": {
+            target: "http://127.0.0.1:7860",
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/sdapi/, ""),
           },
         },
       },
     };
   }
 
-  // production build (Netlify, Vercel, ...)
+  // Production build (Netlify, Vercel, ...)
   return {
     plugins: [react(), tailwindcss()],
   };

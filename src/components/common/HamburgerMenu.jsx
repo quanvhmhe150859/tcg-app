@@ -12,6 +12,7 @@ const HamburgerMenu = () => {
   const [expanded, setExpanded] = useState({
     gacha: false,
     list: false,
+    ai: false,
   });
 
   const toggleExpand = (section) => {
@@ -56,7 +57,7 @@ const HamburgerMenu = () => {
             className="hamburger-menu"
           >
             <div className="hamburger-menu-content">
-              <h1 className="text-2xl font-bold">📂 Menu</h1>
+              <h1 className="text-2xl font-bold">🏠 Menu</h1>
               <ul>
                 <li>
                   <Link to="/" onClick={() => setOpen(false)}>
@@ -115,8 +116,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    📋 <span>{t("list")}</span>{" "}
-                    {expanded.list ? "▼" : "▶"}
+                    📋 <span>{t("list")}</span> {expanded.list ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.list && (
@@ -155,12 +155,49 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/chatbot" onClick={() => setOpen(false)}>
-                    🤖 Chatbot
+                  <Link
+                    to=""
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleExpand("ai");
+                    }}
+                    className="flex items-center"
+                  >
+                    🤖 <span>AI</span> {expanded.ai ? "▼" : "▶"}
                   </Link>
+                  <AnimatePresence>
+                    {expanded.ai && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="submenu"
+                      >
+                        <li>
+                          <Link
+                            to="/chatbot"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            💻 Chatbot
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/imagegenerator"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            🖥️ Artbot
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
               </ul>
-            </div>            
+            </div>
             <div className="absolute inset-x-0 bottom-0 p-3">
               <ControlButtons />
             </div>
