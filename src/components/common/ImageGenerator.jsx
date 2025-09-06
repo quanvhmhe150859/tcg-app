@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 
 export default function ImageGenerator() {
@@ -86,9 +87,7 @@ export default function ImageGenerator() {
 
       const data = await res.json();
 
-      const base64 = useBackendProxy
-        ? data?.imageBase64
-        : data?.images?.[0];
+      const base64 = useBackendProxy ? data?.imageBase64 : data?.images?.[0];
 
       if (!base64) throw new Error(t("noImageReturnedCheckServerLogs"));
 
@@ -130,7 +129,9 @@ export default function ImageGenerator() {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium">{t("negativePrompt")} ({t("optional")})</span>
+            <span className="text-sm font-medium">
+              {t("negativePrompt")} ({t("optional")})
+            </span>
             <textarea
               className="mt-1 w-full rounded-2xl border p-3 focus:outline-none focus:ring"
               rows={2}
@@ -142,7 +143,14 @@ export default function ImageGenerator() {
 
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-sm">{t("steps")}</span>
+              <span
+                className="text-sm"
+                data-tooltip-id="steps"
+                data-tooltip-content="Số bước lặp khi tạo ảnh (nhiều bước hơn = chi tiết hơn nhưng chậm hơn)"
+              >
+                {t("steps")}
+              </span>
+              <Tooltip id="steps" place="top" effect="solid" />
               <input
                 type="number"
                 className="mt-1 w-full rounded-xl border p-2"
@@ -150,6 +158,25 @@ export default function ImageGenerator() {
                 max={50}
                 value={steps}
                 onChange={(e) => setSteps(Number(e.target.value))}
+              />
+            </label>
+            <label className="block">
+              <span
+                className="text-sm"
+                data-tooltip-id="cfg"
+                data-tooltip-content="Điều chỉnh mức độ bám sát prompt. Giá trị cao = ảnh bám prompt hơn nhưng có thể mất sáng tạo"
+              >
+                {t("cfg")}
+              </span>
+              <Tooltip id="cfg" place="top" effect="solid" />
+              <input
+                type="number"
+                className="mt-1 w-full rounded-xl border p-2"
+                min={1}
+                max={15}
+                step={0.5}
+                value={cfg}
+                onChange={(e) => setCfg(Number(e.target.value))}
               />
             </label>
             <label className="block">
@@ -172,18 +199,6 @@ export default function ImageGenerator() {
                 step={64}
                 value={height}
                 onChange={(e) => setHeight(Number(e.target.value))}
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm">{t("cfg")}</span>
-              <input
-                type="number"
-                className="mt-1 w-full rounded-xl border p-2"
-                min={1}
-                max={15}
-                step={0.5}
-                value={cfg}
-                onChange={(e) => setCfg(Number(e.target.value))}
               />
             </label>
           </div>

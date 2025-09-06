@@ -180,7 +180,7 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            💻 Chatbot
+                            💻 Chat
                           </Link>
                         </li>
                         <li>
@@ -189,7 +189,7 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            🖥️ Artbot
+                            🖥️ Art
                           </Link>
                         </li>
                       </motion.ul>
