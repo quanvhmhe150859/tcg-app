@@ -68,7 +68,7 @@ export default function BgmPlayer() {
   };
 
   return (
-    <div className="section">
+    <>
       <h3 className="font-bold mb-2">{t("backgroundMusic")}</h3>
 
       <label className="block mb-2 text-sm font-medium">
@@ -93,12 +93,12 @@ export default function BgmPlayer() {
       <button
         onClick={handleChangeMode}
         className="text-xl mb-4 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
-        data-tooltip-id="mode-tooltip"
+        data-tooltip-id="play-mode-tooltip"
         data-tooltip-content={`${t(getLabel(mode))}`}
       >
         {t("playMode")}: {getLabel(mode)}
       </button>
-      <Tooltip id="mode-tooltip" place="bottom" effect="solid" />
+      <Tooltip id="play-mode-tooltip" place="bottom" effect="solid" />
 
       <div className="text-sm mb-4">
         {formatTime(currentTime)} / {formatTime(duration)}
@@ -114,6 +114,6 @@ export default function BgmPlayer() {
         onChange={(e) => setVolume(parseFloat(e.target.value))}
         className="w-1/2"
       />
-    </div>
+    </>
   );
 }

@@ -12,6 +12,7 @@ import {
   getRaritiesInPack,
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
+import { addCardsToLocalStorage } from "../../utils/storageUtils";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -159,6 +160,8 @@ const RandomCardsYugioh = () => {
         actualSet || null
       );
 
+      await new Promise((res) => setTimeout(res, 500));
+
       if (!result || result.length === 0) {
         setNoResultWarning(true);
         setCards([]);
@@ -166,7 +169,9 @@ const RandomCardsYugioh = () => {
         setCards(result);
       }
 
-      await new Promise((res) => setTimeout(res, 500));
+      // 🆕 Lưu vào localStorage
+      addCardsToLocalStorage(result, "yugioh");
+      
     } catch (err) {
       console.error("Lỗi khi roll:", err);
       setNoResultWarning(true);
@@ -263,7 +268,7 @@ const RandomCardsYugioh = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <CardItemYugioh card={card} index={index} type={"gacha"}/>
+              <CardItemYugioh card={card} index={index} type={"gacha"} />
             </motion.div>
           ))}
         </AnimatePresence>

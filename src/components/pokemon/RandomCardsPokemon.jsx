@@ -5,6 +5,7 @@ import styles from "../common/RandomCards.module.css";
 import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
+import { addCardsToLocalStorage } from "../../utils/storageUtils";
 import SelectBox from "../common/SelectBox";
 import { useTranslation } from "react-i18next";
 
@@ -53,6 +54,10 @@ const RandomCardsPokemon = () => {
 
       await new Promise((res) => setTimeout(res, 500));
       setCards(result);
+
+      // 🆕 Lưu vào localStorage
+      addCardsToLocalStorage(result, "pokemon");
+
     } catch (err) {
       setNoResultWarning(true);
     } finally {
@@ -61,20 +66,20 @@ const RandomCardsPokemon = () => {
   };
 
   const optionsSuperType = [
-    { label: "🌐 " +t("all")+ " Supertypes", value: "" },
+    { label: "🌐 " + t("all") + " Supertypes", value: "" },
     { label: "🔥 Pokémon", value: "Pokémon" },
     { label: "📘 Trainer", value: "Trainer" },
     { label: "⚡ Energy", value: "Energy" },
   ];
 
-  const optionsRarity = [{ label: t("all")+" Rarity", value: "" }].concat(
+  const optionsRarity = [{ label: t("all") + " Rarity", value: "" }].concat(
     filteredRarities.map((r) => ({
       label: r,
       value: r,
     }))
   );
 
-  const optionsType = [{ label: t("all")+" Type", value: "" }].concat(
+  const optionsType = [{ label: t("all") + " Type", value: "" }].concat(
     filteredTypes.map((t) => ({
       label: t,
       value: t,
@@ -129,14 +134,14 @@ const RandomCardsPokemon = () => {
       {isRolling && (
         <div className={styles.spinnerContainer}>
           <span className="spinner" />
-          <span>⏳ {t("rollingCard")}, {t("pleaseWait")}...</span>
+          <span>
+            ⏳ {t("rollingCard")}, {t("pleaseWait")}...
+          </span>
         </div>
       )}
 
       {!isRolling && noResultWarning && (
-        <p className="m-4">
-          ⚠️ {t("noCardsMatchTheCurrentSelection")}.
-        </p>
+        <p className="m-4">⚠️ {t("noCardsMatchTheCurrentSelection")}.</p>
       )}
 
       <div className={styles.cardList}>

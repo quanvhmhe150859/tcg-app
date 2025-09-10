@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function DarkModeToggle() {
+  const { t } = useTranslation();
+
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
@@ -19,7 +22,7 @@ export default function DarkModeToggle() {
     <button
       className="floating-button"
       onClick={toggleDarkMode}
-      title={isDarkMode ? "Switch to Light mode" : "Switch to Dark mode"}
+      title={isDarkMode ? t("switchToLight") : t("switchToDark")}
     >
       {isDarkMode ? "🌙" : "☀️"}
     </button>

@@ -7,6 +7,7 @@ import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
 import ControlButtons from "../common/ControlButtons";
 import BgmPlayer from "./BgmPlayer";
+import SaveLoadData from "./SaveLoadData";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -92,6 +93,32 @@ const AdminSettings = () => {
         </button>
       </div>
 
+      {/* General Tab */}
+      <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
+        <div className="section">
+          <h3 className="text-center">
+            {t("position")} {t("floatingActionButtons")}
+          </h3>
+          <ControlButtons />
+        </div>
+
+        <div className="section">
+          <BgmPlayer />
+        </div>
+
+        <div className="section">
+          <SaveLoadData />
+        </div>
+
+        <ProtectedSection>
+          <div className="section">
+            <h3>{t("importData")}</h3>
+            <ImportDataPokemon />
+            <ImportDataYugioh />
+          </div>
+        </ProtectedSection>
+      </div>
+
       {/* Pokémon Tab */}
       <div className={`tab-content ${tab === "pokemon" ? "open" : "closed"}`}>
         <AllowedTypesSelector ref={pokemonTypes} type="pokemon" />
@@ -102,25 +129,6 @@ const AdminSettings = () => {
       <div className={`tab-content ${tab === "yugioh" ? "open" : "closed"}`}>
         <AllowedTypesSelector ref={yugiohTypes} type="yugioh" />
         <AllowedRaritiesYugiohWeight ref={yugiohRaritites} />
-      </div>
-
-      {/* Import Data Tab */}
-      <div className={`tab-content ${tab === "general" ? "open" : "closed"}`}>
-        <div className="section">
-          <h3 className="text-center">
-            {t("position")} {t("floatingActionButtons")}
-          </h3>
-          <ControlButtons />
-        </div>
-        <BgmPlayer />
-
-        <ProtectedSection>
-          <div className="section">
-            <h3>{t("importData")}</h3>
-            <ImportDataPokemon />
-            <ImportDataYugioh />
-          </div>
-        </ProtectedSection>
       </div>
 
       {tab !== "general" && <button onClick={handleSave}>{t("save")}</button>}

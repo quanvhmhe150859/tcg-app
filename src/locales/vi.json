@@ -92,5 +92,21 @@
   "download": "Tải xuống ảnh",
   "cancel": "Hủy",
   "yourImageWillAppearHere": "Ảnh của bạn sẽ xuất hiện ở đây",
-  "renderingImage": "Đang tạo ảnh"
+  "renderingImage": "Đang tạo ảnh",
+  "switchToLight": "Chuyển sang Sáng",
+  "switchToDark": "Chuyển sang Tối",
+  "switchToEnglish": "Chuyển sang Tiếng Anh",
+  "switchToVietnamese": "Chuyển sang Tiếng Việt",
+  "switchToUnmute": "Chuyển sang Bật tiếng",
+  "switchToMute": "Chuyển sang Tắt tiếng",
+  "saveLoadCollection": "Lưu / Tải bộ sưu tập",
+  "rollMode": "Chế độ quay",
+  "freeSpin": "Quay Miễn Phí",
+  "ticketSpin": "Quay Dùng Vé",
+  "saveFile": "Lưu Tệp Xuống",
+  "loadFile": "Tải Tệp Lên",
+  "loadSuccessfully": "Tải thành công",
+  "invalidFileFormat": "Định dạng tệp không hợp lệ",
+  "cardsWillNotBeSavedToYourCollection": "Thẻ sẽ KHÔNG được lưu vào bộ sưu tập",
+  "cardsWillBeSavedToYourCollection": "Thẻ sẽ được lưu vào bộ sưu tập"
 }

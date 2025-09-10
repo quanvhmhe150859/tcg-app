@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export default function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [lang, setLang] = useState(i18n.language || "en");
 
   const toggleLang = () => {
@@ -16,7 +16,7 @@ export default function LanguageSwitcher() {
     <button
       onClick={toggleLang}
       className="floating-button"
-      title={lang === "en" ? "Switch to Vietnamese" : "Switch to English"}
+      title={lang === "en" ? t("switchToVietnamese") : t("switchToEnglish")}
     >
       <img
         src={lang === "en" ? "/flags/en.png" : "/flags/vi.png"}

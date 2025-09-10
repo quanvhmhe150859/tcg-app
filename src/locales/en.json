@@ -92,5 +92,21 @@
   "download": "Download",
   "cancel": "Cancel",
   "yourImageWillAppearHere": "Your image will appear here",
-  "renderingImage": "Rendering image"
+  "renderingImage": "Rendering image",
+  "switchToLight": "Switch to Light",
+  "switchToDark": "Switch to Dark",
+  "switchToEnglish": "Switch to English",
+  "switchToVietnamese": "Switch to Vietnamese",
+  "switchToUnmute": "Switch to Unmute",
+  "switchToMute": "Switch to Mute",
+  "saveLoadCollection": "Save / Load collection",
+  "rollMode": "Roll Mode",
+  "freeSpin": "Free Spin",
+  "ticketSpin": "Ticket Spin",
+  "saveFile": "Save File",
+  "loadFile": "Load File",
+  "loadSuccessfully": "Load successfully",
+  "invalidFileFormat": "Invalid file format",
+  "cardsWillNotBeSavedToYourCollection": "Cards will NOT be saved to your collection",
+  "cardsWillBeSavedToYourCollection": "Cards will be saved to your collection"
 }

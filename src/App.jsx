@@ -18,11 +18,14 @@ import ImageGenerator from "./components/common/ImageGenerator";
 
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
+
 import DarkModeToggle from "./components/common/DarkModeToggle";
-import ScrollToTopButton from "./components/common/ScrollToTopButton";
-import MusicToggleButton from "./components/common/MusicToggleButton";
-import "./App.css";
 import LanguageSwitcher from "./components/common/LanguageSwitcher";
+import MusicToggleButton from "./components/common/MusicToggleButton";
+import TicketCount from "./components/common/TicketCount";
+
+import ScrollToTopButton from "./components/common/ScrollToTopButton";
+import "./App.css";
 import "./i18n";
 import { useOrientation } from "./components/context/OrientationContext";
 
@@ -66,6 +69,7 @@ function App() {
     { id: 1, component: <DarkModeToggle /> },
     { id: 2, component: <LanguageSwitcher /> },
     { id: 3, component: <MusicToggleButton /> },
+    { id: 4, component: <TicketCount /> },
   ];
 
   return (
