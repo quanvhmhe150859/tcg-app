@@ -1,7 +1,9 @@
 // Hàm thêm card vào localStorage
-export function addCardsToLocalStorage(result, gameType) {
+export function addCardsToLocalStorage(result, gameType, spinMode) {
   // Chỉ cho phép lưu nếu spinMode = "paid"
-  const spinMode = localStorage.getItem("spinMode");
+  if(spinMode === null) {
+    localStorage.setItem("spinMode", "free");
+  }
   if (spinMode === "free") {
     return;
   }

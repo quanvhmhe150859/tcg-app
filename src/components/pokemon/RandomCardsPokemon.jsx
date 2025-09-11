@@ -6,6 +6,8 @@ import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
+import { spendTicketsIfNeeded } from "../../utils/ticketUtils";
+import { useTickets } from "../context/TicketContext";
 import SelectBox from "../common/SelectBox";
 import { useTranslation } from "react-i18next";
 
@@ -36,7 +38,15 @@ const RandomCardsPokemon = () => {
     allowedRarities.includes(rarity)
   );
 
+  const spinMode = localStorage.getItem("spinMode");
+  const { tickets, updateTickets } = useTickets();
+
   const handleRoll = async (count = 1) => {
+    // 🆕 kiểm tra vé trước
+    if (!spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)) {
+      return; // không đủ vé thì thoát
+    }
+
     setIsRolling(true);
     setNoResultWarning(false);
 
@@ -56,8 +66,7 @@ const RandomCardsPokemon = () => {
       setCards(result);
 
       // 🆕 Lưu vào localStorage
-      addCardsToLocalStorage(result, "pokemon");
-
+      addCardsToLocalStorage(result, "pokemon", spinMode);
     } catch (err) {
       setNoResultWarning(true);
     } finally {
@@ -128,7 +137,7 @@ const RandomCardsPokemon = () => {
         </div>
 
         {/* Roll Buttons */}
-        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
+        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} spinMode={spinMode} />
       </div>
 
       {isRolling && (

@@ -13,6 +13,8 @@ import {
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
+import { spendTicketsIfNeeded } from "../../utils/ticketUtils";
+import { useTickets } from "../context/TicketContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -108,7 +110,15 @@ const RandomCardsYugioh = () => {
     }
   };
 
+  const spinMode = localStorage.getItem("spinMode");
+  const { tickets, updateTickets } = useTickets();
+
   const handleRoll = async (count = 1) => {
+    // 🆕 kiểm tra vé trước
+    if (!spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)) {
+      return; // không đủ vé thì thoát
+    }
+
     setIsRolling(true);
     setNoResultWarning(false);
 
@@ -170,8 +180,7 @@ const RandomCardsYugioh = () => {
       }
 
       // 🆕 Lưu vào localStorage
-      addCardsToLocalStorage(result, "yugioh");
-      
+      addCardsToLocalStorage(result, "yugioh", spinMode);
     } catch (err) {
       console.error("Lỗi khi roll:", err);
       setNoResultWarning(true);
@@ -234,7 +243,7 @@ const RandomCardsYugioh = () => {
           )}
         </div>
 
-        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} />
+        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} spinMode={spinMode} />
       </div>
 
       {isRolling && (

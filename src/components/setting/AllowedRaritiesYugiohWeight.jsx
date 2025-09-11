@@ -12,7 +12,7 @@ const LOCAL_KEY = "allowedRaritiesYugiohWeights";
 const TOTAL_WEIGHT = 10000;
 
 const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [weights, setWeights] = useState({});
   const [fixedFirstPercent, setFixedFirstPercent] = useState("");
@@ -113,7 +113,7 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
     <div className="section">
       <Tooltip id="tooltip" />
 
-      <h3 className="text-lg font-bold">Rarities {t("allowed")}</h3>
+      <h3 className="text-lg font-bold">{i18n.language == "en" ? "Rarities Banners" : "Banner Rarities"} {t("allowed")}</h3>
 
       <div className="flex justify-center items-center gap-2">
         <label>Common:</label>

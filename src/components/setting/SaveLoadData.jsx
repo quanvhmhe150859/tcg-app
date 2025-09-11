@@ -96,13 +96,13 @@ export default function CardSaveLoad() {
         <Tooltip id="roll-mode-tooltip" place="top" effect="solid" />
       </div>
 
-      <div className="mt-4">
-        <button className="mr-4" onClick={saveLocalCardsToFile}>
-          {t("saveFile")}
+      <div className="flex w-full w-fit sm:mx-auto gap-2 sm:justify-center mt-4 lg:w-1/2">
+        <button className="min-w-0 flex-1 flex flex-col items-center" onClick={saveLocalCardsToFile}>
+          ⬇️ {t("saveFile")}
         </button>
 
-        <button onClick={() => document.getElementById("file-upload").click()}>
-          {t("loadFile")}
+        <button className="min-w-0 flex-1 flex flex-col items-center" onClick={() => document.getElementById("file-upload").click()}>
+          ⬆️ {t("loadFile")}
         </button>
         <input
           id="file-upload"

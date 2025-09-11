@@ -20,7 +20,7 @@
   "dataSynchronization": "Data Synchronization",
   "sendingDataImportRequest": "Sending data import request",
   "errorCallingImportOrSyncAPI": "Error calling import or sync API.",
-  "allowed": "Allowed",
+  "allowed": "allowed",
   "save": "Save",
   "randomizeBasedOnCommon": "Randomize remaining rarities based on Common",
   "randomize": "Randomize",
@@ -109,5 +109,8 @@
   "invalidFileFormat": "Invalid file format",
   "cardsWillNotBeSavedToYourCollection": "Cards will NOT be saved to your collection",
   "cardsWillBeSavedToYourCollection": "Cards will be saved to your collection",
-  "currentTicketCanEarnMoreByPlayingTheGame": "Current ticket, can earn more by playing the game"
+  "currentTicketCanEarnMoreByPlayingTheGame": "Current ticket, can earn more by playing the game",
+  "cost": "Cost",
+  "ticket": "ticket",
+  "notEnoughTicketsToRoll": "Not enough tickets to roll"
 }

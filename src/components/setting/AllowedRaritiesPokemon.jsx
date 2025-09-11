@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const LOCAL_KEY = "allowedRaritiesPokemon";
 
 const AllowedRaritiesPokemon = forwardRef((_, ref) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [selected, setSelected] = useState([]);
 
@@ -29,7 +29,7 @@ const AllowedRaritiesPokemon = forwardRef((_, ref) => {
 
   return (
     <div className="section">
-      <h3>Rarities {t("allowed")}</h3>
+      <h3>{i18n.language == "en" ? "Rarities Banners" : "Banner Rarities"} {t("allowed")}</h3>
       <div className="toggle-group">
         {allRaritiesPokemon.map((rarity) => (
           <button

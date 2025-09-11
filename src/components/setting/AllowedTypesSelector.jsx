@@ -1,19 +1,28 @@
-import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
+import React, {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+} from "react";
 import { allTypesPokemon, allTypesYugioh } from "../../utils/constants";
 import "./AdminSettings.css";
 import { useTranslation } from "react-i18next";
 
 const AllowedTypesSelector = forwardRef(({ type = "pokemon" }, ref) => {
-  const { t } = useTranslation();
-  
+  const { t, i18n } = useTranslation();
+
   const config = {
     pokemon: {
-      title: "Types "+t("allowed"),
+      title:
+        (i18n.language == "en" ? "Types Banners " : "Banner Types ") +
+        t("allowed"),
       allTypes: allTypesPokemon,
       localKey: "allowedTypesPokemon",
     },
     yugioh: {
-      title: "Types "+t("allowed"),
+      title:
+        (i18n.language == "en" ? "Types Banners " : "Banner Types ") +
+        t("allowed"),
       allTypes: allTypesYugioh,
       localKey: "allowedTypesYugioh",
     },
@@ -47,7 +56,9 @@ const AllowedTypesSelector = forwardRef(({ type = "pokemon" }, ref) => {
         {allTypes.map((type) => (
           <button
             key={type}
-            className={`toggle-button ${selectedTypes.includes(type) ? "selected" : ""}`}
+            className={`toggle-button ${
+              selectedTypes.includes(type) ? "selected" : ""
+            }`}
             onClick={() => toggleType(type)}
           >
             {type}
