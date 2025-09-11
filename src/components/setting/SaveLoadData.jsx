@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
+import { getTickets, setTickets } from "../../utils/ticketStorage";
+import { useTickets } from "../context/TicketContext";
 
 export default function CardSaveLoad() {
   const { t } = useTranslation();
+
+  const { updateTickets } = useTickets();
 
   // Mode: true = free spin, false = paid spin
   const [freeMode, setFreeMode] = useState(true);
@@ -25,12 +29,19 @@ export default function CardSaveLoad() {
     localStorage.setItem("spinMode", newMode ? "free" : "ticket");
   };
 
-  // Save localStorage cards -> file .txt (Base64)
+  // Save localStorage cards + tickets -> file .txt (Base64)
   const saveLocalCardsToFile = () => {
-    const stored =
+    const storedCards =
       localStorage.getItem("cards") ||
       JSON.stringify({ pokemon: [], yugioh: [] });
-    const encoded = btoa(stored);
+    const tickets = getTickets();
+
+    const payload = {
+      cards: JSON.parse(storedCards),
+      tickets,
+    };
+
+    const encoded = btoa(JSON.stringify(payload));
     const blob = new Blob([encoded], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -47,19 +58,19 @@ export default function CardSaveLoad() {
     reader.onload = (event) => {
       try {
         const decoded = atob(event.target.result);
-        const loadedCards = JSON.parse(decoded);
+        const loadedData = JSON.parse(decoded);
 
-        // đảm bảo luôn có key pokemon và yugioh
-        const normalized = {
-          pokemon: loadedCards.pokemon || [],
-          yugioh: loadedCards.yugioh || [],
+        // đảm bảo luôn có cards và tickets
+        const normalizedCards = {
+          pokemon: loadedData.cards?.pokemon || [],
+          yugioh: loadedData.cards?.yugioh || [],
         };
+        const normalizedTickets = Number(loadedData.tickets) || 0;
 
-        localStorage.setItem("cards", JSON.stringify(normalized));
+        localStorage.setItem("cards", JSON.stringify(normalizedCards));
+        updateTickets(normalizedTickets);
 
-        // Nếu muốn hiển thị cả 2 loại thì setCards(normalized)
-        // Nếu chỉ hiển thị 1 game (vd Pokémon) thì setCards(normalized.pokemon)
-        setCards(normalized);
+        setCards(normalizedCards);
 
         alert(t("loadSuccessfully") + "!");
       } catch (err) {

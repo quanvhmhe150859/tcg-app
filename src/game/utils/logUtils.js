@@ -8,6 +8,8 @@ export const getLogColor = (type) => {
       return "text-red-400";
     case "gold":
       return "text-yellow-300";
+    case "ticket":
+      return "text-pink-300";
     default:
       return "text-gray-300";
   }

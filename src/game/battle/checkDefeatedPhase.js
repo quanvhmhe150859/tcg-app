@@ -17,6 +17,7 @@ export const checkDefeatedPhase = (
     bossEffectOptions,
     shopLevelShown,
     generateShopChoices,
+    earnTickets,
   }
 ) => {
   if (enemy.health <= 0) {
@@ -63,8 +64,31 @@ export const checkDefeatedPhase = (
     roundLog.push({ text: "Player is defeated. Game Over.", type: "defeat" });
     setGameOver(true);
     setAutoBattle(false);
+
+    // 🆕 Thưởng tickets = level hiện tại
+    if (earnTickets) {
+      const gained = calculateTickets(level);
+      earnTickets(gained);
+      roundLog.push({
+        text: `🎫 You gained ${gained} tickets!`,
+        type: "ticket",
+      });
+    }
+
     return { defeated: "player" };
   }
 
   return { defeated: null };
 };
+
+function calculateTickets(level) {
+  if (level < 10) {
+    return level;
+  } else if (level < 20) {
+    return Math.floor(level * 1.2);
+  } else if (level < 30) {
+    return Math.floor(level * 1.5);
+  } else {
+    return Math.floor(level * 2);
+  }
+}

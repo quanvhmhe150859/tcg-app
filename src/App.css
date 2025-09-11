@@ -54,3 +54,18 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: background-color 0.2s ease;
 }
+
+.floating-button-no-bg{
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+.floating-button-no-bg:hover {
+  background-color: transparent;
+  color: inherit !important;
+  cursor: default;
+}

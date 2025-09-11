@@ -108,5 +108,6 @@
   "loadSuccessfully": "Load successfully",
   "invalidFileFormat": "Invalid file format",
   "cardsWillNotBeSavedToYourCollection": "Cards will NOT be saved to your collection",
-  "cardsWillBeSavedToYourCollection": "Cards will be saved to your collection"
+  "cardsWillBeSavedToYourCollection": "Cards will be saved to your collection",
+  "currentTicketCanEarnMoreByPlayingTheGame": "Current ticket, can earn more by playing the game"
 }

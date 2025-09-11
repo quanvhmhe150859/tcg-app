@@ -108,5 +108,6 @@
   "loadSuccessfully": "Tải thành công",
   "invalidFileFormat": "Định dạng tệp không hợp lệ",
   "cardsWillNotBeSavedToYourCollection": "Thẻ sẽ KHÔNG được lưu vào bộ sưu tập",
-  "cardsWillBeSavedToYourCollection": "Thẻ sẽ được lưu vào bộ sưu tập"
+  "cardsWillBeSavedToYourCollection": "Thẻ sẽ được lưu vào bộ sưu tập",
+  "currentTicketCanEarnMoreByPlayingTheGame": "Vé hiện tại, có thể kiếm thêm bằng cách chơi trò chơi"
 }

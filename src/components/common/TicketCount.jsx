@@ -1,26 +1,19 @@
 import { useState, useEffect } from "react";
-import { getTickets, setTickets } from "../../utils/ticketStorage";
+import { useTickets } from "../context/TicketContext";
+import { useTranslation } from "react-i18next";
 
 export default function TicketButton() {
-  const [tickets, setTicketsState] = useState(0);
+  const { t } = useTranslation();
 
-  useEffect(() => {
-    // nếu chưa có thì set 10 ticket mặc định
-    let current = getTickets();
-    if (current === 0) {
-      setTickets(10);
-      current = 10;
-    }
-    setTicketsState(current);
-  }, []);
-
+  const { tickets } = useTickets();
+  
   return (
     <button
       disabled
-      className="floating-button !p-0 !text-xs !hover:text-transparent !bg-transparent"
-      title="Số vé hiện tại của bạn"
+      className="floating-button-no-bg !p-0 !text-xs"
+      title={t("currentTicketCanEarnMoreByPlayingTheGame")}
     >
-        {tickets} 🎟️
+      {tickets} 🎟️
     </button>
   );
 }
