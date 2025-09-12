@@ -58,7 +58,7 @@ const upgradeConfig = {
   minAttack: { name: "Min Attack", value: 5 },
   maxAttack: { name: "Max Attack", value: 5 },
   armor: { name: "Armor", value: 5 },
-  dodge: { name: "Dodge", value: 5 },
+  dodge: { name: "Dodge", value: 3 },
   critChance: { name: "Crit Chance", value: 5 },
   lifeSteal: { name: "Life Steal", value: 5 },
 };
@@ -90,7 +90,7 @@ export const bossEffects = {
   stun: {
     name: "Stunning Blow",
     type: "stun",
-    stunChance: 0.05,
+    stunChance: 0.03,
   },
 };
 

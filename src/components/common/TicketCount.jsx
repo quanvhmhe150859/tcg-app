@@ -13,7 +13,7 @@ export default function TicketButton() {
       className="floating-button-no-bg !p-0 !text-xs"
       title={t("currentTicketCanEarnMoreByPlayingTheGame")}
     >
-      {tickets} 🎟️
+      {tickets} 🎫
     </button>
   );
 }

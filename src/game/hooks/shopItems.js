@@ -5,7 +5,7 @@ export const baseShopItems = [
   { key: "minAttack", value: 5, cost: 30 },
   { key: "maxAttack", value: 5, cost: 30 },
   { key: "armor", value: 5, cost: 40 },
-  { key: "dodge", value: 5, cost: 60 },
+  { key: "dodge", value: 3, cost: 90 },
   { key: "critChance", value: 5, cost: 70 },
   { key: "lifeSteal", value: 5, cost: 60 },
 ];

@@ -70,7 +70,7 @@ export const checkDefeatedPhase = (
       const gained = calculateTickets(level);
       earnTickets(gained);
       roundLog.push({
-        text: `🎫 You gained ${gained} tickets!`,
+        text: `🎟️ You gained ${gained} tickets!`,
         type: "ticket",
       });
     }

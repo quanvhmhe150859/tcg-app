@@ -23,7 +23,7 @@ export default function PlayerStats({ stats }) {
       <div className="flex justify-between">
         <span>Dodge:</span>
         <span>
-          {stats.dodge}%{stats.dodge >= 60 ? " / 60%" : ""}
+          {stats.dodge}%{stats.dodge >= 60 ? " (MAX)" : ""}
         </span>
       </div>
       <div className="flex justify-between">
