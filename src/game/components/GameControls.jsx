@@ -7,6 +7,7 @@ export default function GameControls({
   onToggleAuto,
   onRestart,
   shopPending,
+  onEndRun,
 }) {
   return (
     <div className="flex gap-2 mt-4">
@@ -18,21 +19,23 @@ export default function GameControls({
           Restart
         </button>
       ) : (
-        !pendingUpgrades && !shopPending && (
+        !pendingUpgrades &&
+        !shopPending && (
           <>
             {!autoBattle && (
-              <button
-                className="bg-green-600 hover:bg-green-700 py-1 px-4 rounded"
-                onClick={onStart}
-              >
-                {battleStarted ? "Next Round" : "Start"}
-              </button>
+              <>
+                <button onClick={onStart}>
+                  {battleStarted ? "Next Round" : "Start"}
+                </button>
+                {battleStarted && (
+                  <button className="" onClick={onEndRun}>
+                    ☠️
+                  </button>
+                )}
+              </>
             )}
             {battleStarted && (
-              <button
-                className={`bg-yellow-600 hover:bg-yellow-700 py-1 px-4 rounded`}
-                onClick={onToggleAuto}
-              >
+              <button onClick={onToggleAuto}>
                 {autoBattle ? "Stop Auto" : "Auto"}
               </button>
             )}

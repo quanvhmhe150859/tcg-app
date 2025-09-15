@@ -5,6 +5,7 @@ export const getLogColor = (type) => {
     case "crit":
       return "text-orange-300";
     case "defeat":
+    case "system":
       return "text-red-400";
     case "gold":
       return "text-yellow-300";

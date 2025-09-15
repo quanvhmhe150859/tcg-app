@@ -70,11 +70,6 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/gamev2" onClick={() => setOpen(false)}>
-                    🎮 {t("game")} v2
-                  </Link>
-                </li>
-                <li>
                   <Link
                     to=""
                     onClick={(e) => {

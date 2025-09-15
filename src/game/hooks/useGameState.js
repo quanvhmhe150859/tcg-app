@@ -1,8 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { generateEnemy, getInitialStats } from "../utils/gameUtils";
 import { useBattleLogs } from "./useBattleLogs";
+import { useTickets } from "../../components/context/TicketContext";
 
 export function useGameState() {
+  const { earnTickets } = useTickets();
+
   const [level, setLevel] = useState(1);
   const [enemy, setEnemy] = useState(null);
   const { logs, addLog, clearLogs } = useBattleLogs();
@@ -65,6 +68,34 @@ export function useGameState() {
     startNextBattle();
   };
 
+  const endRun = () => {
+    setStats((prev) => ({
+      ...prev,
+      health: 0,
+    }));
+    // addLog([{ text: "You chose to end the run.", type: "system" }]);
+    setGameOver(true);
+  };
+
+  // 🆕 Tạo callback gameOver
+  const onGameOver = () => {
+    // có thể thêm: reset shop, lưu kết quả, hiển thị popup...
+    const gained = calculateTickets(level);
+      earnTickets(gained);
+      addLog([{
+        text: `🎟️ You gained ${gained} tickets!`,
+        type: "ticket",
+      }]);
+      addLog([{ text: "Game Over!", type: "system" }]);
+  };
+
+  // 🆕 Theo dõi gameOver state
+  useEffect(() => {
+    if (gameOver) {
+      onGameOver();
+    }
+  }, [gameOver]);
+
   return {
     level,
     setLevel,
@@ -93,5 +124,18 @@ export function useGameState() {
     startNextBattle,
     restartGame,
     applyUpgrade,
+    endRun,
   };
+}
+
+function calculateTickets(level) {
+  if (level < 10) {
+    return level;
+  } else if (level < 20) {
+    return Math.floor(level * 1.2);
+  } else if (level < 30) {
+    return Math.floor(level * 1.5);
+  } else {
+    return Math.floor(level * 2);
+  }
 }

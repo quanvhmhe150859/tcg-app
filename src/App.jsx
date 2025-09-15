@@ -12,7 +12,6 @@ import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
 import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 
 import TextStatGame from "./game/AutoGame";
-import GameComponent from "./gamev2/Game";
 
 import Chatbot from "./components/common/Chatbot";
 import ImageGenerator from "./components/common/ImageGenerator";
@@ -109,7 +108,6 @@ function App() {
           <Route path="/game" element={<TextStatGame />} />
           <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/imagegenerator" element={<ImageGenerator />} />
-          <Route path="/gamev2" element={<GameComponent />} />
         </Routes>
       </div>
     </Router>

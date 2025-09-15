@@ -29,7 +29,6 @@ export function useBattleLogic({
   startNextBattle,
   shopLevelShown,
   setRerollCost,
-  earnTickets,
 }) {
   const startBattle = () => {
     if (pendingUpgrades || shopPending) return;
@@ -58,7 +57,6 @@ export function useBattleLogic({
       shopLevelShown,
       generateShopChoices,
       setRerollCost,
-      earnTickets,
     };
 
     const playerResult = playerTurn(

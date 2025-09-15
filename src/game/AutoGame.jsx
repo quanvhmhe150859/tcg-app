@@ -27,6 +27,7 @@ export default function TextStatGame() {
     handleExitShop,
     handleReroll,
     rerollCost,
+    endRun,
   } = useGameEngine();
 
   return (
@@ -47,6 +48,7 @@ export default function TextStatGame() {
           onToggleAuto={() => setAutoBattle((prev) => !prev)}
           onRestart={restartGame}
           shopPending={shopPending}
+          onEndRun={endRun}
         />
       </div>
 

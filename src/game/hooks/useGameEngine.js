@@ -2,10 +2,8 @@ import { useAutoBattle } from "./useAutoBattle";
 import { useGameState } from "./useGameState";
 import { useShopPhase } from "./useShopPhase";
 import { useBattleLogic } from "./useBattleLogic";
-import { useTickets } from "../../components/context/TicketContext";
 
 export function useGameEngine() {
-  const { earnTickets } = useTickets();
 
   const {
     level,
@@ -34,6 +32,7 @@ export function useGameEngine() {
     startNextBattle,
     restartGame,
     applyUpgrade,
+    endRun
   } = useGameState();
 
   const {
@@ -75,7 +74,6 @@ export function useGameEngine() {
     startNextBattle,
     shopLevelShown,
     setRerollCost,
-    earnTickets,
   });
 
   useAutoBattle(
@@ -105,5 +103,6 @@ export function useGameEngine() {
     handleExitShop,
     handleReroll,
     rerollCost,
+    endRun,
   };
 }
