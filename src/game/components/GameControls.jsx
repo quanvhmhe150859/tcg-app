@@ -22,6 +22,11 @@ export default function GameControls({
         !pendingUpgrades &&
         !shopPending && (
           <>
+            {battleStarted && (
+              <button onClick={onToggleAuto}>
+                {autoBattle ? "Stop Auto" : "Auto"}
+              </button>
+            )}
             {!autoBattle && (
               <>
                 <button onClick={onStart}>
@@ -33,11 +38,6 @@ export default function GameControls({
                   </button>
                 )}
               </>
-            )}
-            {battleStarted && (
-              <button onClick={onToggleAuto}>
-                {autoBattle ? "Stop Auto" : "Auto"}
-              </button>
             )}
           </>
         )

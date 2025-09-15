@@ -73,20 +73,23 @@ export function useGameState() {
       ...prev,
       health: 0,
     }));
-    // addLog([{ text: "You chose to end the run.", type: "system" }]);
     setGameOver(true);
   };
 
   // 🆕 Tạo callback gameOver
   const onGameOver = () => {
+    const roundLog = [];
     // có thể thêm: reset shop, lưu kết quả, hiển thị popup...
     const gained = calculateTickets(level);
-      earnTickets(gained);
-      addLog([{
+    earnTickets(gained);
+    roundLog.push({ text: "Game Over!", type: "system" });
+    roundLog.push(
+      {
         text: `🎟️ You gained ${gained} tickets!`,
         type: "ticket",
-      }]);
-      addLog([{ text: "Game Over!", type: "system" }]);
+      },
+    );
+    addLog(roundLog);
   };
 
   // 🆕 Theo dõi gameOver state
