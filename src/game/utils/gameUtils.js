@@ -93,7 +93,7 @@ const upgradeConfig = {
   regen: { name: "Regen", value: 5 },
   minAttack: { name: "Min Attack", value: 5 },
   maxAttack: { name: "Max Attack", value: 5 },
-  armor: { name: "Armor", value: 5 },
+  armor: { name: "Armor", value: 7 },
   dodge: { name: "Dodge", value: 3 },
   critChance: { name: "Crit Chance", value: 5 },
   lifeSteal: { name: "Life Steal", value: 5 },
