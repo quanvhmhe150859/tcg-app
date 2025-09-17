@@ -1,45 +1,106 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 // Initialize player with fixed stats
 const initPlayer = () => ({
   health: 100,
-  minAttack: 10,
-  maxAttack: 100,
+  minAttack: 10000,
+  maxAttack: 10000,
   critChance: 0.2, // 20% chance for critical hit
-  critDamage: 2,   // 200% damage on critical hit
-  lifeSteal: 0.3,  // 30% of damage dealt restored as health
+  critDamage: 2, // 200% damage on critical hit
+  lifeSteal: 0.3, // 30% of damage dealt restored as health
   regeneration: 5, // 5 health restored per turn
-  dodge: 0.1,      // 10% chance to dodge attacks
-  armor: 50,       // 50 armor reduces damage by ~33.33%
-  gold: 0,         // Gold earned from defeating enemies
+  dodge: 0.1, // 10% chance to dodge attacks
+  armor: 50, // 50 armor reduces damage by ~33.33%
+  gold: 0, // Gold earned from defeating enemies
 });
 
-// Initialize enemy with random stats based on level
-const initEnemy = (level) => ({
-  health: Math.floor(100 * level * (0.8 + Math.random() * 0.4)),
-  minAttack: Math.floor(1 * level * (0.8 + Math.random() * 0.4)),
-  maxAttack: Math.floor(10 * level * (0.8 + Math.random() * 0.4)),
-  critChance: 0.2 * (0.8 + Math.random() * 0.4),
-  critDamage: 2 * (0.8 + Math.random() * 0.4),
-  lifeSteal: 0.3 * (0.8 + Math.random() * 0.4),
-  regeneration: Math.floor(5 * level * (0.8 + Math.random() * 0.4)),
-  dodge: 0.1 * (0.8 + Math.random() * 0.4),
-  armor: Math.floor(50 * level * (0.8 + Math.random() * 0.4)),
-});
+// Initialize enemy with random stats based on level, with boss scaling at levels 10, 20, 30, ...
+const initEnemy = (level) => {
+  const isBoss = level % 10 === 0;
+  const baseFactor = 0.7 + Math.random() * 0.3; // Reduced scaling factor
+  const bossMultiplier = isBoss ? 2 : 1; // Double certain stats for bosses
+  return {
+    health: Math.floor(100 * level * baseFactor * bossMultiplier),
+    minAttack: Math.floor(1 * level * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(10 * level * baseFactor * bossMultiplier),
+    critChance: 0.2 * baseFactor,
+    critDamage: 2 * baseFactor,
+    lifeSteal: 0.3 * baseFactor,
+    regeneration: Math.floor(5 * level * baseFactor * bossMultiplier),
+    dodge: 0.1 * baseFactor,
+    armor: Math.floor(50 * level * baseFactor * bossMultiplier),
+  };
+};
 
-// Generate three random upgrade options
-const generateUpgradeOptions = () => {
+// Generate three random upgrade options, excluding minAttack if minAttack equals maxAttack
+const generateUpgradeOptions = (player) => {
   const stats = [
-    { key: 'health', name: 'Health', min: 20, max: 50, format: (val) => `+${val}` },
-    { key: 'minAttack', name: 'Min Attack', min: 1, max: 3, format: (val) => `+${val}` },
-    { key: 'maxAttack', name: 'Max Attack', min: 2, max: 5, format: (val) => `+${val}` },
-    { key: 'critChance', name: 'Crit Chance', min: 1, max: 5, format: (val) => `+${val}%` },
-    { key: 'critDamage', name: 'Crit Damage', min: 10, max: 50, format: (val) => `+${val}%` },
-    { key: 'lifeSteal', name: 'Life Steal', min: 1, max: 5, format: (val) => `+${val}%` },
-    { key: 'regeneration', name: 'Regeneration', min: 2, max: 5, format: (val) => `+${val}` },
-    { key: 'dodge', name: 'Dodge', min: 1, max: 5, format: (val) => `+${val}%` },
-    { key: 'armor', name: 'Armor', min: 10, max: 30, format: (val) => `+${val}` },
-  ];
+    {
+      key: "health",
+      name: "Health",
+      min: 20,
+      max: 50,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "minAttack",
+      name: "Min Attack",
+      min: 1,
+      max: 3,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "maxAttack",
+      name: "Max Attack",
+      min: 2,
+      max: 5,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "critChance",
+      name: "Crit Chance",
+      min: 1,
+      max: 5,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "critDamage",
+      name: "Crit Damage",
+      min: 10,
+      max: 50,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "lifeSteal",
+      name: "Life Steal",
+      min: 1,
+      max: 5,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "regeneration",
+      name: "Regeneration",
+      min: 2,
+      max: 5,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "dodge",
+      name: "Dodge",
+      min: 1,
+      max: 5,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "armor",
+      name: "Armor",
+      min: 10,
+      max: 30,
+      format: (val) => `+${val}`,
+    },
+  ].filter(
+    (stat) => stat.key !== "minAttack" || player.minAttack !== player.maxAttack
+  );
   // Shuffle stats and pick first three
   const shuffled = stats.sort(() => Math.random() - 0.5).slice(0, 3);
   return shuffled.map((stat) => ({
@@ -83,17 +144,17 @@ const BattleGame = () => {
   // Add log to the current turn's log array
   const addLog = (message, type, currentTurnLogs) => {
     const colorMap = {
-      turn: '',
-      attackCritical: 'text-orange-500',
-      lifeSteal: 'text-green-500',
-      regeneration: 'text-green-500',
-      gameOver: 'text-red-500',
-      dodge: 'text-blue-500',
-      levelUp: 'text-purple-500',
-      upgrade: 'text-yellow-500',
-      gold: 'text-yellow-500',
+      turn: "",
+      attackCritical: "text-orange-500",
+      lifeSteal: "text-green-500",
+      regeneration: "text-green-500",
+      gameOver: "text-red-500",
+      dodge: "text-blue-500",
+      levelUp: "text-purple-500",
+      upgrade: "text-yellow-500",
+      gold: "text-yellow-500",
     };
-    currentTurnLogs.push({ message, color: colorMap[type] || '' });
+    currentTurnLogs.push({ message, color: colorMap[type] || "" });
   };
 
   // Check if game is over or level up (player or enemy health <= 0)
@@ -102,22 +163,26 @@ const BattleGame = () => {
       // Calculate gold as sum of enemy stats
       const goldGained = Math.floor(
         newEnemy.health +
-        newEnemy.minAttack +
-        newEnemy.maxAttack +
-        newEnemy.critChance * 100 +
-        newEnemy.critDamage * 100 +
-        newEnemy.lifeSteal * 100 +
-        newEnemy.regeneration +
-        newEnemy.dodge * 100 +
-        newEnemy.armor
+          newEnemy.minAttack +
+          newEnemy.maxAttack +
+          newEnemy.critChance * 100 +
+          newEnemy.critDamage * 100 +
+          newEnemy.lifeSteal * 100 +
+          newEnemy.regeneration +
+          newEnemy.dodge * 100 +
+          newEnemy.armor
       );
       newPlayer.gold += goldGained;
-      addLog(`Enemy defeated! Level up to ${level + 1}!`, 'levelUp', currentTurnLogs);
-      addLog(`Player gained ${goldGained} gold!`, 'gold', currentTurnLogs);
+      addLog(
+        `Enemy defeated! Level up to ${level + 1}!`,
+        "levelUp",
+        currentTurnLogs
+      );
+      addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
       return { isOver: false, levelUp: true };
     }
     if (newPlayer.health <= 0) {
-      addLog('Player defeated!', 'gameOver', currentTurnLogs);
+      addLog("Player defeated!", "gameOver", currentTurnLogs);
       return { isOver: true, levelUp: false };
     }
     return { isOver: false, levelUp: false };
@@ -125,25 +190,38 @@ const BattleGame = () => {
 
   // Start of a turn
   const startTurn = (turn, level, currentTurnLogs) => {
-    addLog(`Turn ${turn} (Level ${level})`, 'turn', currentTurnLogs);
+    addLog(`Turn ${turn} (Level ${level})`, "turn", currentTurnLogs);
   };
 
   // Consolidated attack phase for player or enemy
   const attackPhase = (attacker, defender, attackerName, currentTurnLogs) => {
-    // Check for dodge
-    if (Math.random() < defender.dodge) {
-      addLog(`${attackerName === 'Player' ? 'Enemy' : 'Player'} dodges the attack!`, 'dodge', currentTurnLogs);
+    // Check for dodge, capped at 60%
+    if (Math.random() < Math.min(defender.dodge, 0.6)) {
+      addLog(
+        `${attackerName === "Player" ? "Enemy" : "Player"} dodges the attack!`,
+        "dodge",
+        currentTurnLogs
+      );
       return true; // Defender is alive
     }
 
-    const baseDamage = Math.floor(Math.random() * (attacker.maxAttack - attacker.minAttack + 1)) + attacker.minAttack;
+    const baseDamage =
+      Math.floor(
+        Math.random() * (attacker.maxAttack - attacker.minAttack + 1)
+      ) + attacker.minAttack;
     const isCritical = Math.random() < attacker.critChance;
-    const preArmorDamage = isCritical ? Math.floor(baseDamage * attacker.critDamage) : baseDamage;
-    const finalDamage = Math.floor(preArmorDamage * (100 / (100 + defender.armor)));
+    const preArmorDamage = isCritical
+      ? Math.floor(baseDamage * attacker.critDamage)
+      : baseDamage;
+    const finalDamage = Math.floor(
+      preArmorDamage * (100 / (100 + defender.armor))
+    );
     defender.health = Math.max(0, defender.health - finalDamage);
     addLog(
-      `${attackerName} deals ${finalDamage} (${preArmorDamage}) damage to ${attackerName === 'Player' ? 'Enemy' : 'Player'}!${isCritical ? ' (Critical Hit)' : ''}`,
-      isCritical ? 'attackCritical' : '',
+      `${attackerName} deals ${finalDamage} (${preArmorDamage}) damage to ${
+        attackerName === "Player" ? "Enemy" : "Player"
+      }!${isCritical ? " (Critical Hit)" : ""}`,
+      isCritical ? "attackCritical" : "",
       currentTurnLogs
     );
 
@@ -151,7 +229,12 @@ const BattleGame = () => {
     if (attacker.lifeSteal > 0 && finalDamage > 0) {
       const healthRestored = Math.floor(finalDamage * attacker.lifeSteal);
       if (healthRestored > 0) {
-        addLog(`${attackerName} restores ${healthRestored} health via life steal!`, 'lifeSteal', currentTurnLogs);
+        attacker.health += healthRestored;
+        addLog(
+          `${attackerName} restores ${healthRestored} health via life steal!`,
+          "lifeSteal",
+          currentTurnLogs
+        );
       }
     }
 
@@ -162,18 +245,26 @@ const BattleGame = () => {
   const playerTurn = (newPlayer, newEnemy, currentTurnLogs) => {
     if (newPlayer.regeneration > 0) {
       newPlayer.health += newPlayer.regeneration;
-      addLog(`Player regenerates ${newPlayer.regeneration} health!`, 'regeneration', currentTurnLogs);
+      addLog(
+        `Player regenerates ${newPlayer.regeneration} health!`,
+        "regeneration",
+        currentTurnLogs
+      );
     }
-    return attackPhase(newPlayer, newEnemy, 'Player', currentTurnLogs);
+    return attackPhase(newPlayer, newEnemy, "Player", currentTurnLogs);
   };
 
   // Enemy's turn phase
   const enemyTurn = (newPlayer, newEnemy, currentTurnLogs) => {
     if (newEnemy.regeneration > 0) {
       newEnemy.health += newEnemy.regeneration;
-      addLog(`Enemy regenerates ${newEnemy.regeneration} health!`, 'regeneration', currentTurnLogs);
+      addLog(
+        `Enemy regenerates ${newEnemy.regeneration} health!`,
+        "regeneration",
+        currentTurnLogs
+      );
     }
-    attackPhase(newEnemy, newPlayer, 'Enemy', currentTurnLogs);
+    attackPhase(newEnemy, newPlayer, "Enemy", currentTurnLogs);
   };
 
   // End of a turn
@@ -181,7 +272,15 @@ const BattleGame = () => {
     setPlayer(newPlayer);
     setEnemy(newEnemy);
     setTurnLogs((prev) => {
-      const newTurnLogs = [...prev, { turnId: globalTurnCount, turn: turnCount, level: level, logs: currentTurnLogs }];
+      const newTurnLogs = [
+        ...prev,
+        {
+          turnId: globalTurnCount,
+          turn: turnCount,
+          level: level,
+          logs: currentTurnLogs,
+        },
+      ];
       // Limit to 20 turns, remove oldest if necessary
       if (newTurnLogs.length > 20) {
         return newTurnLogs.slice(1);
@@ -194,7 +293,7 @@ const BattleGame = () => {
     }
     if (gameStatus.levelUp) {
       setShowUpgradeOptions(true);
-      setUpgradeOptions(generateUpgradeOptions());
+      setUpgradeOptions(generateUpgradeOptions(player));
     }
   };
 
@@ -203,20 +302,46 @@ const BattleGame = () => {
     setGlobalTurnCount((prev) => prev + 1); // Increment before logging
     setPlayer((prev) => {
       const newPlayer = { ...prev };
+      const originalMinAttack = newPlayer.minAttack;
       // Scale percentage stats by dividing by 100
-      const value = ['critChance', 'lifeSteal', 'dodge'].includes(option.key)
+      const value = ["critChance", "lifeSteal", "dodge"].includes(option.key)
         ? option.value / 100
-        : ['critDamage'].includes(option.key)
+        : ["critDamage"].includes(option.key)
         ? option.value / 100
         : option.value;
-      newPlayer[option.key] += value;
+      // Cap minAttack to maxAttack
+      if (
+        option.key === "minAttack" &&
+        newPlayer.minAttack + value > newPlayer.maxAttack
+      ) {
+        newPlayer.minAttack = newPlayer.maxAttack;
+      } else {
+        newPlayer[option.key] += value;
+      }
       const currentTurnLogs = [];
-      const logMessage = ['critChance', 'critDamage', 'lifeSteal', 'dodge'].includes(option.key)
+      const actualValue =
+        option.key === "minAttack"
+          ? newPlayer.minAttack - originalMinAttack
+          : value;
+      const logMessage = [
+        "critChance",
+        "critDamage",
+        "lifeSteal",
+        "dodge",
+      ].includes(option.key)
         ? `Player upgraded ${option.name} by +${option.value}%!`
-        : `Player upgraded ${option.name} by +${option.value}!`;
-      addLog(logMessage, 'upgrade', currentTurnLogs);
+        : `Player upgraded ${option.name} by +${actualValue}!`;
+      addLog(logMessage, "upgrade", currentTurnLogs);
       setTurnLogs((prev) => {
-        const newTurnLogs = [...prev, { turnId: globalTurnCount + 1, turn: turnCount, level: level, logs: currentTurnLogs }];
+        const newTurnLogs = [
+          ...prev,
+          {
+            turnId: globalTurnCount + 1,
+            turn: turnCount,
+            level: level,
+            logs: currentTurnLogs,
+          },
+        ];
         if (newTurnLogs.length > 20) {
           return newTurnLogs.slice(1);
         }
@@ -246,7 +371,11 @@ const BattleGame = () => {
     const gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs);
     if (enemyAlive && !gameStatus.isOver) {
       enemyTurn(newPlayer, newEnemy, currentTurnLogs);
-      const finalGameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs);
+      const finalGameStatus = checkGameOver(
+        newPlayer,
+        newEnemy,
+        currentTurnLogs
+      );
       endTurn(newPlayer, newEnemy, currentTurnLogs, finalGameStatus);
     } else {
       endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
@@ -279,8 +408,16 @@ const BattleGame = () => {
 
   return (
     <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Turn-Based Battle Game - Level {level}</h1>
-      <div className="mb-4 grid grid-cols-2 gap-4">
+      <h1 className="text-2xl font-bold mb-4">
+        {level % 10 === 0 ? (
+          <>
+            <span className="text-red-500">Boss</span> - Level {level}
+          </>
+        ) : (
+          <>Level {level}</>
+        )}
+      </h1>
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <h2 className="font-semibold">Player Stats:</h2>
           <p>Health: {player.health}</p>
@@ -290,9 +427,13 @@ const BattleGame = () => {
           <p>Crit Damage: {(player.critDamage * 100).toFixed(0)}%</p>
           <p>Life Steal: {(player.lifeSteal * 100).toFixed(0)}%</p>
           <p>Regeneration: {player.regeneration}</p>
-          <p>Dodge: {(player.dodge * 100).toFixed(0)}%</p>
+          <p>
+            Dodge:{" "}
+            {player.dodge < 0.6
+              ? `${(player.dodge * 100).toFixed(0)}%`
+              : `${(player.dodge * 100).toFixed(0)}% / 60%`}
+          </p>
           <p>Armor: {player.armor}</p>
-          <p>Gold: {player.gold}</p>
         </div>
         <div>
           <h2 className="font-semibold">Enemy Stats:</h2>
@@ -303,10 +444,16 @@ const BattleGame = () => {
           <p>Crit Damage: {(enemy.critDamage * 100).toFixed(0)}%</p>
           <p>Life Steal: {(enemy.lifeSteal * 100).toFixed(0)}%</p>
           <p>Regeneration: {enemy.regeneration}</p>
-          <p>Dodge: {(enemy.dodge * 100).toFixed(0)}%</p>
+          <p>
+            Dodge:{" "}
+            {enemy.dodge < 0.6
+              ? `${(enemy.dodge * 100).toFixed(0)}%`
+              : `${(enemy.dodge * 100).toFixed(0)}% / 60%`}
+          </p>
           <p>Armor: {enemy.armor}</p>
         </div>
       </div>
+      <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>
       {showUpgradeOptions && (
         <div className="mb-4">
           <h2 className="font-semibold">Choose an Upgrade:</h2>
@@ -337,11 +484,11 @@ const BattleGame = () => {
             onClick={toggleAuto}
             className={`px-4 py-2 rounded ${
               isAuto
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                ? "bg-red-500 hover:bg-red-600 text-white"
+                : "bg-yellow-500 hover:bg-yellow-600 text-white"
             }`}
           >
-            {isAuto ? 'Stop Auto' : 'Auto'}
+            {isAuto ? "Stop Auto" : "Auto"}
           </button>
         </div>
       )}
@@ -354,20 +501,25 @@ const BattleGame = () => {
         </button>
       )}
       <h2 className="font-semibold mt-4">Battle Log:</h2>
-      <div
-        ref={logContainerRef}
-        className="mt-2 max-h-64 overflow-y-auto"
-      >
-        {turnLogs.slice().reverse().map((turnEntry, turnIndex, reversedArray) => (
-          <div key={turnEntry.turnId}>
-            {turnEntry.logs.map((log, logIndex) => (
-              <p key={`${turnEntry.turnId}-${logIndex}`} className={`text-sm ${log.color}`}>
-                {log.message}
-              </p>
-            ))}
-            {turnIndex < reversedArray.length - 1 && <hr className="my-2 border-gray-300" />}
-          </div>
-        ))}
+      <div ref={logContainerRef} className="mt-2 max-h-64 overflow-y-auto">
+        {turnLogs
+          .slice()
+          .reverse()
+          .map((turnEntry, turnIndex, reversedArray) => (
+            <div key={turnEntry.turnId}>
+              {turnEntry.logs.map((log, logIndex) => (
+                <p
+                  key={`${turnEntry.turnId}-${logIndex}`}
+                  className={`text-sm ${log.color}`}
+                >
+                  {log.message}
+                </p>
+              ))}
+              {turnIndex < reversedArray.length - 1 && (
+                <hr className="my-2 border-gray-300" />
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );
