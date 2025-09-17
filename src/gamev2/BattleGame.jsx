@@ -108,6 +108,7 @@ const generateUpgradeOptions = (player) => {
     name: stat.name,
     value: Math.floor(stat.min + Math.random() * (stat.max - stat.min + 1)),
     format: stat.format,
+    price: Math.floor(50 + Math.random() * 100), // Random price between 50 and 150 gold
   }));
 };
 
@@ -118,10 +119,15 @@ const BattleGame = () => {
   const [gameOver, setGameOver] = useState(false);
   const [turnCount, setTurnCount] = useState(1);
   const [globalTurnCount, setGlobalTurnCount] = useState(1);
+  const [logId, setLogId] = useState(1); // Unique ID for turnLogs entries
   const [level, setLevel] = useState(1);
   const [isAuto, setIsAuto] = useState(false);
   const [showUpgradeOptions, setShowUpgradeOptions] = useState(false);
   const [upgradeOptions, setUpgradeOptions] = useState([]);
+  const [showShop, setShowShop] = useState(false);
+  const [shopOptions, setShopOptions] = useState([]);
+  const [rerollPrice, setRerollPrice] = useState(50); // Initial reroll price
+  const [boughtOptions, setBoughtOptions] = useState([]); // Array of indices of bought options
   const logContainerRef = useRef(null);
 
   // Auto-scroll to the latest turn (top)
@@ -133,13 +139,22 @@ const BattleGame = () => {
 
   // Handle auto-attack mode
   useEffect(() => {
-    if (isAuto && !gameOver && !showUpgradeOptions) {
+    if (isAuto && !gameOver && !showUpgradeOptions && !showShop) {
       const interval = setInterval(() => {
         handleAttack();
       }, 100);
       return () => clearInterval(interval); // Cleanup interval
     }
-  }, [isAuto, gameOver, showUpgradeOptions, player, enemy, turnCount, level]);
+  }, [
+    isAuto,
+    gameOver,
+    showUpgradeOptions,
+    showShop,
+    player,
+    enemy,
+    turnCount,
+    level,
+  ]);
 
   // Add log to the current turn's log array
   const addLog = (message, type, currentTurnLogs) => {
@@ -152,7 +167,7 @@ const BattleGame = () => {
       dodge: "text-blue-500",
       levelUp: "text-purple-500",
       upgrade: "text-yellow-500",
-      gold: "text-yellow-500",
+      purchase: "text-yellow-500",
     };
     currentTurnLogs.push({ message, color: colorMap[type] || "" });
   };
@@ -274,12 +289,7 @@ const BattleGame = () => {
     setTurnLogs((prev) => {
       const newTurnLogs = [
         ...prev,
-        {
-          turnId: globalTurnCount,
-          turn: turnCount,
-          level: level,
-          logs: currentTurnLogs,
-        },
+        { turnId: logId, turn: turnCount, level: level, logs: currentTurnLogs },
       ];
       // Limit to 20 turns, remove oldest if necessary
       if (newTurnLogs.length > 20) {
@@ -287,6 +297,7 @@ const BattleGame = () => {
       }
       return newTurnLogs;
     });
+    setLogId((prev) => prev + 1);
     if (gameStatus.isOver) {
       setGameOver(true);
       setIsAuto(false); // Stop auto mode on game over
@@ -297,9 +308,109 @@ const BattleGame = () => {
     }
   };
 
+  // Handle shop purchase
+  const handlePurchase = (option, index) => {
+    if (player.gold < option.price || boughtOptions.includes(index)) return;
+    const newLogId = logId;
+    setPlayer((prev) => {
+      const newPlayer = { ...prev };
+      const originalMinAttack = newPlayer.minAttack;
+      // Scale percentage stats by dividing by 100
+      const value = ["critChance", "lifeSteal", "dodge"].includes(option.key)
+        ? option.value / 100
+        : ["critDamage"].includes(option.key)
+        ? option.value / 100
+        : option.value;
+      // Cap minAttack to maxAttack
+      if (
+        option.key === "minAttack" &&
+        newPlayer.minAttack + value > newPlayer.maxAttack
+      ) {
+        newPlayer.minAttack = newPlayer.maxAttack;
+      } else {
+        newPlayer[option.key] += value;
+      }
+      newPlayer.gold -= option.price;
+      const currentTurnLogs = [];
+      const actualValue =
+        option.key === "minAttack"
+          ? newPlayer.minAttack - originalMinAttack
+          : option.value;
+      const logMessage = [
+        "critChance",
+        "critDamage",
+        "lifeSteal",
+        "dodge",
+      ].includes(option.key)
+        ? `Player purchased ${option.name} by +${actualValue}% for ${option.price} gold!`
+        : `Player purchased ${option.name} by +${actualValue} for ${option.price} gold!`;
+      addLog(logMessage, "purchase", currentTurnLogs);
+      setTurnLogs((prev) => {
+        const newTurnLogs = [
+          ...prev,
+          {
+            turnId: newLogId,
+            turn: turnCount,
+            level: level,
+            logs: currentTurnLogs,
+          },
+        ];
+        if (newTurnLogs.length > 20) {
+          return newTurnLogs.slice(1);
+        }
+        return newTurnLogs;
+      });
+      return newPlayer;
+    });
+    setBoughtOptions((prev) => [...prev, index]);
+    setLogId((prev) => prev + 1);
+  };
+
+  // Handle reroll shop
+  const handleReroll = () => {
+    if (player.gold < rerollPrice) return;
+    const newLogId = logId;
+    setPlayer((prev) => {
+      const newPlayer = { ...prev, gold: prev.gold - rerollPrice };
+      const currentTurnLogs = [];
+      addLog(
+        `Player rerolled shop for ${rerollPrice} gold!`,
+        "purchase",
+        currentTurnLogs
+      );
+      setTurnLogs((prev) => {
+        const newTurnLogs = [
+          ...prev,
+          {
+            turnId: newLogId,
+            turn: turnCount,
+            level: level,
+            logs: currentTurnLogs,
+          },
+        ];
+        if (newTurnLogs.length > 20) {
+          return newTurnLogs.slice(1);
+        }
+        return newTurnLogs;
+      });
+      return newPlayer;
+    });
+    setRerollPrice((prev) => prev + 50); // Increase price by 50 each reroll
+    setShopOptions(generateUpgradeOptions(player)); // Generate new options
+    setBoughtOptions([]); // Reset bought options for new shop
+    setLogId((prev) => prev + 1);
+  };
+
+  // Handle exit shop
+  const handleExitShop = () => {
+    setShowShop(false);
+    setRerollPrice(50); // Reset reroll price for next shop
+    setBoughtOptions([]);
+  };
+
   // Handle upgrade selection
   const handleUpgrade = (option) => {
-    setGlobalTurnCount((prev) => prev + 1); // Increment before logging
+    const newLogId = logId;
     setPlayer((prev) => {
       const newPlayer = { ...prev };
       const originalMinAttack = newPlayer.minAttack;
@@ -322,21 +433,21 @@ const BattleGame = () => {
       const actualValue =
         option.key === "minAttack"
           ? newPlayer.minAttack - originalMinAttack
-          : value;
+          : option.value;
       const logMessage = [
         "critChance",
         "critDamage",
         "lifeSteal",
         "dodge",
       ].includes(option.key)
-        ? `Player upgraded ${option.name} by +${option.value}%!`
+        ? `Player upgraded ${option.name} by +${actualValue}%!`
         : `Player upgraded ${option.name} by +${actualValue}!`;
       addLog(logMessage, "upgrade", currentTurnLogs);
       setTurnLogs((prev) => {
         const newTurnLogs = [
           ...prev,
           {
-            turnId: globalTurnCount + 1,
+            turnId: newLogId,
             turn: turnCount,
             level: level,
             logs: currentTurnLogs,
@@ -352,17 +463,23 @@ const BattleGame = () => {
     setLevel((prev) => prev + 1);
     setEnemy(initEnemy(level + 1));
     setTurnCount(1);
-    setGlobalTurnCount((prev) => prev + 1); // Increment after logging
     setShowUpgradeOptions(false);
+    if (level % 10 === 9) {
+      // Show shop after upgrade on levels 9, 19, 29, ...
+      setShowShop(true);
+      setShopOptions(generateUpgradeOptions(player));
+      setRerollPrice(50);
+      setBoughtOptions([]);
+    }
+    setLogId((prev) => prev + 1);
   };
 
   const handleAttack = () => {
-    if (gameOver || showUpgradeOptions) return;
+    if (gameOver || showUpgradeOptions || showShop) return;
 
     let newPlayer = { ...player };
     let newEnemy = { ...enemy };
     const currentTurn = turnCount;
-    const currentGlobalTurn = globalTurnCount;
     const currentTurnLogs = []; // Logs for the current turn
 
     // Execute turn phases
@@ -381,14 +498,14 @@ const BattleGame = () => {
       endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
     }
 
-    setGlobalTurnCount(currentGlobalTurn + 1);
+    setGlobalTurnCount((prev) => prev + 1);
     if (!gameStatus.levelUp) {
       setTurnCount(currentTurn + 1);
     }
   };
 
   const toggleAuto = () => {
-    if (!showUpgradeOptions) {
+    if (!showUpgradeOptions && !showShop) {
       setIsAuto((prev) => !prev);
     }
   };
@@ -400,10 +517,15 @@ const BattleGame = () => {
     setGameOver(false);
     setTurnCount(1);
     setGlobalTurnCount(1);
+    setLogId(1);
     setLevel(1);
     setIsAuto(false);
     setShowUpgradeOptions(false);
     setUpgradeOptions([]);
+    setShowShop(false);
+    setShopOptions([]);
+    setRerollPrice(50);
+    setBoughtOptions([]);
   };
 
   return (
@@ -470,7 +592,44 @@ const BattleGame = () => {
           </div>
         </div>
       )}
-      {!gameOver && !showUpgradeOptions && (
+      {showShop && (
+        <div className="mb-4">
+          <h2 className="font-semibold">Shop:</h2>
+          <div className="space-y-2">
+            {shopOptions.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handlePurchase(option, index)}
+                className={`w-full px-4 py-2 rounded text-white ${
+                  boughtOptions.includes(index) || player.gold < option.price
+                    ? "bg-gray-500 opacity-50 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+              >
+                {option.name}: {option.format(option.value)} - Cost:{" "}
+                {option.price} gold
+              </button>
+            ))}
+            <button
+              onClick={handleReroll}
+              className={`w-full px-4 py-2 mt-2 rounded text-white ${
+                player.gold < rerollPrice
+                  ? "bg-gray-500 opacity-50 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600"
+              }`}
+            >
+              Reroll Shop - Cost: {rerollPrice} gold
+            </button>
+            <button
+              onClick={handleExitShop}
+              className="w-full px-4 py-2 mt-2 bg-green-500 hover:bg-green-600 text-white rounded"
+            >
+              Exit Shop
+            </button>
+          </div>
+        </div>
+      )}
+      {!gameOver && !showUpgradeOptions && !showShop && (
         <div className="space-x-2">
           {!isAuto && (
             <button
