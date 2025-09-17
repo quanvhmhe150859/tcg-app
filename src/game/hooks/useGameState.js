@@ -132,11 +132,11 @@ export function useGameState() {
 }
 
 function calculateTickets(level) {
-  if (level < 10) {
+  if (level < 20) {
     return level;
-  } else if (level < 20) {
-    return Math.floor(level * 1.2);
   } else if (level < 30) {
+    return Math.floor(level * 1.2);
+  } else if (level < 40) {
     return Math.floor(level * 1.5);
   } else {
     return Math.floor(level * 2);
