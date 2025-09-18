@@ -12,7 +12,7 @@ import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
 import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 
 import TextStatGame from "./game/AutoGame";
-import BattleGame from "./gamev2/BattleGame";
+import BattleGame from "./gamev2/SplitVersion/BattleGame";
 
 import Chatbot from "./components/common/Chatbot";
 import ImageGenerator from "./components/common/ImageGenerator";

@@ -114,3 +114,17 @@ button:hover {
     top: 115px;
   }
 }
+
+.bg-game{
+  background: var(--color-card-bg);
+  color: var(--color-card-text);
+}
+
+.bg-game-secondary{
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.bg-game-secondary:has(div){
+  padding: 0.25rem;
+}
