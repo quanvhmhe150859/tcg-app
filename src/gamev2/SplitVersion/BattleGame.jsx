@@ -8,7 +8,11 @@ import {
 import { playerTurn, enemyTurn, attackPhase } from "./gameLogic";
 import { addLog, checkGameOver, startTurn } from "./utils";
 
+import { useTickets } from "../../components/context/TicketContext";
+
 const BattleGame = () => {
+  const { earnTickets } = useTickets();
+
   const [player, setPlayer] = useState(initPlayer());
   const [enemy, setEnemy] = useState(initEnemy(1));
   const [turnLogs, setTurnLogs] = useState([]);
@@ -40,17 +44,19 @@ const BattleGame = () => {
   const [showRareStats, setShowRareStats] = useState(false);
   const logContainerRef = useRef(null);
 
+  // Auto-scroll to the latest turn (top)
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = 0;
     }
   }, [turnLogs]);
 
+  // Handle auto-attack mode
   useEffect(() => {
     if (isAuto && !gameOver && !showUpgradeOptions && !showShop) {
       const interval = setInterval(() => {
         handleAttack();
-      }, 100);
+      }, 150);
       return () => clearInterval(interval);
     }
   }, [
@@ -64,10 +70,35 @@ const BattleGame = () => {
     level,
   ]);
 
+  // Reusable function to update turn logs
+  const updateTurnLogs = (currentTurnLogs) => {
+    setLogId((prev) => {
+      const newLogId = prev + 1;
+      setTurnLogs((prevLogs) => {
+        const newTurnLogs = [
+          ...prevLogs,
+          {
+            turnId: newLogId,
+            turn: turnCount,
+            level: level,
+            logs: currentTurnLogs,
+          },
+        ];
+        if (newTurnLogs.length > 20) {
+          return newTurnLogs.slice(1);
+        }
+        return newTurnLogs;
+      });
+      return newLogId;
+    });
+  };
+
+  // Toggle rare stats visibility
   const toggleRareStats = () => {
     setShowRareStats((prev) => !prev);
   };
 
+  // End of a turn
   const endTurn = (
     newPlayer,
     newEnemy,
@@ -80,20 +111,9 @@ const BattleGame = () => {
     setEnemy(newEnemy);
     setPlayerEffects(localPlayerEffects);
     setEnemyEffects(localEnemyEffects);
-    setTurnLogs((prev) => {
-      const newTurnLogs = [
-        ...prev,
-        { turnId: logId, turn: turnCount, level: level, logs: currentTurnLogs },
-      ];
-      if (newTurnLogs.length > 20) {
-        return newTurnLogs.slice(1);
-      }
-      return newTurnLogs;
-    });
-    setLogId((prev) => prev + 1);
+    updateTurnLogs(currentTurnLogs);
     if (gameStatus.isOver) {
-      setGameOver(true);
-      setIsAuto(false);
+      endGame();
     }
     if (gameStatus.levelUp) {
       const isBossDefeated = level % 10 === 0;
@@ -107,9 +127,9 @@ const BattleGame = () => {
     }
   };
 
+  // Handle shop purchase
   const handlePurchase = (option, index) => {
     if (player.gold < option.price || boughtOptions.includes(index)) return;
-    const newLogId = logId;
     setPlayer((prev) => {
       const newPlayer = { ...prev };
       const originalMinAttack = newPlayer.minAttack;
@@ -146,30 +166,15 @@ const BattleGame = () => {
         ? `Player purchased ${option.name} by +${actualValue}% for ${option.price} gold!`
         : `Player purchased ${option.name} by +${actualValue} for ${option.price} gold!`;
       addLog(logMessage, "purchase", currentTurnLogs);
-      setTurnLogs((prev) => {
-        const newTurnLogs = [
-          ...prev,
-          {
-            turnId: newLogId,
-            turn: turnCount,
-            level: level,
-            logs: currentTurnLogs,
-          },
-        ];
-        if (newTurnLogs.length > 20) {
-          return newTurnLogs.slice(1);
-        }
-        return newTurnLogs;
-      });
+      updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
     setBoughtOptions((prev) => [...prev, index]);
-    setLogId((prev) => prev + 1);
   };
 
+  // Handle reroll shop
   const handleReroll = () => {
     if (player.gold < rerollPrice) return;
-    const newLogId = logId;
     setPlayer((prev) => {
       const newPlayer = { ...prev, gold: prev.gold - rerollPrice };
       const currentTurnLogs = [];
@@ -178,37 +183,23 @@ const BattleGame = () => {
         "purchase",
         currentTurnLogs
       );
-      setTurnLogs((prev) => {
-        const newTurnLogs = [
-          ...prev,
-          {
-            turnId: newLogId,
-            turn: turnCount,
-            level: level,
-            logs: currentTurnLogs,
-          },
-        ];
-        if (newTurnLogs.length > 20) {
-          return newTurnLogs.slice(1);
-        }
-        return newTurnLogs;
-      });
+      updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
     setRerollPrice((prev) => prev + 50);
     setShopOptions(generateUpgradeOptions(player));
     setBoughtOptions([]);
-    setLogId((prev) => prev + 1);
   };
 
+  // Handle exit shop
   const handleExitShop = () => {
     setShowShop(false);
     setRerollPrice(50);
     setBoughtOptions([]);
   };
 
+  // Handle upgrade selection
   const handleUpgrade = (option) => {
-    const newLogId = logId;
     setPlayer((prev) => {
       const newPlayer = { ...prev };
       const originalMinAttack = newPlayer.minAttack;
@@ -244,21 +235,7 @@ const BattleGame = () => {
         ? `Player upgraded ${option.name} by +${actualValue}%!`
         : `Player upgraded ${option.name} by +${actualValue}!`;
       addLog(logMessage, "upgrade", currentTurnLogs);
-      setTurnLogs((prev) => {
-        const newTurnLogs = [
-          ...prev,
-          {
-            turnId: newLogId,
-            turn: turnCount,
-            level: level,
-            logs: currentTurnLogs,
-          },
-        ];
-        if (newTurnLogs.length > 20) {
-          return newTurnLogs.slice(1);
-        }
-        return newTurnLogs;
-      });
+      updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
     setLevel((prev) => prev + 1);
@@ -283,7 +260,46 @@ const BattleGame = () => {
       setRerollPrice(50);
       setBoughtOptions([]);
     }
-    setLogId((prev) => prev + 1);
+  };
+
+  function calculateTickets(level) {
+    if (level < 20) {
+      return level;
+    } else if (level < 30) {
+      return Math.floor(level * 1.2);
+    } else if (level < 40) {
+      return Math.floor(level * 1.5);
+    } else {
+      return Math.floor(level * 2);
+    }
+  }
+
+  // Centralized game over function
+  const endGame = () => {
+    const gained = calculateTickets(level);
+    earnTickets(gained);
+    const currentTurnLogs = [];
+    addLog("Game Over!", "gameOver", currentTurnLogs);
+    addLog(`🎟️ You gained ${gained} tickets!`, "ticket", currentTurnLogs);
+    updateTurnLogs(currentTurnLogs);
+    setGameOver(true);
+    setIsAuto(false);
+  };
+
+  // Handle quit game
+  const handleEndRun = () => {
+    const newPlayer = { ...player, rareStats: { ...player.rareStats } };
+    const newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
+    const currentTurnLogs = [];
+    const gameStatus = { isOver: true, levelUp: false };
+    endTurn(
+      newPlayer,
+      newEnemy,
+      currentTurnLogs,
+      gameStatus,
+      playerEffects,
+      enemyEffects
+    );
   };
 
   const handleAttack = () => {
@@ -382,8 +398,22 @@ const BattleGame = () => {
     setShowRareStats(false);
   };
 
+  const renderStat = (name, value, isPercentage = false) => (
+    <div className="flex justify-between text-sm">
+      <span>{name}:</span>
+      <span>{isPercentage ? `${(value * 100).toFixed(0)}%` : value}</span>
+    </div>
+  );
+
+  const renderRareStat = (name, value, isPercentage = false) => (
+    <div className="flex justify-between text-sm">
+      <span>{name}:</span>
+      <span>{isPercentage ? `${(value * 100).toFixed(0)}%` : value}</span>
+    </div>
+  );
+
   return (
-    <div className="p-4 max-w-md mx-auto rounded-lg bg-game">
+    <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
       <h1 className="text-2xl font-bold mb-4">
         {level % 10 === 0 ? (
           <>
@@ -395,137 +425,57 @@ const BattleGame = () => {
       </h1>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <h2 className="font-semibold mb-2">Player Stats:</h2>
-          <div>
-            <div className="space-y-1 p-1">
-              <div className="flex justify-between">
-                <span>Health:</span>
-                <span>{player.health}</span>  
+          <h2 className="font-semibold">Player Stats:</h2>
+          <div className="p-1">
+            {renderStat("Health", player.health)}
+            {renderStat("Regeneration", player.regeneration)}
+            {renderStat("Armor", player.armor)}
+            {renderStat("Min Attack", player.minAttack)}
+            {renderStat("Max Attack", player.maxAttack)}
+            {renderStat("Crit Chance", player.critChance, true)}
+            {renderStat("Crit Damage", player.critDamage, true)}
+            {renderStat("Life Steal", player.lifeSteal, true)}
+            {renderStat("Dodge", player.dodge < 0.6 ? player.dodge : 0.6, true)}
+          </div>
+          <div className="mt-2">
+            {showRareStats && (
+              <div className="bg-game-secondary">
+                {renderRareStat("Burn", player.rareStats.burn)}
+                {renderRareStat("Poison", player.rareStats.poison)}
+                {renderRareStat(
+                  "Stun Chance",
+                  player.rareStats.stunChance,
+                  true
+                )}
               </div>
-              <div className="flex justify-between">
-                <span>Min Attack:</span>
-                <span>{player.minAttack}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Max Attack:</span>
-                <span>{player.maxAttack}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Crit Chance:</span>
-                <span>{(player.critChance * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Crit Damage:</span>
-                <span>{(player.critDamage * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Life Steal:</span>
-                <span>{(player.lifeSteal * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Regeneration:</span>
-                <span>{player.regeneration}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Dodge:</span>
-                <span>
-                  {player.dodge < 0.6
-                    ? `${(player.dodge * 100).toFixed(0)}%`
-                    : `${(player.dodge * 100).toFixed(0)}% / 60%`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Armor:</span>
-                <span>{player.armor}</span>
-              </div>
-            </div>
-            <div className="mt-2">
-              {showRareStats && (
-                <div className="space-y-1 bg-game-secondary">
-                  <div className="flex justify-between">
-                    <span>Burn:</span>
-                    <span>{player.rareStats.burn}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Poison:</span>
-                    <span>{player.rareStats.poison}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Stun Chance:</span>
-                    <span>
-                      {(player.rareStats.stunChance * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
         <div>
-          <h2 className="font-semibold mb-2">Enemy Stats:</h2>
-          <div>
-            <div className="space-y-1 p-1">
-              <div className="flex justify-between">
-                <span>Health:</span>
-                <span>{enemy.health}</span>
+          <h2 className="font-semibold">Enemy Stats:</h2>
+          <div className="p-1">
+            {renderStat("Health", enemy.health)}
+            {renderStat("Regeneration", enemy.regeneration)}
+            {renderStat("Armor", enemy.armor)}
+            {renderStat("Min Attack", enemy.minAttack)}
+            {renderStat("Max Attack", enemy.maxAttack)}
+            {renderStat("Crit Chance", enemy.critChance, true)}
+            {renderStat("Crit Damage", enemy.critDamage, true)}
+            {renderStat("Life Steal", enemy.lifeSteal, true)}
+            {renderStat("Dodge", enemy.dodge < 0.6 ? enemy.dodge : 0.6, true)}
+          </div>
+          <div className="mt-2">
+            {showRareStats && (
+              <div className="bg-game-secondary">
+                {renderRareStat("Burn", enemy.rareStats.burn)}
+                {renderRareStat("Poison", enemy.rareStats.poison)}
+                {renderRareStat(
+                  "Stun Chance",
+                  enemy.rareStats.stunChance,
+                  true
+                )}
               </div>
-              <div className="flex justify-between">
-                <span>Min Attack:</span>
-                <span>{enemy.minAttack}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Max Attack:</span>
-                <span>{enemy.maxAttack}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Crit Chance:</span>
-                <span>{(enemy.critChance * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Crit Damage:</span>
-                <span>{(enemy.critDamage * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Life Steal:</span>
-                <span>{(enemy.lifeSteal * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Regeneration:</span>
-                <span>{enemy.regeneration}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Dodge:</span>
-                <span>
-                  {enemy.dodge < 0.6
-                    ? `${(enemy.dodge * 100).toFixed(0)}%`
-                    : `${(enemy.dodge * 100).toFixed(0)}% / 60%`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Armor:</span>
-                <span>{enemy.armor}</span>
-              </div>
-            </div>
-            <div className="mt-2">
-              {showRareStats && (
-                <div className="space-y-1 bg-game-secondary">
-                  <div className="flex justify-between">
-                    <span>Burn:</span>
-                    <span>{enemy.rareStats.burn}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Poison:</span>
-                    <span>{enemy.rareStats.poison}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Stun Chance:</span>
-                    <span>
-                      {(enemy.rareStats.stunChance * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -597,21 +547,17 @@ const BattleGame = () => {
         <div className="space-x-2">
           <button
             onClick={toggleAuto}
-            className={`px-4 py-2 rounded ${
-              isAuto
-                ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-yellow-500 hover:bg-yellow-600 text-white"
-            }`}
+            className={`${isAuto ? "w-[100%]" : "w-[40%]"}`}
           >
             {isAuto ? "Stop Auto" : "Auto"}
           </button>
           {!isAuto && (
-            <button
-              onClick={handleAttack}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
-            >
-              Next Turn
-            </button>
+            <>
+              <button onClick={handleAttack} className="w-[40%]">
+                Next Turn
+              </button>
+              <button onClick={handleEndRun}>☠️</button>
+            </>
           )}
         </div>
       )}
@@ -624,10 +570,7 @@ const BattleGame = () => {
         </button>
       )}
       <h2 className="font-semibold mt-4">Battle Log:</h2>
-      <div
-        ref={logContainerRef}
-        className="mt-2 max-h-64 overflow-y-auto bg-game-secondary"
-      >
+      <div ref={logContainerRef} className="mt-2 max-h-64 overflow-y-auto bg-game-secondary">
         {turnLogs
           .slice()
           .reverse()
@@ -641,9 +584,10 @@ const BattleGame = () => {
                   {log.message}
                 </p>
               ))}
-              {turnIndex < reversedArray.length - 1 && (
-                <hr className="my-2 border-gray-300" />
-              )}
+              {turnIndex < reversedArray.length - 1 &&
+                turnEntry.logs.length > 0 && (
+                  <hr className="my-2 border-gray-300" />
+                )}
             </div>
           ))}
       </div>

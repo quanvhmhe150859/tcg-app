@@ -13,6 +13,7 @@ export const addLog = (message, type, currentTurnLogs) => {
     upgrade: "text-yellow-500",
     purchase: "text-yellow-500",
     gold: "text-yellow-500",
+    ticket: "text-pink-500",
   };
   currentTurnLogs.push({ message, color: colorMap[type] || "" });
 };
@@ -46,5 +47,5 @@ export const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
 };
 
 export const startTurn = (turn, level, currentTurnLogs) => {
-  addLog(`Turn ${turn} (Level ${level})`, "turn", currentTurnLogs);
+  addLog(`Turn ${turn}`, "turn", currentTurnLogs);
 };

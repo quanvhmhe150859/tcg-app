@@ -1,7 +1,7 @@
 export const initPlayer = () => ({
-  health: 100,
-  minAttack: 10000,
-  maxAttack: 10000,
+  health: 10,
+  minAttack: 1000,
+  maxAttack: 1000,
   critChance: 0.2,
   critDamage: 2,
   lifeSteal: 0.3,
@@ -22,8 +22,8 @@ export const initEnemy = (level) => {
   const bossMultiplier = isBoss ? 2 : 1;
   return {
     health: Math.floor(100 * level * baseFactor * bossMultiplier),
-    minAttack: Math.floor(1 * level * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(10 * level * baseFactor * bossMultiplier),
+    minAttack: Math.floor(10 * level * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(20 * level * baseFactor * bossMultiplier),
     critChance: 0.2 * baseFactor,
     critDamage: 2 * baseFactor,
     lifeSteal: 0.3 * baseFactor,
