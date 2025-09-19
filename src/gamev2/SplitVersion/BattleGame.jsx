@@ -93,6 +93,17 @@ const BattleGame = () => {
     });
   };
 
+  // Reusable function to reset shop state
+  const resetShopState = () => {
+    setRerollPrice(50 + Math.floor(level * 1.5));
+    setBoughtOptions([]);
+  };
+
+  const increaseRerollPrice = () => {
+    setRerollPrice((prev) => Math.floor(prev * 1.5));
+    setBoughtOptions([]);
+  };
+
   // Toggle rare stats visibility
   const toggleRareStats = () => {
     setShowRareStats((prev) => !prev);
@@ -186,16 +197,14 @@ const BattleGame = () => {
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
-    setRerollPrice((prev) => prev + 50);
     setShopOptions(generateUpgradeOptions(player));
-    setBoughtOptions([]);
+    increaseRerollPrice();
   };
 
   // Handle exit shop
   const handleExitShop = () => {
     setShowShop(false);
-    setRerollPrice(50);
-    setBoughtOptions([]);
+    resetShopState();
   };
 
   // Handle upgrade selection
@@ -257,27 +266,13 @@ const BattleGame = () => {
     if (level % 10 === 9) {
       setShowShop(true);
       setShopOptions(generateUpgradeOptions(player));
-      setRerollPrice(50);
-      setBoughtOptions([]);
+      resetShopState();
     }
   };
 
-  function calculateTickets(level) {
-    if (level < 20) {
-      return level;
-    } else if (level < 30) {
-      return Math.floor(level * 1.2);
-    } else if (level < 40) {
-      return Math.floor(level * 1.5);
-    } else {
-      return Math.floor(level * 2);
-    }
-  }
-
   // Centralized game over function
   const endGame = () => {
-    const gained = calculateTickets(level);
-    earnTickets(gained);
+    const gained = earnTickets(level);
     const currentTurnLogs = [];
     addLog("Game Over!", "gameOver", currentTurnLogs);
     addLog(`🎟️ You gained ${gained} tickets!`, "ticket", currentTurnLogs);
@@ -323,6 +318,8 @@ const BattleGame = () => {
     );
     let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     if (gameStatus.isOver || gameStatus.levelUp) {
+      newPlayer.level++;
+      // console.log("Player level increased to:", newPlayer.level);
       endTurn(
         newPlayer,
         newEnemy,
@@ -381,8 +378,7 @@ const BattleGame = () => {
     setIsRareUpgrade(false);
     setShowShop(false);
     setShopOptions([]);
-    setRerollPrice(50);
-    setBoughtOptions([]);
+    resetShopState();
     setPlayerEffects({
       burnDot: 0,
       poisonBase: 0,
@@ -430,8 +426,14 @@ const BattleGame = () => {
             {renderStat("Health", player.health)}
             {renderStat("Regeneration", player.regeneration)}
             {renderStat("Armor", player.armor)}
-            {renderStat("Min Attack", player.minAttack)}
-            {renderStat("Max Attack", player.maxAttack)}
+            {/* {renderStat("Min Attack", player.minAttack)}
+            {renderStat("Max Attack", player.maxAttack)} */}
+            <div className="flex justify-between text-sm">
+              <span>Attack:</span>
+              <span>
+                {player.minAttack} - {player.maxAttack}
+              </span>
+            </div>
             {renderStat("Crit Chance", player.critChance, true)}
             {renderStat("Crit Damage", player.critDamage, true)}
             {renderStat("Life Steal", player.lifeSteal, true)}
@@ -457,8 +459,14 @@ const BattleGame = () => {
             {renderStat("Health", enemy.health)}
             {renderStat("Regeneration", enemy.regeneration)}
             {renderStat("Armor", enemy.armor)}
-            {renderStat("Min Attack", enemy.minAttack)}
-            {renderStat("Max Attack", enemy.maxAttack)}
+            {/* {renderStat("Min Attack", enemy.minAttack)}
+            {renderStat("Max Attack", enemy.maxAttack)} */}
+            <div className="flex justify-between text-sm">
+              <span>Attack:</span>
+              <span>
+                {enemy.minAttack} - {enemy.maxAttack}
+              </span>
+            </div>
             {renderStat("Crit Chance", enemy.critChance, true)}
             {renderStat("Crit Damage", enemy.critDamage, true)}
             {renderStat("Life Steal", enemy.lifeSteal, true)}
@@ -570,7 +578,10 @@ const BattleGame = () => {
         </button>
       )}
       <h2 className="font-semibold mt-4">Battle Log:</h2>
-      <div ref={logContainerRef} className="mt-2 max-h-64 overflow-y-auto bg-game-secondary">
+      <div
+        ref={logContainerRef}
+        className="mt-2 max-h-64 overflow-y-auto bg-game-secondary"
+      >
         {turnLogs
           .slice()
           .reverse()

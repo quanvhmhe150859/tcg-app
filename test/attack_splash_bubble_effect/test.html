@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Starburst Damage</title>
+  <style>
+    body { background:#222; color:white; text-align:center; font-family:sans-serif; }
+    .character { display:inline-block; width:200px; margin:40px; position:relative; }
+    .hp { font-size:24px; font-weight:bold; }
+
+    .damage-bubble {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.5);
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 20px;
+      border: 2px solid white;
+      text-shadow: 2px 2px 0px black;
+      opacity: 0;
+      animation: popUp 1s ease-out forwards;
+    }
+
+    @keyframes popUp {
+      0%   { opacity:1; transform: translateX(-50%) scale(0.5) rotate(0deg); }
+      40%  { transform: translateX(-50%) scale(1.2) rotate(5deg); }
+      60%  { transform: translateX(-50%) scale(1) rotate(-3deg); }
+      100% { opacity:0; transform: translate(-50%, -80px) scale(1) rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="character" id="enemy">
+    <h2>Enemy</h2>
+    <div>HP: <span class="hp">100</span></div>
+  </div>
+
+  <button id="attackBtn">Attack!</button>
+
+  <script>
+    const enemy = { hp:100 };
+
+    // 🔹 Hàm generate starburst random
+    function generateStarburstPoints(spikes = 12, radius = 40) {
+      const points = [];
+      for (let i = 0; i < spikes; i++) {
+        const angle = (i / spikes) * Math.PI * 2;
+        const r = radius + Math.random() * 20 - 10; // biến thiên độ dài răng
+        const x = 50 + r * Math.cos(angle);
+        const y = 50 + r * Math.sin(angle);
+        points.push(`${x}% ${y}%`);
+      }
+      return points.join(", ");
+    }
+
+    function updateHP(newHp){
+      const el = document.querySelector("#enemy .hp");
+      let current = enemy.hp;
+      const interval = setInterval(()=>{
+        if(current <= newHp){
+          clearInterval(interval);
+          enemy.hp = newHp;
+          el.textContent = newHp;
+        } else {
+          current--;
+          el.textContent = current;
+        }
+      },30);
+    }
+
+    function showDamage(dmg){
+      const el = document.getElementById("enemy");
+      const dmgEl = document.createElement("div");
+      dmgEl.className = "damage-bubble";
+      dmgEl.textContent = `-${dmg}`;
+
+      // Random màu, lệch, xoay
+      const colors = ["#e74c3c", "#f39c12", "#e67e22", "#c0392b"];
+      const randomColor = colors[Math.floor(Math.random()*colors.length)];
+      const randomRotate = (Math.random()*30 - 15);
+      const randomX = (Math.random()*40 - 20);
+
+      dmgEl.style.background = randomColor;
+      dmgEl.style.transform = `translateX(calc(-50% + ${randomX}px)) scale(0.5) rotate(${randomRotate}deg)`;
+
+      // 🔹 Gán clip-path starburst random
+      dmgEl.style.clipPath = `polygon(${generateStarburstPoints(12, 40)})`;
+
+      el.appendChild(dmgEl);
+      setTimeout(()=>dmgEl.remove(),1000);
+    }
+
+    document.getElementById("attackBtn").addEventListener("click",()=>{
+      const dmg = Math.floor(Math.random()*20)+10; // random damage
+      const newHp = Math.max(enemy.hp - dmg,0);
+      showDamage(dmg);
+      updateHP(newHp);
+    });
+  </script>
+</body>
+</html>

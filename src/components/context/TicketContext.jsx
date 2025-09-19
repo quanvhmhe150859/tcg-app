@@ -12,9 +12,11 @@ export function TicketProvider({ children }) {
   }, []);
 
   // Hàm cộng vé
-  const earnTickets = (amount) => {
-    const next = addTickets(amount); // addTickets đã lưu localStorage
+  const earnTickets = (level) => {
+    const gained = Math.floor(calculateTickets(level));
+    const next = addTickets(gained); // addTickets đã lưu localStorage
     setTicketsState(next);
+    return gained;
   };
 
   // Hàm set vé trực tiếp (ít dùng)
@@ -33,3 +35,15 @@ export function TicketProvider({ children }) {
 export function useTickets() {
   return useContext(TicketContext);
 }
+
+function calculateTickets(level) {
+    if (level < 20) {
+      return level * 0.7;
+    } else if (level < 30) {
+      return Math.floor(level * 1.2);
+    } else if (level < 40) {
+      return Math.floor(level * 1.5);
+    } else {
+      return Math.floor(level * 2);
+    }
+  }
