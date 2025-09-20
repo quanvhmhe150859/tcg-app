@@ -13,3 +13,9 @@ export function spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)
   updateTickets(tickets - count); // trừ vé
   return true;
 }
+
+export function refundTickets(amount, spinMode, tickets, updateTickets) {
+  if (spinMode !== "ticket") return; // chỉ hoàn vé khi ở chế độ vé
+  
+  updateTickets(tickets + amount); // hoàn vé
+}

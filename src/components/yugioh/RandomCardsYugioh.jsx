@@ -13,7 +13,7 @@ import {
 } from "./yugiohApiHelpers";
 import SelectBox from "../common/SelectBox";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
-import { spendTicketsIfNeeded } from "../../utils/ticketUtils";
+import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
 import { useTickets } from "../context/TicketContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -113,28 +113,54 @@ const RandomCardsYugioh = () => {
   const spinMode = localStorage.getItem("spinMode");
   const { tickets, updateTickets } = useTickets();
 
-  const handleRoll = async (count = 1) => {
-    // 🆕 kiểm tra vé trước
-    if (!spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)) {
-      return; // không đủ vé thì thoát
+  // ✅ Hàm tính vé cần dùng
+  const calcTicketCost = (baseCount = 1) => {
+    let extraMultiplier = 0;
+
+    // Nếu chọn pack (không phải All, không phải Random)
+    if (selectedSet?.value && selectedSet.value === "__random_pack__") {
+      extraMultiplier += 30;
+    } else if (selectedSet?.value && selectedSet.value !== "") {
+      extraMultiplier += 50;
     }
+
+    // Nếu chọn type (không phải All)
+    if (selectedType && selectedType !== "") {
+      extraMultiplier += 10;
+    }
+
+    return baseCount * (extraMultiplier > 0 ? extraMultiplier : 1);
+  };
+
+  const handleRoll = async (baseCount = 1) => {
+    const ticketCost = calcTicketCost(baseCount);
+
+    // 🛑 kiểm tra vé
+    if (
+      !spendTicketsIfNeeded(ticketCost, spinMode, tickets, updateTickets, t)
+    ) {
+      return;
+    }
+
+    // Lấy giá trị tickets mới từ context
+    const updatedTickets = tickets - ticketCost;
 
     setIsRolling(true);
     setNoResultWarning(false);
 
     let actualSet = selectedSet?.value;
 
-    // 🔀 Nếu là pack ngẫu nhiên
-    if (actualSet === "__random_pack__") {
-      const filtered = allSets.filter(
-        (s) => s.value !== "__random_pack__" && s.value !== ""
-      );
-      const random = filtered[Math.floor(Math.random() * filtered.length)];
-      actualSet = random.value;
-      console.log("Pack ngẫu nhiên chọn:", actualSet);
-    }
-
     try {
+      // 🔀 Nếu là pack ngẫu nhiên
+      if (actualSet === "__random_pack__") {
+        const filtered = allSets.filter(
+          (s) => s.value !== "__random_pack__" && s.value !== ""
+        );
+        const random = filtered[Math.floor(Math.random() * filtered.length)];
+        actualSet = random.value;
+        console.log("Pack ngẫu nhiên chọn:", actualSet);
+      }
+
       let result = [];
 
       const fullWeights = JSON.parse(raw);
@@ -159,7 +185,7 @@ const RandomCardsYugioh = () => {
       }
 
       // Roll rarity theo weight (dù là pack hay all)
-      const rolledRarities = Array.from({ length: count }, () =>
+      const rolledRarities = Array.from({ length: baseCount }, () =>
         rollWithWeight(filteredWeights)
       );
 
@@ -175,6 +201,7 @@ const RandomCardsYugioh = () => {
       if (!result || result.length === 0) {
         setNoResultWarning(true);
         setCards([]);
+        refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       } else {
         setCards(result);
       }
@@ -185,6 +212,7 @@ const RandomCardsYugioh = () => {
       console.error("Lỗi khi roll:", err);
       setNoResultWarning(true);
       setCards([]);
+      refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
     } finally {
       setIsRolling(false);
     }
@@ -243,7 +271,12 @@ const RandomCardsYugioh = () => {
           )}
         </div>
 
-        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} spinMode={spinMode} />
+        <RollButtonGroup
+          handleRoll={handleRoll}
+          isRolling={isRolling}
+          spinMode={spinMode}
+          ticketOptions={[calcTicketCost(1), calcTicketCost(10)]}
+        />
       </div>
 
       {isRolling && (

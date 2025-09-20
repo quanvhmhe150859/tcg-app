@@ -6,7 +6,7 @@ import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
-import { spendTicketsIfNeeded } from "../../utils/ticketUtils";
+import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
 import { useTickets } from "../context/TicketContext";
 import SelectBox from "../common/SelectBox";
 import { useTranslation } from "react-i18next";
@@ -41,18 +41,47 @@ const RandomCardsPokemon = () => {
   const spinMode = localStorage.getItem("spinMode");
   const { tickets, updateTickets } = useTickets();
 
-  const handleRoll = async (count = 1) => {
-    // 🆕 kiểm tra vé trước
-    if (!spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)) {
-      return; // không đủ vé thì thoát
+  const calcTicketCost = (baseCount = 1) => {
+    let extraMultiplier = 0;
+
+    if (selectedSuperType && selectedSuperType !== "") {
+      extraMultiplier += 10;
     }
+
+    if (selectedRarity && selectedRarity !== "") {
+      const rarityIndex = allRaritiesPokemon.findIndex(
+        (r) => r === selectedRarity
+      );
+      if (rarityIndex >= 0) {
+        extraMultiplier += (rarityIndex + 1) * 10;
+      }
+    }
+
+    if (selectedType && selectedType !== "") {
+      extraMultiplier += 10;
+    }
+
+    return baseCount * (extraMultiplier > 0 ? extraMultiplier : 1);
+  };
+
+  const handleRoll = async (baseCount = 1) => {
+    const ticketCost = calcTicketCost(baseCount);
+
+    if (
+      !spendTicketsIfNeeded(ticketCost, spinMode, tickets, updateTickets, t)
+    ) {
+      return;
+    }
+
+    // Lấy giá trị tickets mới từ context
+    const updatedTickets = tickets - ticketCost;
 
     setIsRolling(true);
     setNoResultWarning(false);
 
     try {
       const result = await getPokemonCards({
-        count,
+        count: baseCount,
         type: selectedType,
         rarity: selectedRarity,
         superType: selectedSuperType,
@@ -60,15 +89,16 @@ const RandomCardsPokemon = () => {
 
       if (!result || result.length === 0) {
         setNoResultWarning(true);
+        refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       }
 
       await new Promise((res) => setTimeout(res, 500));
       setCards(result);
 
-      // 🆕 Lưu vào localStorage
       addCardsToLocalStorage(result, "pokemon", spinMode);
     } catch (err) {
       setNoResultWarning(true);
+      refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
     } finally {
       setIsRolling(false);
     }
@@ -137,7 +167,12 @@ const RandomCardsPokemon = () => {
         </div>
 
         {/* Roll Buttons */}
-        <RollButtonGroup handleRoll={handleRoll} isRolling={isRolling} spinMode={spinMode} />
+        <RollButtonGroup
+          handleRoll={handleRoll}
+          isRolling={isRolling}
+          spinMode={spinMode}
+          ticketOptions={[calcTicketCost(1), calcTicketCost(1) * 10]}
+        />
       </div>
 
       {isRolling && (

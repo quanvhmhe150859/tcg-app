@@ -11,7 +11,7 @@ export default function TicketButton() {
     <button
       disabled
       className="floating-button-no-bg !p-0 !text-xs"
-      title={t("currentTicketCanEarnMoreByPlayingTheGame")}
+      title={t("canEarnMoreByPlayingTheGame")}
     >
       {tickets} 🎫
     </button>
