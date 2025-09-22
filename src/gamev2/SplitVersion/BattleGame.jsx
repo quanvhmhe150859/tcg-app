@@ -52,6 +52,7 @@ const BattleGame = () => {
   });
   const [showRareStats, setShowRareStats] = useState(true);
   const logContainerRef = useRef(null);
+  const [autoSpeed, setAutoSpeed] = useState(150);
 
   // Auto-scroll to the latest turn (top)
   useEffect(() => {
@@ -65,7 +66,8 @@ const BattleGame = () => {
     if (isAuto && !gameOver && !showUpgradeOptions && !showShop) {
       const interval = setInterval(() => {
         handleAttack();
-      }, 150);
+      }, autoSpeed);
+
       return () => clearInterval(interval);
     }
   }, [
@@ -77,6 +79,7 @@ const BattleGame = () => {
     enemy,
     turnCount,
     level,
+    autoSpeed, // thêm dependency
   ]);
 
   // Reusable function to update turn logs
@@ -475,7 +478,8 @@ const BattleGame = () => {
                     <b>Burn</b>: Deals fixed damage at the end of each turn.
                   </li>
                   <li>
-                    <b>Poison</b>: Deals damage each turn and increases over time.
+                    <b>Poison</b>: Deals damage each turn and increases over
+                    time.
                   </li>
                   <li>
                     <b>Stun Chance</b>: Probability of disabling the enemy for
@@ -576,6 +580,19 @@ const BattleGame = () => {
         </button>
       </div>
       <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>
+
+      <div className="flex justify-center items-center space-x-2 mb-2" title="Adjust Auto Speed">
+        <input
+          type="range"
+          min="100"
+          max="1000"
+          step="50"
+          value={autoSpeed}
+          onChange={(e) => setAutoSpeed(Number(e.target.value))}
+        />
+        <span>{autoSpeed} ms</span>
+      </div>
+
       {showUpgradeOptions && (
         <div className="mb-4">
           <h2 className="font-semibold">
@@ -639,12 +656,13 @@ const BattleGame = () => {
           >
             {isAuto ? "Stop Auto" : "Auto"}
           </button>
+
           {!isAuto && (
             <>
               <button onClick={handleAttack} className="w-[40%]">
                 Next Turn
               </button>
-              <button onClick={handleEndRun}>☠️</button>
+              <button onClick={handleEndRun} title="End Run">☠️</button>
             </>
           )}
         </div>
