@@ -112,5 +112,8 @@
   "canEarnMoreByPlayingTheGame": "Can earn more by playing the game",
   "cost": "Cost",
   "ticket": "ticket",
-  "notEnoughTicketsToRoll": "Not enough tickets to roll"
+  "notEnoughTicketsToRoll": "Not enough tickets to roll",
+  "persistAudio": "Persist Audio",
+  "persistAudioOn": "Audio persists when tab is hidden",
+  "persistAudioOff": "Audio pauses when tab is hidden"
 }

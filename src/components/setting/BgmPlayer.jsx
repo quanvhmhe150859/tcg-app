@@ -29,6 +29,8 @@ export default function BgmPlayer() {
     mode,
     setMode,
     PLAY_MODES,
+    persistAudio,
+    setPersistAudio,
   } = useBgm();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -54,8 +56,12 @@ export default function BgmPlayer() {
   };
 
   const handleTrackSelect = (i) => {
-    console.log(`Selecting track index: ${i}, track: ${tracks[i]}`); // Debug log
+    console.log(`Selecting track index: ${i}, track: ${tracks[i]}`);
     setIndex(i);
+  };
+
+  const handleTogglePersistAudio = () => {
+    setPersistAudio((prev) => !prev);
   };
 
   const formatTime = (sec) => {
@@ -92,13 +98,15 @@ export default function BgmPlayer() {
 
       <button
         onClick={handleChangeMode}
-        className="text-xl mb-4 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
+        className="text-xl px-3 py-1 mb-4 mt-4 rounded transition"
         data-tooltip-id="play-mode-tooltip"
         data-tooltip-content={`${t(getLabel(mode))}`}
       >
         {t("playMode")}: {getLabel(mode)}
       </button>
+
       <Tooltip id="play-mode-tooltip" place="bottom" effect="solid" />
+      <Tooltip id="persist-audio-tooltip" place="bottom" effect="solid" />
 
       <div className="text-sm mb-4">
         {formatTime(currentTime)} / {formatTime(duration)}
@@ -112,8 +120,21 @@ export default function BgmPlayer() {
         step={0.01}
         value={volume}
         onChange={(e) => setVolume(parseFloat(e.target.value))}
-        className="w-1/2"
+        className="w-1/2 mb-4"
       />
+
+      <div>
+        <button
+          onClick={handleTogglePersistAudio}
+          className={`text-xl px-3 py-1 rounded transition`}
+          data-tooltip-id="persist-audio-tooltip"
+          data-tooltip-content={t(
+            persistAudio ? "persistAudioOn" : "persistAudioOff"
+          )}
+        >
+          {t("persistAudio")}: {persistAudio ? "🔓" : "🔒"}
+        </button>
+      </div>
     </>
   );
 }

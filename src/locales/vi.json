@@ -112,5 +112,8 @@
   "canEarnMoreByPlayingTheGame": "Có thể kiếm thêm bằng cách chơi trò chơi",
   "cost": "Tiêu",
   "ticket": "vé",
-  "notEnoughTicketsToRoll": "Không đủ vé để quay"
+  "notEnoughTicketsToRoll": "Không đủ vé để quay",
+  "persistAudio": "Giữ âm thanh",
+  "persistAudioOn": "Âm thanh tiếp tục phát khi tab bị ẩn",
+  "persistAudioOff": "Âm thanh sẽ tạm dừng khi tab bị ẩn"
 }
