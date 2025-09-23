@@ -52,6 +52,9 @@ const BattleGame = () => {
   });
   const [showRareStats, setShowRareStats] = useState(true);
   const logContainerRef = useRef(null);
+  const min = 100;
+  const max = 1000;
+  const step = 50;
   const [autoSpeed, setAutoSpeed] = useState(150);
 
   // Auto-scroll to the latest turn (top)
@@ -224,9 +227,13 @@ const BattleGame = () => {
     setPlayer((prev) => {
       const newPlayer = { ...prev };
       const originalMinAttack = newPlayer.minAttack;
-      const value = ["critChance", "lifeSteal", "dodge", "stunChance"].includes(
-        option.key
-      )
+      const value = [
+        "critChance",
+        "lifeSteal",
+        "dodge",
+        "stunChance",
+        "counterattack",
+      ].includes(option.key)
         ? option.value / 100
         : ["critDamage"].includes(option.key)
         ? option.value / 100
@@ -252,6 +259,7 @@ const BattleGame = () => {
         "lifeSteal",
         "dodge",
         "stunChance",
+        "counterattack",
       ].includes(option.key)
         ? `Player upgraded ${option.name} by +${actualValue}%!`
         : `Player upgraded ${option.name} by +${actualValue}!`;
@@ -403,7 +411,7 @@ const BattleGame = () => {
       poisonDot: 0,
       stunned: false,
     });
-    setShowRareStats(false);
+    setShowRareStats(true);
   };
 
   const renderStat = (name, value, isPercentage = false) => (
@@ -482,6 +490,14 @@ const BattleGame = () => {
                     time.
                   </li>
                   <li>
+                    <b>Thorn</b>: Deals fixed damage back to the attacker when
+                    hit by an attack.
+                  </li>
+                  <li>
+                    <b>Counterattack</b>: Chance to attack back at the attacker
+                    when hit.
+                  </li>
+                  <li>
                     <b>Stun Chance</b>: Probability of disabling the enemy for
                     one turn.
                   </li>
@@ -528,6 +544,12 @@ const BattleGame = () => {
               <div className="bg-game-secondary">
                 {renderRareStat("Burn", player.rareStats.burn)}
                 {renderRareStat("Poison", player.rareStats.poison)}
+                {renderRareStat("Thorn", player.rareStats.thorn)}
+                {renderRareStat(
+                  "Counterattack",
+                  player.rareStats.counterattack,
+                  true
+                )}
                 {renderRareStat(
                   "Stun Chance",
                   player.rareStats.stunChance,
@@ -561,6 +583,12 @@ const BattleGame = () => {
               <div className="bg-game-secondary">
                 {renderRareStat("Burn", enemy.rareStats.burn)}
                 {renderRareStat("Poison", enemy.rareStats.poison)}
+                {renderRareStat("Thorn", enemy.rareStats.thorn)}
+                {renderRareStat(
+                  "Counterattack",
+                  enemy.rareStats.counterattack,
+                  true
+                )}
                 {renderRareStat(
                   "Stun Chance",
                   enemy.rareStats.stunChance,
@@ -581,16 +609,19 @@ const BattleGame = () => {
       </div>
       <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>
 
-      <div className="flex justify-center items-center space-x-2 mb-2" title="Adjust Auto Speed">
+      <div
+        className="flex justify-center items-center space-x-2 mb-2"
+        title={`Adjust Auto Speed: ${autoSpeed} ms`}
+      >
+        <span>Auto Speed:</span>
         <input
           type="range"
-          min="100"
-          max="1000"
-          step="50"
-          value={autoSpeed}
-          onChange={(e) => setAutoSpeed(Number(e.target.value))}
+          min={min}
+          max={max}
+          step={step}
+          value={max - autoSpeed + min}
+          onChange={(e) => setAutoSpeed(max - Number(e.target.value) + min)}
         />
-        <span>{autoSpeed} ms</span>
       </div>
 
       {showUpgradeOptions && (
@@ -625,7 +656,7 @@ const BattleGame = () => {
                     : "bg-blue-500 hover:bg-blue-600"
                 }`}
               >
-                {option.name}: {option.format(option.value)} - Cost:{" "}
+                {option.name}: {option.format(option.value)} | Cost:{" "}
                 {option.price} gold
               </button>
             ))}
@@ -637,7 +668,7 @@ const BattleGame = () => {
                   : "bg-orange-500 hover:bg-orange-600"
               }`}
             >
-              Reroll Shop - Cost: {rerollPrice} gold
+              Reroll Shop | Cost: {rerollPrice} gold
             </button>
             <button
               onClick={handleExitShop}
@@ -662,7 +693,9 @@ const BattleGame = () => {
               <button onClick={handleAttack} className="w-[40%]">
                 Next Turn
               </button>
-              <button onClick={handleEndRun} title="End Run">☠️</button>
+              <button onClick={handleEndRun} title="End Run">
+                ☠️
+              </button>
             </>
           )}
         </div>

@@ -2,14 +2,16 @@ export const addLog = (message, type, currentTurnLogs) => {
   const colorMap = {
     turn: "",
     attackCritical: "text-orange-500",
-    lifeSteal: "text-green-500",
-    regeneration: "text-green-500",
+    regeneration: "text-green-400",
+    lifeSteal: "text-green-400",
     gameOver: "text-red-500",
     dodge: "text-blue-500",
-    stun: "text-blue-500",
+    stun: "text-yellow-300",
+    counterattack: "text-yellow-600",
     burn: "text-orange-500",
     poison: "text-purple-500",
-    levelUp: "text-purple-500",
+    thorn: "text-red-700",
+    levelUp: "text-blue-500",
     upgrade: "text-yellow-500",
     purchase: "text-yellow-500",
     gold: "text-yellow-500",
@@ -32,6 +34,8 @@ export const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
         newEnemy.armor +
         newEnemy.rareStats.burn +
         newEnemy.rareStats.poison +
+        newEnemy.rareStats.thorn +
+        newEnemy.rareStats.counterattack * 100 +
         newEnemy.rareStats.stunChance * 100
     );
     newPlayer.gold += goldGained;

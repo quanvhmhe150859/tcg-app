@@ -13,7 +13,9 @@ export const initPlayer = () => ({
   rareStats: {
     burn: 0,
     poison: 0,
+    thorn: 0,
     stunChance: 0,
+    counterattack: 0,
   },
 });
 
@@ -22,7 +24,7 @@ export const initEnemy = (level) => {
   const baseFactor = 0.5 + Math.random() * 0.2;
   const bossMultiplier = isBoss ? 2 : 1;
   return {
-    health: Math.floor(5 * level * baseFactor * bossMultiplier),
+    health: Math.floor(10 * level * baseFactor * bossMultiplier),
     minAttack: Math.floor(5 * level * baseFactor * bossMultiplier),
     maxAttack: Math.floor(10 * level * baseFactor * bossMultiplier),
     critChance: 0.1 * baseFactor,
@@ -38,7 +40,9 @@ export const initEnemy = (level) => {
       poison: Math.floor(
         0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
+      thorn: Math.floor(0.1 * (level >= 20 ? level : 0) * baseFactor),
       stunChance: Math.floor(0.01 * (level >= 20 ? level : 0) * baseFactor),
+      counterattack: Math.floor(0.05 * (level >= 20 ? level : 0) * baseFactor),
     },
   };
 };
@@ -152,10 +156,24 @@ export const generateRareUpgradeOptions = (player) => {
       format: (val) => `+${val}`,
     },
     {
+      key: "thorn",
+      name: "Thorn",
+      min: 10,
+      max: 20,
+      format: (val) => `+${val}`,
+    },
+    {
       key: "stunChance",
       name: "Stun Chance",
       min: 1,
       max: 3,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "counterattack",
+      name: "Counterattack",
+      min: 5,
+      max: 10,
       format: (val) => `+${val}%`,
     },
   ];
