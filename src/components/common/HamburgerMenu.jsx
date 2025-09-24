@@ -12,6 +12,7 @@ const HamburgerMenu = () => {
   const [expanded, setExpanded] = useState({
     gacha: false,
     list: false,
+    collection: false,
     ai: false,
   });
 
@@ -101,12 +102,54 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            🐛 Pokémon
+                            🦠 Pokémon
                           </Link>
                         </li>
                         <li>
                           <Link
                             to="/yugioh"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            🌱 Yu-Gi-Oh!
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </li>
+                <li>
+                  <Link
+                    to=""
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleExpand("collection");
+                    }}
+                    className="flex items-center"
+                  >
+                    📋 <span>{t("collection")}</span> {expanded.collection ? "▼" : "▶"}
+                  </Link>
+                  <AnimatePresence>
+                    {expanded.collection && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="submenu"
+                      >
+                        <li>
+                          <Link
+                            to="/pokemonowned"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            🐛 Pokémon
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/yugiohowned"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -126,7 +169,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    📋 <span>{t("list")}</span> {expanded.list ? "▼" : "▶"}
+                    🫚 <span>{t("list")}</span> {expanded.list ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.list && (

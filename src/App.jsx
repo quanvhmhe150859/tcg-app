@@ -7,9 +7,11 @@ import {
 } from "react-router-dom";
 import RandomCardsPokemon from "./components/pokemon/RandomCardsPokemon";
 import ListCardsPokemon from "./components/pokemon/ListCardsPokemon";
+import OwnedPokemonCards from "./components/pokemon/owned/OwnedPokemonCards";
 
 import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
 import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
+import OwnedYugiohCards from "./components/yugioh/owned/OwnedYugiohCards";
 
 import TextStatGame from "./game/AutoGame";
 import BattleGame from "./gamev2/SplitVersion/BattleGame";
@@ -104,8 +106,10 @@ function App() {
           <Route path="/" element={<AdminSettings />} />
           <Route path="/pokemon" element={<RandomCardsPokemon />} />
           <Route path="/pokemonls" element={<ListCardsPokemon />} />
+          <Route path="/pokemonowned" element={<OwnedPokemonCards />} />
           <Route path="/yugioh" element={<RandomCardsYugioh />} />
           <Route path="/yugiohls" element={<ListCardsYugioh />} />
+          <Route path="/yugiohowned" element={<OwnedYugiohCards />} />
           <Route path="/game" element={<TextStatGame />} />
           <Route path="/gamev2" element={<BattleGame />} />
           <Route path="/chatbot" element={<Chatbot />} />

@@ -25,8 +25,8 @@ export const initEnemy = (level) => {
   const bossMultiplier = isBoss ? 2 : 1;
   return {
     health: Math.floor(10 * level * baseFactor * bossMultiplier),
-    minAttack: Math.floor(5 * level * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(10 * level * baseFactor * bossMultiplier),
+    minAttack: Math.floor(3 * level * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(6 * level * baseFactor * bossMultiplier),
     critChance: 0.1 * baseFactor,
     critDamage: 2 * baseFactor,
     lifeSteal: 0.1 * baseFactor,

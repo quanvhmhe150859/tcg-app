@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import api from "../../utils/api";
 import Pagination from "../common/Pagination";
 import Sidebar from "./SidebarPokemon";
 import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
