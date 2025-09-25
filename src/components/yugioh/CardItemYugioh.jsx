@@ -32,7 +32,7 @@ const CardItemYugioh = ({ card, index, type }) => {
           alt={card.name}
           className={`card-image`}
           // style={ {width: "200px", height: "291.79px" }}
-          style={ {width: "184px", height: "268.44px" }}
+          style={{ width: "184px", height: "268.44px" }}
         />
         <span className="zoom-icon">🔍</span>
       </div>
@@ -69,7 +69,7 @@ const CardItemYugioh = ({ card, index, type }) => {
               data-tooltip-id={tooltipId}
               data-tooltip-content={`Rarity: ${rarity}`}
             >
-              ⭐: 
+              ⭐:
               <RarityDot rarity={card.rarity} code={card.setRarityCode} />
               {rarity}
             </p>
@@ -79,10 +79,17 @@ const CardItemYugioh = ({ card, index, type }) => {
         <p
           className={`card-info-line`}
           data-tooltip-id={tooltipId}
-          data-tooltip-content={`Price: ${price.toFixed(2)} $`}
+          data-tooltip-content={`${price.toFixed(2)} $`}
         >
           💰: {price.toFixed(2)} <span className="text-green-400">$</span>
         </p>
+
+        {/*Quantity*/}
+        {card.quantity !== undefined && card.quantity > 0 && (
+          <p className="card-info-line quantity-line">
+            <span className="quantity-value">x{card.quantity}</span>
+          </p>
+        )}
 
         <ReactTooltip id={tooltipId} place="top" />
       </div>

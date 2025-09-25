@@ -6,9 +6,11 @@ import "./rarityEffects.css";
 import { getRarityStyle } from "../../utils/getRarityStyle";
 import CardItemPokemonModal from "./CardItemPokemonModal";
 
-const CardItem = ({ card, index, darkMode }) => {
+const CardItemPokemon = ({ card, index, darkMode }) => {
   const [showModal, setShowModal] = useState(false);
-  const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${card.id}.png`;
+  const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${
+    card.id
+  }.png`;
 
   const rarityStyle = getRarityStyle(card.rarity);
   const rarityClass = rarityStyle.className || "";
@@ -52,6 +54,13 @@ const CardItem = ({ card, index, darkMode }) => {
       </p>
       <Tooltip id={`tooltip-${card.id}-rarity`} place="top" />
 
+      {/*Quantity*/}
+      {card.quantity !== undefined && card.quantity > 0 && (
+        <p className="card-info-line quantity-line">
+          <span className="quantity-value">x{card.quantity}</span>
+        </p>
+      )}
+
       {/* Modal tách riêng */}
       <CardItemPokemonModal
         isOpen={showModal}
@@ -62,4 +71,4 @@ const CardItem = ({ card, index, darkMode }) => {
   );
 };
 
-export default CardItem;
+export default CardItemPokemon;

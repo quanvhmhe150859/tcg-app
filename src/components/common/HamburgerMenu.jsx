@@ -57,8 +57,8 @@ const HamburgerMenu = () => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="hamburger-menu"
           >
+            <h1 className="text-2xl font-bold mt-12">🏠 Menu</h1>
             <div className="hamburger-menu-content">
-              <h1 className="text-2xl font-bold">🏠 Menu</h1>
               <ul>
                 <li>
                   <Link to="/" onClick={() => setOpen(false)}>
@@ -127,7 +127,8 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    📋 <span>{t("collection")}</span> {expanded.collection ? "▼" : "▶"}
+                    📋 <span>{t("collection")}</span>{" "}
+                    {expanded.collection ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.collection && (

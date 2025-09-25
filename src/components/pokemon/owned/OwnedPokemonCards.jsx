@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import api from "../../../utils/api";
+import CardItemPokemon from "../CardItemPokemon";
+import { AnimatePresence, motion } from "framer-motion";
+import styles from "../../common/RandomCards.module.css";
 
 const OwnedPokemonCards = () => {
   const [cards, setCards] = useState([]);
@@ -65,27 +68,27 @@ const OwnedPokemonCards = () => {
 
       {!loading && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
             {cards.length === 0 ? (
               <p className="col-span-full text-center text-red-500">
                 Bạn chưa sở hữu thẻ Pokémon nào
               </p>
             ) : (
-              cards.map((card) => (
-                <div
-                  key={card.id}
-                  className="border rounded p-2 shadow hover:shadow-md transition"
-                >
-                  <img
-                    src={card.smallUrl}
-                    alt={card.name}
-                    className="w-full h-40 object-contain mb-2"
-                  />
-                  <h2 className="text-sm font-semibold">{card.name}</h2>
-                  <p className="text-xs">Rarity: {card.rarity}</p>
-                  <p className="text-xs">Số lượng: {card.quantity}</p>
-                </div>
-              ))
+              <div className={styles.cardList}>
+                <AnimatePresence>
+                  {cards.filter(Boolean).map((card, index) => (
+                    <motion.div
+                      key={`${card.id}-${index}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <CardItemPokemon card={card} index={index} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             )}
           </div>
 

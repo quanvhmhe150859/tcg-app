@@ -31,11 +31,38 @@
   padding: 2rem 1rem;
   z-index: 1001;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
+  text-align: left;
+
+  display: flex;
+  flex-direction: column; 
+}
+
+.hamburger-menu-header {
+  position: sticky;     /* giữ header luôn hiện */
+  top: 0;               /* dính lên đầu */
+  background: inherit;  /* giữ cùng màu nền */
+  padding: 1rem;
+  font-weight: bold;
+  z-index: 1;           /* nổi hơn nội dung */
 }
 
 .hamburger-menu-content {
-  text-align: left;
-  margin-top: 3rem;
+  flex: 1;
+  overflow-y: auto;
+
+  /* Ẩn scrollbar nhưng vẫn cuộn được */
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE, Edge cũ */
+}
+
+.hamburger-menu-content::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari */
+}
+
+.hamburger-menu-content::after {
+  content: "";
+  display: block;
+  height: 3rem;  /* khoảng trống thêm ở cuối */
 }
 
 .hamburger-menu-content ul {

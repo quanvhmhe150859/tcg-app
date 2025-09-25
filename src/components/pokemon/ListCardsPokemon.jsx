@@ -3,7 +3,7 @@ import Pagination from "../common/Pagination";
 import Sidebar from "./SidebarPokemon";
 import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
 import { fetchPokemonCards } from "./pokemonApiHelpers";
-import CardItem from "./CardItemPokemon";
+import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
@@ -148,7 +148,7 @@ export default function ListCardsPokemon() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <CardItem card={card} index={index} />
+                  <CardItemPokemon card={card} index={index} />
                 </motion.div>
               ))}
             </AnimatePresence>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import CardItem from "./CardItemPokemon";
+import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../common/RandomCards.module.css";
 import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
@@ -198,7 +198,7 @@ const RandomCardsPokemon = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <CardItem card={card} index={index} />
+              <CardItemPokemon card={card} index={index} />
             </motion.div>
           ))}
         </AnimatePresence>
