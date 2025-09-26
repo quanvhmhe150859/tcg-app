@@ -116,5 +116,10 @@
   "notEnoughTicketsToRoll": "Not enough tickets to roll",
   "persistAudio": "Persist Audio",
   "persistAudioOn": "Audio persists when tab is hidden",
-  "persistAudioOff": "Audio pauses when tab is hidden"
+  "persistAudioOff": "Audio pauses when tab is hidden",
+  "listOfOwnedYugiohCards": "List of owned Yu-Gi-Oh! cards",
+  "listOfOwnedPokemonCards": "List of owned Pokémon cards",
+  "youDontOwnAnyCardsYet": "You don't own any cards yet",
+  "sort": "Sort",
+  "quantity": "Quantity"
 }

@@ -26,7 +26,7 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
   };
 
   return (
-    <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
+    <div className="flex justify-center items-center gap-1 flex-wrap">
       <button
         className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         disabled={page <= 1 || isLoading}
@@ -75,7 +75,8 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
         ))}
 
       {/* Các trang quanh trang hiện tại */}
-      {Array.from({ length: 5 }, (_, i) => page - 2 + i)
+      {/* {Array.from({ length: 5 }, (_, i) => page - 2 + i) */}
+      {Array.from({ length: 3 }, (_, i) => page - 1 + i)
         .filter((p) => p > 1 && p < totalPages)
         .map((p) => (
           <button

@@ -3,9 +3,14 @@ import api from "../../../utils/api";
 import CardItemYugioh from "../CardItemYugioh";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../../common/RandomCards.module.css";
+import { useTranslation } from "react-i18next";
+import Pagination from "../../common/Pagination";
 
 const OwnedYugiohCards = () => {
+  const { t } = useTranslation();
+
   const [cards, setCards] = useState([]);
+  const [allOwned, setAllOwned] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
   const [total, setTotal] = useState(0);
@@ -14,16 +19,15 @@ const OwnedYugiohCards = () => {
   // Cache theo page
   const cacheRef = useRef({});
 
-  // Lấy toàn bộ danh sách Yu-Gi-Oh! trong localStorage
-  const getOwnedYugioh = () => {
+  // Load toàn bộ owned cards từ localStorage khi component mount
+  useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cards") || "{}");
-    return stored.yugioh || [];
-  };
+    const owned = stored.yugioh || [];
+    setAllOwned(owned);
+    setTotal(owned.length);
+  }, []);
 
   const fetchCards = async () => {
-    const allOwned = getOwnedYugioh();
-    setTotal(allOwned.length);
-
     if (allOwned.length === 0) {
       setCards([]);
       return;
@@ -55,25 +59,35 @@ const OwnedYugiohCards = () => {
   };
 
   useEffect(() => {
-    fetchCards();
-  }, [page]);
+    if (allOwned.length > 0) {
+      fetchCards();
+    } else {
+      setCards([]); // để hiển thị "chưa có thẻ"
+    }
+  }, [page, allOwned]);
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">
-        Danh sách thẻ Yu-Gi-Oh! đã sở hữu
-      </h1>
+      <h1 className="text-xl font-bold mb-4">{t("listOfOwnedYugiohCards")}</h1>
 
       {loading && <p>Đang tải...</p>}
 
       {!loading && (
         <>
-          <div>
-            {cards.length === 0 ? (
-              <p className="col-span-full text-center text-red-500">
-                Bạn chưa sở hữu thẻ Yu-Gi-Oh! nào
-              </p>
-            ) : (
+          {cards.length === 0 ? (
+            <p className="col-span-full text-center text-red-500">
+              {t("youDontOwnAnyCardsYet")}
+            </p>
+          ) : (
+            <div>
+              {/* Phân trang */}
+              <Pagination
+                page={page}
+                totalPages={Math.ceil(total / pageSize)}
+                setPage={setPage}
+                isLoading={loading}
+              />
+
               <div className={styles.cardList}>
                 <AnimatePresence>
                   {cards.filter(Boolean).map((card, index) => (
@@ -89,29 +103,16 @@ const OwnedYugiohCards = () => {
                   ))}
                 </AnimatePresence>
               </div>
-            )}
-          </div>
 
-          {/* Phân trang */}
-          <div className="flex justify-center items-center mt-4 gap-2">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            >
-              Trang trước
-            </button>
-            <span>
-              Trang {page} / {Math.ceil(total / pageSize)}
-            </span>
-            <button
-              disabled={page * pageSize >= total}
-              onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-            >
-              Trang sau
-            </button>
-          </div>
+              {/* Phân trang */}
+              <Pagination
+                page={page}
+                totalPages={Math.ceil(total / pageSize)}
+                setPage={setPage}
+                isLoading={loading}
+              />
+            </div>
+          )}
         </>
       )}
     </div>

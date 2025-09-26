@@ -116,5 +116,10 @@
   "notEnoughTicketsToRoll": "Không đủ vé để quay",
   "persistAudio": "Giữ âm thanh",
   "persistAudioOn": "Âm thanh tiếp tục phát khi tab bị ẩn",
-  "persistAudioOff": "Âm thanh sẽ tạm dừng khi tab bị ẩn"
+  "persistAudioOff": "Âm thanh sẽ tạm dừng khi tab bị ẩn",
+  "listOfOwnedYugiohCards": "Danh sách thẻ Yu-Gi-Oh! đã sở hữu",
+  "listOfOwnedPokemonCards": "Danh sách thẻ Pokémon đã sở hữu",
+  "youDontOwnAnyCardsYet": "Bạn chưa sở hữu thẻ nào",
+  "sort": "Sắp xếp",
+  "quantity": "Số lượng"
 }

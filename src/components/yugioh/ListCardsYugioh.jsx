@@ -144,7 +144,9 @@ export default function ListCardsYugioh() {
       <div className="flex-1">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">
-            <span className="hidden sm:inline">{t("list")} {t("card")} </span>
+            <span className="hidden sm:inline">
+              {t("list")} {t("card")}{" "}
+            </span>
             Yu-Gi-Oh!
           </h2>
           <button
@@ -206,15 +208,15 @@ export default function ListCardsYugioh() {
                 </motion.div>
               ))}
             </AnimatePresence>
+            
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              setPage={setPage}
+              isLoading={loading}
+            />
           </div>
         )}
-
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          setPage={setPage}
-          isLoading={loading}
-        />
       </div>
 
       {showSidebar && (
