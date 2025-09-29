@@ -13,6 +13,7 @@ export default defineConfig(({ command }) => {
           cert: fs.readFileSync("./localhost+2.pem"),
         },
         host: "localhost",
+        // host: true,
         port: 5173,
         proxy: {
           // Proxy for Ollama API
