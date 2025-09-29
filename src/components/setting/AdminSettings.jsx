@@ -5,7 +5,7 @@ import ImportDataYugioh from "./ImportDataYugioh";
 import AllowedTypesSelector from "./AllowedTypesSelector";
 import AllowedRaritiesPokemon from "./AllowedRaritiesPokemon";
 import AllowedRaritiesYugiohWeight from "./AllowedRaritiesYugiohWeight";
-import ControlButtons from "../common/ControlButtons";
+import ControlButtons from "../common/ControlDirectionButtons";
 import BgmPlayer from "./BgmPlayer";
 import SaveLoadData from "./SaveLoadData";
 import ProtectedSection from "./ProtectedSection";

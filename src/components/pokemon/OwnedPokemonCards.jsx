@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import api from "../../../utils/api";
-import CardItemYugioh from "../CardItemYugioh";
+import api from "../../utils/api";
+import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../../common/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
-import Pagination from "../../common/Pagination";
+import Pagination from "../common/Pagination";
 
-const OwnedYugiohCards = () => {
+const OwnedPokemonCards = () => {
   const { t } = useTranslation();
 
   const [cards, setCards] = useState([]);
@@ -24,7 +24,7 @@ const OwnedYugiohCards = () => {
   // Load toàn bộ owned cards từ localStorage khi component mount
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cards") || "{}");
-    const owned = stored.yugioh || [];
+    const owned = stored.pokemon || [];
     // console.log("Initial allOwned quantities:", owned.map(card => card.quantity));
     // console.log("Initial allOwned IDs:", owned.map(card => card.cardID));
     setAllOwned(owned);
@@ -41,11 +41,11 @@ const OwnedYugiohCards = () => {
     const sortedCards = [...allOwned].sort((a, b) => {
       // console.log(`Sorting by ${sortBy}, order: ${sortOrder}`);
       // console.log(`Comparing card ${a.cardID} (quantity: ${a.quantity}) with card ${b.cardID} (quantity: ${b.quantity})`);
-      
+
       if (sortBy === "id") {
         return sortOrder === "asc"
-          ? a.cardID - b.cardID
-          : b.cardID - a.cardID;
+          ? a.cardID.localeCompare(b.cardID)
+          : b.cardID.localeCompare(a.cardID);
       } else {
         return sortOrder === "asc"
           ? a.quantity - b.quantity
@@ -66,8 +66,8 @@ const OwnedYugiohCards = () => {
       const cached = [...cacheRef.current[cacheKey]].sort((a, b) => {
         if (sortBy === "id") {
           return sortOrder === "asc"
-            ? a.cardId - b.cardId
-            : b.cardId - a.cardId;
+            ? a.id.localeCompare(b.id)
+            : b.id.localeCompare(a.id);
         } else {
           return sortOrder === "asc"
             ? a.quantity - b.quantity
@@ -77,13 +77,13 @@ const OwnedYugiohCards = () => {
 
       setCards(cached);
       // console.log("Using cached cards, quantities:", cached.map(c => c.quantity));
-      // console.log("Using cached cards, IDs:", cached.map(c => c.cardId));
+      // console.log("Using cached cards, IDs:", cached.map(c => c.id));
       return;
     }
 
     setLoading(true);
     try {
-      const res = await api.post("/api/yugioh/get-owned", {
+      const res = await api.post("/api/pokemon/get-owned", {
         cards: pageCards,
       });
 
@@ -91,8 +91,8 @@ const OwnedYugiohCards = () => {
       const sortedRes = [...res.data].sort((a, b) => {
         if (sortBy === "id") {
           return sortOrder === "asc"
-            ? a.cardId - b.cardId
-            : b.cardId - a.cardId;
+            ? a.id.localeCompare(b.id)
+            : b.id.localeCompare(a.id);
         } else {
           return sortOrder === "asc"
             ? a.quantity - b.quantity
@@ -104,11 +104,11 @@ const OwnedYugiohCards = () => {
       setCards(sortedRes);
 
       // console.log("Raw API response quantities:", res.data.map(c => c.quantity));
-      // console.log("Raw API response IDs:", res.data.map(c => c.cardId));
+      // console.log("Raw API response IDs:", res.data.map(c => c.id));
       // console.log("Fetched cards, quantities:", sortedRes.map(c => c.quantity));
-      // console.log("Fetched cards, IDs:", sortedRes.map(c => c.cardId));
+      // console.log("Fetched cards, IDs:", sortedRes.map(c => c.id));
     } catch (err) {
-      console.error("Failed to fetch owned yugioh cards", err);
+      console.error("Failed to fetch owned pokemon cards", err);
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ const OwnedYugiohCards = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">{t("listOfOwnedYugiohCards")}</h1>
+      <h1 className="text-xl font-bold mb-4">{t("listOfOwnedPokemonCards")}</h1>
 
       {/* Sort Controls */}
       <div className="mb-4">
@@ -204,13 +204,13 @@ const OwnedYugiohCards = () => {
                 <AnimatePresence>
                   {cards.filter(Boolean).map((card, index) => (
                     <motion.div
-                      key={`${card.cardId}-${index}`}
+                      key={`${card.id}-${index}`}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <CardItemYugioh card={card} index={index} />
+                      <CardItemPokemon card={card} index={index} />
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -231,4 +231,4 @@ const OwnedYugiohCards = () => {
   );
 };
 
-export default OwnedYugiohCards;
+export default OwnedPokemonCards;

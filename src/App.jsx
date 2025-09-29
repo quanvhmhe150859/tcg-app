@@ -7,23 +7,23 @@ import {
 } from "react-router-dom";
 import RandomCardsPokemon from "./components/pokemon/RandomCardsPokemon";
 import ListCardsPokemon from "./components/pokemon/ListCardsPokemon";
-import OwnedPokemonCards from "./components/pokemon/owned/OwnedPokemonCards";
+import OwnedPokemonCards from "./components/pokemon/OwnedPokemonCards";
 
 import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
 import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
-import OwnedYugiohCards from "./components/yugioh/owned/OwnedYugiohCards";
+import OwnedYugiohCards from "./components/yugioh/OwnedYugiohCards";
 
 import TextStatGame from "./game/AutoGame";
 import BattleGame from "./gamev2/SplitVersion/BattleGame";
 
-import Chatbot from "./components/common/Chatbot";
-import ImageGenerator from "./components/common/ImageGenerator";
+import Chatbot from "./components/bot/Chatbot";
+import ImageGenerator from "./components/bot/Artbot";
 
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";
 
-import DarkModeToggle from "./components/common/DarkModeToggle";
-import LanguageSwitcher from "./components/common/LanguageSwitcher";
+import DarkModeToggle from "./components/common/DarkModeToggleButton";
+import LanguageSwitcher from "./components/common/LanguageSwitcherButton";
 import MusicToggleButton from "./components/common/MusicToggleButton";
 import TicketCount from "./components/common/TicketCount";
 

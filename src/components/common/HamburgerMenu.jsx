@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import ControlButtons from "./ControlButtons";
+import ControlButtons from "./ControlDirectionButtons";
 import "./HamburgerMenu.css";
 import { useTranslation } from "react-i18next";
 
