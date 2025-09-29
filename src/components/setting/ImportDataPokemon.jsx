@@ -1,6 +1,6 @@
 import React from "react";
 import { useImportPokemon } from "./useImportPokemon";
-import "../common/ImportData.css";
+import "../common/styles/ImportData.css";
 import { useTranslation } from "react-i18next";
 
 const ImportDataPokemon = () => {

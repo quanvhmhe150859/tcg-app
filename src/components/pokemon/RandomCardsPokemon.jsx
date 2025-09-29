@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../common/RandomCards.module.css";
+import styles from "../common/styles/RandomCards.module.css";
 import { allTypesPokemon, allRaritiesPokemon } from "../../utils/constants";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";

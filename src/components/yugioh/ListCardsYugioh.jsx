@@ -5,7 +5,7 @@ import Sidebar from "./SidebarYugioh";
 import { fetchYugiohCards, fetchYugiohArchetypes } from "./yugiohApiHelpers";
 import CardItemYugioh from "./CardItemYugioh";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../common/RandomCards.module.css";
+import styles from "../common/styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function ListCardsYugioh() {

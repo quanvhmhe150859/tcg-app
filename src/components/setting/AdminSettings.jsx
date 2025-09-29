@@ -91,6 +91,12 @@ const AdminSettings = () => {
         >
           Yu-Gi-Oh!
         </button>
+        <button
+          className={tab === "music" ? "selected-tab" : ""}
+          onClick={() => setTab("music")}
+        >
+          BGM
+        </button>
       </div>
 
       {/* General Tab */}
@@ -100,10 +106,6 @@ const AdminSettings = () => {
             {t("position")} {t("floatingActionButtons")}
           </h3>
           <ControlButtons />
-        </div>
-
-        <div className="section">
-          <BgmPlayer />
         </div>
 
         <div className="section">
@@ -131,7 +133,14 @@ const AdminSettings = () => {
         <AllowedRaritiesYugiohWeight ref={yugiohRaritites} />
       </div>
 
-      {tab !== "general" && <button onClick={handleSave}>{t("save")}</button>}
+      {/* Music Tab */}
+      <div className={`tab-content ${tab === "music" ? "open" : "closed"}`}>
+        <div className="section">
+          <BgmPlayer />
+        </div>
+      </div>
+
+      {(tab === "pokemon" || tab === "yugioh") && <button onClick={handleSave}>{t("save")}</button>}
     </div>
   );
 };

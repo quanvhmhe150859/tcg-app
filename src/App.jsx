@@ -16,8 +16,8 @@ import OwnedYugiohCards from "./components/yugioh/OwnedYugiohCards";
 import TextStatGame from "./game/AutoGame";
 import BattleGame from "./gamev2/SplitVersion/BattleGame";
 
-import Chatbot from "./components/bot/Chatbot";
-import ImageGenerator from "./components/bot/Artbot";
+import Chatbot from "./bot/Chatbot";
+import ImageGenerator from "./bot/Artbot";
 
 import AdminSettings from "./components/setting/AdminSettings";
 import HamburgerMenu from "./components/common/HamburgerMenu";

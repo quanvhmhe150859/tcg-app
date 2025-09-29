@@ -38,11 +38,11 @@ export const initEnemy = (level) => {
         0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       poison: Math.floor(
-        0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
+        0.05 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       thorn: Math.floor(0.1 * (level >= 20 ? level : 0) * baseFactor),
-      stunChance: Math.floor(0.01 * (level >= 20 ? level : 0) * baseFactor),
-      counterattack: Math.floor(0.05 * (level >= 20 ? level : 0) * baseFactor),
+      stunChance: 0.001 * (level >= 20 ? level : 0) * baseFactor,
+      counterattack: 0.005 * (level >= 20 ? level : 0) * baseFactor,
     },
   };
 };
@@ -147,12 +147,12 @@ export const generateUpgradeOptions = (player) => {
 
 export const generateRareUpgradeOptions = (player) => {
   const rareStats = [
-    { key: "burn", name: "Burn", min: 5, max: 10, format: (val) => `+${val}` },
+    { key: "burn", name: "Burn", min: 7, max: 15, format: (val) => `+${val}` },
     {
       key: "poison",
       name: "Poison",
-      min: 1,
-      max: 3,
+      min: 3,
+      max: 5,
       format: (val) => `+${val}`,
     },
     {

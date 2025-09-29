@@ -5,7 +5,7 @@ import { allRaritiesPokemon, allTypesPokemon } from "../../utils/constants";
 import { fetchPokemonCards } from "./pokemonApiHelpers";
 import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../common/RandomCards.module.css";
+import styles from "../common/styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function ListCardsPokemon() {

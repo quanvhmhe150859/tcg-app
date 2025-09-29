@@ -1,5 +1,5 @@
 import React from "react";
-import "../common/CardItem.css";
+import "../common/styles/CardItem.css";
 
 const CardItemYugiohModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
