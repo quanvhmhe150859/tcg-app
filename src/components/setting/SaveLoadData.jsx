@@ -83,7 +83,7 @@ export default function CardSaveLoad() {
 
   return (
     <>
-      <h3 className="font-bold mb-2">{t("saveLoadCollection")}</h3>
+      <h3 className="font-bold mb-2">{t("saveLoad")} {t("collection")}</h3>
       <div>
         <span className="font-semibold">{t("rollMode")}: </span>
         <button

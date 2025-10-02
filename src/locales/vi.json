@@ -100,7 +100,7 @@
   "switchToVietnamese": "Chuyển sang Tiếng Việt",
   "switchToUnmute": "Chuyển sang Bật tiếng",
   "switchToMute": "Chuyển sang Tắt tiếng",
-  "saveLoadCollection": "Lưu / Tải bộ sưu tập",
+  "saveLoad": "Lưu / Tải",
   "rollMode": "Chế độ quay",
   "freeSpin": "Quay Miễn Phí",
   "ticketSpin": "Quay Dùng Vé",
@@ -121,5 +121,6 @@
   "listOfOwnedPokemonCards": "Danh sách thẻ Pokémon đã sở hữu",
   "youDontOwnAnyCardsYet": "Bạn chưa sở hữu thẻ nào",
   "sort": "Sắp xếp",
-  "quantity": "Số lượng"
+  "quantity": "Số lượng",
+  "scrollToTop": "Lên đầu trang"
 }

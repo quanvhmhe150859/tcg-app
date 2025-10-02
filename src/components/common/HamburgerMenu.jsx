@@ -127,7 +127,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    📋 <span>{t("collection")}</span>{" "}
+                    📎 <span>{t("collection")}</span>{" "}
                     {expanded.collection ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
@@ -170,7 +170,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🫚 <span>{t("list")}</span> {expanded.list ? "▼" : "▶"}
+                    📋 <span>{t("list")}</span> {expanded.list ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.list && (

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ScrollToTopButton = () => {
+  const { t } = useTranslation();
+
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -19,7 +22,7 @@ const ScrollToTopButton = () => {
   if (!visible) return null;
 
   return (
-    <button className="floating-button" style={{ position: "fixed", bottom: "15px", right: "15px" }} onClick={scrollToTop}>
+    <button className="floating-button" style={{ position: "fixed", bottom: "15px", right: "15px" }} onClick={scrollToTop} title={t("scrollToTop")}>
       🔝
     </button>
   );

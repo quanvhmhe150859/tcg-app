@@ -100,7 +100,7 @@
   "switchToVietnamese": "Switch to Vietnamese",
   "switchToUnmute": "Switch to Unmute",
   "switchToMute": "Switch to Mute",
-  "saveLoadCollection": "Save / Load collection",
+  "saveLoad": "Save / Load",
   "rollMode": "Roll Mode",
   "freeSpin": "Free Spin",
   "ticketSpin": "Ticket Spin",
@@ -121,5 +121,6 @@
   "listOfOwnedPokemonCards": "List of owned Pokémon cards",
   "youDontOwnAnyCardsYet": "You don't own any cards yet",
   "sort": "Sort",
-  "quantity": "Quantity"
+  "quantity": "Quantity",
+  "scrollToTop": "Scroll to top"
 }
