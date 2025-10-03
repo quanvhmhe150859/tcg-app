@@ -13,7 +13,7 @@ export const checkHealth = (entity, entityName, currentTurnLogs) => {
       burnDot: 0,
       poisonDot: 0,
       poisonBase: 0,
-      isStuned: false
+      isStuned: false,
     };
     return false;
   }
@@ -35,8 +35,10 @@ export const applyDodge = (defender, attackerName, currentTurnLogs) => {
 export const calculateCrit = (attacker, baseDamage) => {
   const isCritical = Math.random() < attacker.critChance;
   return {
-    damage: isCritical ? Math.floor(baseDamage * attacker.critDamage) : baseDamage,
-    isCritical
+    damage: isCritical
+      ? Math.floor(baseDamage * attacker.critDamage)
+      : baseDamage,
+    isCritical,
   };
 };
 
@@ -44,7 +46,12 @@ export const applyArmor = (defender, preArmorDamage) => {
   return Math.floor(preArmorDamage * (100 / (100 + defender.armor)));
 };
 
-export const applyThorn = (attacker, defender, attackerName, currentTurnLogs) => {
+export const applyThorn = (
+  attacker,
+  defender,
+  attackerName,
+  currentTurnLogs
+) => {
   if (defender.rareStats.thorn > 0) {
     const thornDamage = defender.rareStats.thorn;
     attacker.currentHealth = Math.max(0, attacker.currentHealth - thornDamage);
@@ -60,12 +67,17 @@ export const applyThorn = (attacker, defender, attackerName, currentTurnLogs) =>
   return true;
 };
 
-export const applyLifeSteal = (attacker, attackerName, finalDamage, currentTurnLogs) => {
+export const applyLifeSteal = (
+  attacker,
+  attackerName,
+  finalDamage,
+  currentTurnLogs
+) => {
   if (attacker.lifeSteal > 0 && finalDamage > 0) {
     const healthRestored = Math.floor(finalDamage * attacker.lifeSteal);
     if (healthRestored > 0) {
       attacker.currentHealth += healthRestored;
-      limitHealth(attacker); // Giới hạn currentHealth không vượt quá maxHealth
+      limitHealth(attacker);
       addLog(
         `${attackerName} restores ${healthRestored} health via life steal!`,
         "lifeSteal",
@@ -77,7 +89,12 @@ export const applyLifeSteal = (attacker, attackerName, finalDamage, currentTurnL
   return false;
 };
 
-export const applyStun = (attacker, defender, attackerName, currentTurnLogs) => {
+export const applyStun = (
+  attacker,
+  defender,
+  attackerName,
+  currentTurnLogs
+) => {
   if (Math.random() < attacker.rareStats.stunChance) {
     defender.effects.isStuned = true;
     addLog(
@@ -137,12 +154,41 @@ export const applyCounterattack = (
   return true;
 };
 
+export const applySwiftness = (
+  attacker,
+  defender,
+  attackerName,
+  currentTurnLogs,
+  isSwiftnessAttack = false
+) => {
+  if (
+    !isSwiftnessAttack &&
+    attacker.rareStats.swiftness > 0 &&
+    Math.random() < attacker.rareStats.swiftness &&
+    !attacker.effects.isStuned
+  ) {
+    addLog(
+      `${attackerName} swiftly attacks again!`,
+      "swiftness",
+      currentTurnLogs
+    );
+    attackPhase(attacker, defender, attackerName, currentTurnLogs, true);
+    return checkHealth(
+      defender,
+      attackerName === "Player" ? "Enemy" : "Player",
+      currentTurnLogs
+    );
+  }
+  return true;
+};
+
 export const attackPhase = (
   attacker,
   defender,
   attackerName,
   currentTurnLogs,
-  isCounterattack = false
+  isCounterattack = false,
+  isSwiftnessAttack = false
 ) => {
   if (applyDodge(defender, attackerName, currentTurnLogs)) {
     return true;
@@ -151,7 +197,10 @@ export const attackPhase = (
   const baseDamage =
     Math.floor(Math.random() * (attacker.maxAttack - attacker.minAttack + 1)) +
     attacker.minAttack;
-  const { damage: preArmorDamage, isCritical } = calculateCrit(attacker, baseDamage);
+  const { damage: preArmorDamage, isCritical } = calculateCrit(
+    attacker,
+    baseDamage
+  );
   const finalDamage = applyArmor(defender, preArmorDamage);
 
   defender.currentHealth = Math.max(0, defender.currentHealth - finalDamage);
@@ -163,19 +212,34 @@ export const attackPhase = (
     currentTurnLogs
   );
 
-  if (!checkHealth(defender, attackerName === "Player" ? "Enemy" : "Player", currentTurnLogs)) {
-    return false;
-  }
-
   if (!applyThorn(attacker, defender, attackerName, currentTurnLogs)) {
     return false;
   }
 
   applyLifeSteal(attacker, attackerName, finalDamage, currentTurnLogs);
+
+  if (
+    !checkHealth(
+      defender,
+      attackerName === "Player" ? "Enemy" : "Player",
+      currentTurnLogs
+    )
+  ) {
+    return false;
+  }
+
   applyStun(attacker, defender, attackerName, currentTurnLogs);
   applyBurnEffect(attacker, defender);
   applyPoisonEffect(attacker, defender);
-  if (!applyCounterattack(attacker, defender, attackerName, currentTurnLogs, isCounterattack)) {
+  if (
+    !applyCounterattack(
+      attacker,
+      defender,
+      attackerName,
+      currentTurnLogs,
+      isCounterattack
+    )
+  ) {
     return false;
   }
 
@@ -186,7 +250,11 @@ export const applyBurn = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.burnDot > 0) {
     const damage = entity.effects.burnDot;
     entity.currentHealth = Math.max(0, entity.currentHealth - damage);
-    addLog(`${entityName} takes ${damage} burn damage!`, "burn", currentTurnLogs);
+    addLog(
+      `${entityName} takes ${damage} burn damage!`,
+      "burn",
+      currentTurnLogs
+    );
     return checkHealth(entity, entityName, currentTurnLogs);
   }
   return true;
@@ -196,7 +264,11 @@ export const applyPoison = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.poisonDot > 0) {
     const damage = entity.effects.poisonDot;
     entity.currentHealth = Math.max(0, entity.currentHealth - damage);
-    addLog(`${entityName} takes ${damage} poison damage!`, "poison", currentTurnLogs);
+    addLog(
+      `${entityName} takes ${damage} poison damage!`,
+      "poison",
+      currentTurnLogs
+    );
     entity.effects.poisonDot += entity.effects.poisonBase;
     return checkHealth(entity, entityName, currentTurnLogs);
   }
@@ -206,7 +278,7 @@ export const applyPoison = (entity, entityName, currentTurnLogs) => {
 export const applyRegeneration = (entity, entityName, currentTurnLogs) => {
   if (entity.regeneration > 0) {
     entity.currentHealth += entity.regeneration;
-    limitHealth(entity); // Giới hạn currentHealth không vượt quá maxHealth
+    limitHealth(entity);
     addLog(
       `${entityName} regenerates ${entity.regeneration} health!`,
       "regeneration",
@@ -219,18 +291,18 @@ export const applyRegeneration = (entity, entityName, currentTurnLogs) => {
 
 export const checkStun = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.isStuned) {
-    addLog(`${entityName} is stunned and misses the turn!`, "stun", currentTurnLogs);
+    addLog(
+      `${entityName} is stunned and misses the turn!`,
+      "stun",
+      currentTurnLogs
+    );
     entity.effects.isStuned = false;
     return true;
   }
   return false;
 };
 
-export const playerTurn = (
-  newPlayer,
-  newEnemy,
-  currentTurnLogs
-) => {
+export const playerTurn = (newPlayer, newEnemy, currentTurnLogs) => {
   if (!applyBurn(newPlayer, "Player", currentTurnLogs)) {
     return false;
   }
@@ -241,12 +313,11 @@ export const playerTurn = (
     return newEnemy.currentHealth > 0;
   }
 
-  if (!attackPhase(
-    newPlayer,
-    newEnemy,
-    "Player",
-    currentTurnLogs
-  )) {
+  if (!attackPhase(newPlayer, newEnemy, "Player", currentTurnLogs)) {
+    return false;
+  }
+
+  if (!applySwiftness(newPlayer, newEnemy, "Player", currentTurnLogs)) {
     return false;
   }
 
@@ -257,11 +328,7 @@ export const playerTurn = (
   return newEnemy.currentHealth > 0;
 };
 
-export const enemyTurn = (
-  newPlayer,
-  newEnemy,
-  currentTurnLogs
-) => {
+export const enemyTurn = (newPlayer, newEnemy, currentTurnLogs) => {
   if (!applyBurn(newEnemy, "Enemy", currentTurnLogs)) {
     return;
   }
@@ -272,12 +339,11 @@ export const enemyTurn = (
     return;
   }
 
-  attackPhase(
-    newEnemy,
-    newPlayer,
-    "Enemy",
-    currentTurnLogs
-  );
+  attackPhase(newEnemy, newPlayer, "Enemy", currentTurnLogs);
+
+  if (!applySwiftness(newEnemy, newPlayer, "Enemy", currentTurnLogs)) {
+    return;
+  }
 
   applyPoison(newEnemy, "Enemy", currentTurnLogs);
 };

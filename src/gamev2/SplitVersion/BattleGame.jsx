@@ -39,6 +39,7 @@ const BattleGame = () => {
   const [rerollPrice, setRerollPrice] = useState(50);
   const [boughtOptions, setBoughtOptions] = useState([]);
   const [showRareStats, setShowRareStats] = useState(true);
+  const [showNormalStats, setShowNormalStats] = useState(true);
   const logContainerRef = useRef(null);
   const min = 100;
   const max = 1000;
@@ -107,6 +108,10 @@ const BattleGame = () => {
     setShowRareStats((prev) => !prev);
   };
 
+  const toggleNormalStats = () => {
+    setShowNormalStats((prev) => !prev);
+  };
+
   const endTurn = (newPlayer, newEnemy, currentTurnLogs, gameStatus) => {
     setPlayer(newPlayer);
     setEnemy(newEnemy);
@@ -130,10 +135,15 @@ const BattleGame = () => {
     if (player.gold < option.price || boughtOptions.includes(index)) return;
     setPlayer((prev) => {
       const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
-      const originalMinAttack = newPlayer.minAttack;
-      const value = ["critChance", "lifeSteal", "dodge", "stunChance"].includes(
-        option.key
-      )
+      const currentTurnLogs = [];
+      const value = [
+        "critChance",
+        "lifeSteal",
+        "dodge",
+        "stunChance",
+        "counterattack",
+        "swiftness",
+      ].includes(option.key)
         ? option.value / 100
         : ["critDamage"].includes(option.key)
         ? option.value / 100
@@ -142,28 +152,59 @@ const BattleGame = () => {
         option.key === "minAttack" &&
         newPlayer.minAttack + value > newPlayer.maxAttack
       ) {
-        newPlayer.minAttack = newPlayer.maxAttack;
+        newPlayer.maxAttack += value;
+        addLog(
+          `Player purchased Max Attack by +${value} due to Min Attack exceeding Max Attack for ${option.price} gold!`,
+          "purchase",
+          currentTurnLogs
+        );
+      } else if (option.key === "maxHealth") {
+        newPlayer.maxHealth += value;
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
+        addLog(
+          `Player purchased ${option.name} by +${value} for ${option.price} gold!`,
+          "purchase",
+          currentTurnLogs
+        );
       } else if (option.key in newPlayer.rareStats) {
         newPlayer.rareStats[option.key] += value;
+        addLog(
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
+            ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
+            : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
+          "purchase",
+          currentTurnLogs
+        );
       } else {
         newPlayer[option.key] += value;
+        addLog(
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
+            ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
+            : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
+          "purchase",
+          currentTurnLogs
+        );
       }
       newPlayer.gold -= option.price;
-      const currentTurnLogs = [];
-      const actualValue =
-        option.key === "minAttack"
-          ? newPlayer.minAttack - originalMinAttack
-          : option.value;
-      const logMessage = [
-        "critChance",
-        "critDamage",
-        "lifeSteal",
-        "dodge",
-        "stunChance",
-      ].includes(option.key)
-        ? `Player purchased ${option.name} by +${actualValue}% for ${option.price} gold!`
-        : `Player purchased ${option.name} by +${actualValue} for ${option.price} gold!`;
-      addLog(logMessage, "purchase", currentTurnLogs);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
@@ -195,13 +236,14 @@ const BattleGame = () => {
   const handleUpgrade = (option) => {
     setPlayer((prev) => {
       const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
-      const originalMinAttack = newPlayer.minAttack;
+      const currentTurnLogs = [];
       const value = [
         "critChance",
         "lifeSteal",
         "dodge",
         "stunChance",
         "counterattack",
+        "swiftness",
       ].includes(option.key)
         ? option.value / 100
         : ["critDamage"].includes(option.key)
@@ -211,11 +253,57 @@ const BattleGame = () => {
         option.key === "minAttack" &&
         newPlayer.minAttack + value > newPlayer.maxAttack
       ) {
-        newPlayer.minAttack = newPlayer.maxAttack;
+        newPlayer.maxAttack += value;
+        addLog(
+          `Player upgraded Max Attack by +${value} due to Min Attack exceeding Max Attack!`,
+          "upgrade",
+          currentTurnLogs
+        );
+      } else if (option.key === "maxHealth") {
+        newPlayer.maxHealth += value;
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
+        addLog(
+          `Player upgraded ${option.name} by +${option.value}!`,
+          "upgrade",
+          currentTurnLogs
+        );
       } else if (option.key in newPlayer.rareStats) {
         newPlayer.rareStats[option.key] += value;
+        addLog(
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
+            ? `Player upgraded ${option.name} by +${option.value}%!`
+            : `Player upgraded ${option.name} by +${option.value}!`,
+          "upgrade",
+          currentTurnLogs
+        );
       } else {
         newPlayer[option.key] += value;
+        addLog(
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
+            ? `Player upgraded ${option.name} by +${option.value}%!`
+            : `Player upgraded ${option.name} by +${option.value}!`,
+          "upgrade",
+          currentTurnLogs
+        );
       }
       newPlayer.effects = {
         burnDot: 0,
@@ -223,22 +311,6 @@ const BattleGame = () => {
         poisonDot: 0,
         isStuned: false,
       };
-      const currentTurnLogs = [];
-      const actualValue =
-        option.key === "minAttack"
-          ? newPlayer.minAttack - originalMinAttack
-          : option.value;
-      const logMessage = [
-        "critChance",
-        "critDamage",
-        "lifeSteal",
-        "dodge",
-        "stunChance",
-        "counterattack",
-      ].includes(option.key)
-        ? `Player upgraded ${option.name} by +${actualValue}%!`
-        : `Player upgraded ${option.name} by +${actualValue}!`;
-      addLog(logMessage, "upgrade", currentTurnLogs);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
@@ -345,6 +417,7 @@ const BattleGame = () => {
     setShopOptions([]);
     resetShopState();
     setShowRareStats(true);
+    setShowNormalStats(true);
   };
 
   const renderStat = (name, value, isPercentage = false) => (
@@ -360,6 +433,26 @@ const BattleGame = () => {
       <span>{isPercentage ? `${(value * 100).toFixed(0)}%` : value}</span>
     </div>
   );
+
+  const renderHealthBar = (currentHealth, maxHealth) => {
+    const healthPercentage = Math.max(0, (currentHealth / maxHealth) * 100);
+    const lostHealthPercentage = 100 - healthPercentage;
+    return (
+      <div className="w-full rounded h-4 flex overflow-hidden">
+        <div
+          className="bg-green-500 h-full"
+          style={{ width: `${healthPercentage}%` }}
+        ></div>
+        <div
+          className="bg-red-500 h-full"
+          style={{ width: `${lostHealthPercentage}%` }}
+        ></div>
+        <div className="absolute text-center w-full text-sm text-white">
+          {currentHealth} / {maxHealth}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
@@ -432,6 +525,10 @@ const BattleGame = () => {
                     <b>Stun Chance</b>: Probability of disabling the enemy for
                     one turn.
                   </li>
+                  <li>
+                    <b>Swiftness</b>: Chance to perform a second attack in the
+                    same turn.
+                  </li>
                 </ul>
               </div>
             </div>
@@ -453,25 +550,35 @@ const BattleGame = () => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h2 className="font-semibold">Player Stats:</h2>
-          <div className="p-1">
-            <div className="flex justify-between text-sm">
-              <span>Health:</span>
-              <span>
-                {player.currentHealth} / {player.maxHealth}
-              </span>
-            </div>
-            {renderStat("Regeneration", player.regeneration)}
-            {renderStat("Armor", player.armor)}
-            <div className="flex justify-between text-sm">
-              <span>Attack:</span>
-              <span>
-                {player.minAttack} - {player.maxAttack}
-              </span>
-            </div>
-            {renderStat("Crit Chance", player.critChance, true)}
-            {renderStat("Crit Damage", player.critDamage, true)}
-            {renderStat("Life Steal", player.lifeSteal, true)}
-            {renderStat("Dodge", player.dodge < 0.6 ? player.dodge : 0.6, true)}
+          <div className="p-1 relative">
+            {showNormalStats ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span>Health:</span>
+                  <span>
+                    {player.currentHealth} / {player.maxHealth}
+                  </span>
+                </div>
+                {renderStat("Regeneration", player.regeneration)}
+                {renderStat("Armor", player.armor)}
+                <div className="flex justify-between text-sm">
+                  <span>Attack:</span>
+                  <span>
+                    {player.minAttack} - {player.maxAttack}
+                  </span>
+                </div>
+                {renderStat("Crit Chance", player.critChance, true)}
+                {renderStat("Crit Damage", player.critDamage, true)}
+                {renderStat("Life Steal", player.lifeSteal, true)}
+                {renderStat(
+                  "Dodge",
+                  player.dodge < 0.6 ? player.dodge : 0.6,
+                  true
+                )}
+              </>
+            ) : (
+              renderHealthBar(player.currentHealth, player.maxHealth)
+            )}
           </div>
           <div className="mt-2">
             {showRareStats && (
@@ -489,31 +596,42 @@ const BattleGame = () => {
                   player.rareStats.stunChance,
                   true
                 )}
+                {renderRareStat("Swiftness", player.rareStats.swiftness, true)}
               </div>
             )}
           </div>
         </div>
         <div>
           <h2 className="font-semibold">Enemy Stats:</h2>
-          <div className="p-1">
-            <div className="flex justify-between text-sm">
-              <span>Health:</span>
-              <span>
-                {enemy.currentHealth} / {enemy.maxHealth}
-              </span>
-            </div>
-            {renderStat("Regeneration", enemy.regeneration)}
-            {renderStat("Armor", enemy.armor)}
-            <div className="flex justify-between text-sm">
-              <span>Attack:</span>
-              <span>
-                {enemy.minAttack} - {enemy.maxAttack}
-              </span>
-            </div>
-            {renderStat("Crit Chance", enemy.critChance, true)}
-            {renderStat("Crit Damage", enemy.critDamage, true)}
-            {renderStat("Life Steal", enemy.lifeSteal, true)}
-            {renderStat("Dodge", enemy.dodge < 0.6 ? enemy.dodge : 0.6, true)}
+          <div className="p-1 relative">
+            {showNormalStats ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span>Health:</span>
+                  <span>
+                    {enemy.currentHealth} / {enemy.maxHealth}
+                  </span>
+                </div>
+                {renderStat("Regeneration", enemy.regeneration)}
+                {renderStat("Armor", enemy.armor)}
+                <div className="flex justify-between text-sm">
+                  <span>Attack:</span>
+                  <span>
+                    {enemy.minAttack} - {enemy.maxAttack}
+                  </span>
+                </div>
+                {renderStat("Crit Chance", enemy.critChance, true)}
+                {renderStat("Crit Damage", enemy.critDamage, true)}
+                {renderStat("Life Steal", enemy.lifeSteal, true)}
+                {renderStat(
+                  "Dodge",
+                  enemy.dodge < 0.6 ? enemy.dodge : 0.6,
+                  true
+                )}
+              </>
+            ) : (
+              renderHealthBar(enemy.currentHealth, enemy.maxHealth)
+            )}
           </div>
           <div className="mt-2">
             {showRareStats && (
@@ -531,17 +649,24 @@ const BattleGame = () => {
                   enemy.rareStats.stunChance,
                   true
                 )}
+                {renderRareStat("Swiftness", enemy.rareStats.swiftness, true)}
               </div>
             )}
           </div>
         </div>
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center space-x-2">
+        <button
+          onClick={toggleNormalStats}
+          className="toggle-game-stats"
+        >
+          {showNormalStats ? "➖ Primary" : "➕ Primary"}
+        </button>
         <button
           onClick={toggleRareStats}
-          className="font-semibold flex items-center !border-0 !bg-transparent"
+          className="toggle-game-stats"
         >
-          {showRareStats ? "➖" : "➕"}
+          {showRareStats ? "➖ Secondary" : "➕ Secondary"}
         </button>
       </div>
       <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>

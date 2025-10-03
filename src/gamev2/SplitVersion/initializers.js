@@ -1,5 +1,5 @@
 export const initPlayer = () => ({
-  level: 0,
+  level: 1,
   maxHealth: 1000,
   currentHealth: 1000,
   regeneration: 2,
@@ -17,13 +17,14 @@ export const initPlayer = () => ({
     thorn: 0,
     stunChance: 0,
     counterattack: 0,
+    swiftness: 0,
   },
   effects: {
     burnDot: 0,
     poisonBase: 0,
     poisonDot: 0,
-    isStuned: false
-  }
+    isStuned: false,
+  },
 });
 
 export const initEnemy = (level) => {
@@ -49,9 +50,18 @@ export const initEnemy = (level) => {
       poison: Math.floor(
         0.05 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
-      thorn: Math.floor(0.1 * (level >= 20 ? level : 0) * baseFactor),
-      stunChance: 0.001 * (level >= 20 ? level : 0) * baseFactor,
-      counterattack: 0.005 * (level >= 20 ? level : 0) * baseFactor,
+      thorn: Math.floor(
+        0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
+      ),
+      stunChance: 0.002 * (level >= 20 ? level : 0) * baseFactor,
+      counterattack: 0.01 * (level >= 20 ? level : 0) * baseFactor,
+      swiftness: 0.005 * (level >= 20 ? level : 0) * baseFactor,
+    },
+    effects: {
+      burnDot: 0,
+      poisonBase: 0,
+      poisonDot: 0,
+      isStuned: false,
     },
   };
 };
@@ -61,9 +71,9 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "maxHealth",
       name: "Max Health",
-      basePrice: 0.04,
-      min: 200,
-      max: 500,
+      basePrice: 0.05,
+      min: 100,
+      max: 300,
       format: (val) => `+${val}`,
     },
     {
@@ -182,13 +192,20 @@ export const generateRareUpgradeOptions = (player) => {
     {
       key: "stunChance",
       name: "Stun Chance",
-      min: 1,
-      max: 3,
+      min: 2,
+      max: 5,
       format: (val) => `+${val}%`,
     },
     {
       key: "counterattack",
       name: "Counterattack",
+      min: 7,
+      max: 15,
+      format: (val) => `+${val}%`,
+    },
+    {
+      key: "swiftness",
+      name: "Swiftness",
       min: 5,
       max: 10,
       format: (val) => `+${val}%`,
