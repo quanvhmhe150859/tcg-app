@@ -523,11 +523,14 @@ const BattleGame = () => {
         <div>
           <h2 className="font-semibold">Player Stats:</h2>
           <div className="p-1">
-            {renderStat("Health", player.health)}
+            <div className="flex justify-between text-sm">
+              <span>Health:</span>
+              <span>
+                {player.currentHealth} / {player.maxHealth}
+              </span>
+            </div>
             {renderStat("Regeneration", player.regeneration)}
             {renderStat("Armor", player.armor)}
-            {/* {renderStat("Min Attack", player.minAttack)}
-            {renderStat("Max Attack", player.maxAttack)} */}
             <div className="flex justify-between text-sm">
               <span>Attack:</span>
               <span>
@@ -562,11 +565,14 @@ const BattleGame = () => {
         <div>
           <h2 className="font-semibold">Enemy Stats:</h2>
           <div className="p-1">
-            {renderStat("Health", enemy.health)}
+            <div className="flex justify-between text-sm">
+              <span>Health:</span>
+              <span>
+                {enemy.currentHealth} / {enemy.maxHealth}
+              </span>
+            </div>
             {renderStat("Regeneration", enemy.regeneration)}
             {renderStat("Armor", enemy.armor)}
-            {/* {renderStat("Min Attack", enemy.minAttack)}
-            {renderStat("Max Attack", enemy.maxAttack)} */}
             <div className="flex justify-between text-sm">
               <span>Attack:</span>
               <span>

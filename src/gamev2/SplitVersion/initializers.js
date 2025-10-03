@@ -1,6 +1,7 @@
 export const initPlayer = () => ({
   level: 0,
-  health: 1000,
+  maxHealth: 1000,
+  currentHealth: 1000,
   regeneration: 2,
   armor: 5,
   minAttack: 5,
@@ -17,14 +18,21 @@ export const initPlayer = () => ({
     stunChance: 0,
     counterattack: 0,
   },
+  effects: {
+    burnDot: 0,
+    poisonDot: 0,
+    isStuned: false
+  }
 });
 
 export const initEnemy = (level) => {
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.2;
   const bossMultiplier = isBoss ? 2 : 1;
+  const health = Math.floor(10 * level * baseFactor * bossMultiplier);
   return {
-    health: Math.floor(10 * level * baseFactor * bossMultiplier),
+    maxHealth: health,
+    currentHealth: health,
     minAttack: Math.floor(3 * level * baseFactor * bossMultiplier),
     maxAttack: Math.floor(6 * level * baseFactor * bossMultiplier),
     critChance: 0.1 * baseFactor,
@@ -50,8 +58,16 @@ export const initEnemy = (level) => {
 export const generateUpgradeOptions = (player) => {
   const stats = [
     {
-      key: "health",
-      name: "Health",
+      key: "maxHealth",
+      name: "Max Health",
+      basePrice: 0.04,
+      min: 200,
+      max: 500,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "currentHealth",
+      name: "Current Health",
       basePrice: 0.05,
       min: 200,
       max: 500,

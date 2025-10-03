@@ -1,7 +1,12 @@
 import { addLog, checkGameOver, startTurn } from "./utils";
 
+// Hàm kiểm tra và giới hạn hồi máu không vượt quá maxHealth
+const limitHealth = (entity) => {
+  entity.currentHealth = Math.min(entity.currentHealth, entity.maxHealth);
+};
+
 export const checkHealth = (entity, entityName, currentTurnLogs) => {
-  if (entity.health <= 0) {
+  if (entity.currentHealth <= 0) {
     // addLog(`${entityName} has been defeated!`, "defeated", currentTurnLogs);
     return false;
   }
@@ -35,7 +40,7 @@ export const applyArmor = (defender, preArmorDamage) => {
 export const applyThorn = (attacker, defender, attackerName, currentTurnLogs) => {
   if (defender.rareStats.thorn > 0) {
     const thornDamage = defender.rareStats.thorn;
-    attacker.health = Math.max(0, attacker.health - thornDamage);
+    attacker.currentHealth = Math.max(0, attacker.currentHealth - thornDamage);
     addLog(
       `${attackerName} takes ${thornDamage} thorn damage from ${
         attackerName === "Player" ? "Enemy" : "Player"
@@ -52,7 +57,8 @@ export const applyLifeSteal = (attacker, attackerName, finalDamage, currentTurnL
   if (attacker.lifeSteal > 0 && finalDamage > 0) {
     const healthRestored = Math.floor(finalDamage * attacker.lifeSteal);
     if (healthRestored > 0) {
-      attacker.health += healthRestored;
+      attacker.currentHealth += healthRestored;
+      limitHealth(attacker); // Giới hạn currentHealth không vượt quá maxHealth
       addLog(
         `${attackerName} restores ${healthRestored} health via life steal!`,
         "lifeSteal",
@@ -147,7 +153,7 @@ export const attackPhase = (
   const { damage: preArmorDamage, isCritical } = calculateCrit(attacker, baseDamage);
   const finalDamage = applyArmor(defender, preArmorDamage);
 
-  defender.health = Math.max(0, defender.health - finalDamage);
+  defender.currentHealth = Math.max(0, defender.currentHealth - finalDamage);
   addLog(
     `${attackerName} deals ${finalDamage} (${preArmorDamage}) damage to ${
       attackerName === "Player" ? "Enemy" : "Player"
@@ -178,7 +184,7 @@ export const attackPhase = (
 export const applyBurn = (entity, entityName, currentTurnLogs, effects) => {
   if (effects.burnDot > 0) {
     const damage = effects.burnDot;
-    entity.health = Math.max(0, entity.health - damage);
+    entity.currentHealth = Math.max(0, entity.currentHealth - damage);
     addLog(`${entityName} takes ${damage} burn damage!`, "burn", currentTurnLogs);
     return checkHealth(entity, entityName, currentTurnLogs);
   }
@@ -188,7 +194,7 @@ export const applyBurn = (entity, entityName, currentTurnLogs, effects) => {
 export const applyPoison = (entity, entityName, currentTurnLogs, effects) => {
   if (effects.poisonDot > 0) {
     const damage = effects.poisonDot;
-    entity.health = Math.max(0, entity.health - damage);
+    entity.currentHealth = Math.max(0, entity.currentHealth - damage);
     addLog(`${entityName} takes ${damage} poison damage!`, "poison", currentTurnLogs);
     effects.poisonDot += effects.poisonBase;
     return checkHealth(entity, entityName, currentTurnLogs);
@@ -198,7 +204,8 @@ export const applyPoison = (entity, entityName, currentTurnLogs, effects) => {
 
 export const applyRegeneration = (entity, entityName, currentTurnLogs) => {
   if (entity.regeneration > 0) {
-    entity.health += entity.regeneration;
+    entity.currentHealth += entity.regeneration;
+    limitHealth(entity); // Giới hạn currentHealth không vượt quá maxHealth
     addLog(
       `${entityName} regenerates ${entity.regeneration} health!`,
       "regeneration",
@@ -232,7 +239,7 @@ export const playerTurn = (
   applyRegeneration(newPlayer, "Player", currentTurnLogs);
 
   if (checkStun(localPlayerEffects, "Player", currentTurnLogs)) {
-    return newEnemy.health > 0;
+    return newEnemy.currentHealth > 0;
   }
 
   if (!attackPhase(
@@ -250,7 +257,7 @@ export const playerTurn = (
     return false;
   }
 
-  return newEnemy.health > 0;
+  return newEnemy.currentHealth > 0;
 };
 
 export const enemyTurn = (

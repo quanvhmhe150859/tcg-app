@@ -21,9 +21,9 @@ export const addLog = (message, type, currentTurnLogs) => {
 };
 
 export const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
-  if (newEnemy.health <= 0) {
+  if (newEnemy.currentHealth <= 0) {
     const goldGained = Math.floor(
-      newEnemy.health +
+      newEnemy.maxHealth +
         newEnemy.minAttack +
         newEnemy.maxAttack +
         newEnemy.critChance * 100 +
@@ -43,7 +43,7 @@ export const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
     addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
     return { isOver: false, levelUp: true };
   }
-  if (newPlayer.health <= 0) {
+  if (newPlayer.currentHealth <= 0) {
     addLog("Player defeated!", "gameOver", currentTurnLogs);
     return { isOver: true, levelUp: false };
   }
