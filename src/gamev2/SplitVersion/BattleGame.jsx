@@ -18,7 +18,7 @@ const BattleGame = () => {
     document.body.style.minWidth = "672px";
 
     return () => {
-      document.body.style.minWidth = ""; // reset khi rời trang
+      document.body.style.minWidth = "";
     };
   }, []);
 
@@ -38,18 +38,6 @@ const BattleGame = () => {
   const [shopOptions, setShopOptions] = useState([]);
   const [rerollPrice, setRerollPrice] = useState(50);
   const [boughtOptions, setBoughtOptions] = useState([]);
-  const [playerEffects, setPlayerEffects] = useState({
-    burnDot: 0,
-    poisonBase: 0,
-    poisonDot: 0,
-    stunned: false,
-  });
-  const [enemyEffects, setEnemyEffects] = useState({
-    burnDot: 0,
-    poisonBase: 0,
-    poisonDot: 0,
-    stunned: false,
-  });
   const [showRareStats, setShowRareStats] = useState(true);
   const logContainerRef = useRef(null);
   const min = 100;
@@ -57,14 +45,12 @@ const BattleGame = () => {
   const step = 50;
   const [autoSpeed, setAutoSpeed] = useState(150);
 
-  // Auto-scroll to the latest turn (top)
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = 0;
     }
   }, [turnLogs]);
 
-  // Handle auto-attack mode
   useEffect(() => {
     if (isAuto && !gameOver && !showUpgradeOptions && !showShop) {
       const interval = setInterval(() => {
@@ -82,10 +68,9 @@ const BattleGame = () => {
     enemy,
     turnCount,
     level,
-    autoSpeed, // thêm dependency
+    autoSpeed,
   ]);
 
-  // Reusable function to update turn logs
   const updateTurnLogs = (currentTurnLogs) => {
     setLogId((prev) => {
       const newLogId = prev + 1;
@@ -108,7 +93,6 @@ const BattleGame = () => {
     });
   };
 
-  // Reusable function to reset shop state
   const resetShopState = () => {
     setRerollPrice(50 + Math.floor(level * 1.5));
     setBoughtOptions([]);
@@ -119,24 +103,13 @@ const BattleGame = () => {
     setBoughtOptions([]);
   };
 
-  // Toggle rare stats visibility
   const toggleRareStats = () => {
     setShowRareStats((prev) => !prev);
   };
 
-  // End of a turn
-  const endTurn = (
-    newPlayer,
-    newEnemy,
-    currentTurnLogs,
-    gameStatus,
-    localPlayerEffects,
-    localEnemyEffects
-  ) => {
+  const endTurn = (newPlayer, newEnemy, currentTurnLogs, gameStatus) => {
     setPlayer(newPlayer);
     setEnemy(newEnemy);
-    setPlayerEffects(localPlayerEffects);
-    setEnemyEffects(localEnemyEffects);
     updateTurnLogs(currentTurnLogs);
     if (gameStatus.isOver) {
       endGame();
@@ -153,11 +126,10 @@ const BattleGame = () => {
     }
   };
 
-  // Handle shop purchase
   const handlePurchase = (option, index) => {
     if (player.gold < option.price || boughtOptions.includes(index)) return;
     setPlayer((prev) => {
-      const newPlayer = { ...prev };
+      const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
       const originalMinAttack = newPlayer.minAttack;
       const value = ["critChance", "lifeSteal", "dodge", "stunChance"].includes(
         option.key
@@ -198,7 +170,6 @@ const BattleGame = () => {
     setBoughtOptions((prev) => [...prev, index]);
   };
 
-  // Handle reroll shop
   const handleReroll = () => {
     if (player.gold < rerollPrice) return;
     setPlayer((prev) => {
@@ -216,16 +187,14 @@ const BattleGame = () => {
     increaseRerollPrice();
   };
 
-  // Handle exit shop
   const handleExitShop = () => {
     setShowShop(false);
     resetShopState();
   };
 
-  // Handle upgrade selection
   const handleUpgrade = (option) => {
     setPlayer((prev) => {
-      const newPlayer = { ...prev };
+      const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
       const originalMinAttack = newPlayer.minAttack;
       const value = [
         "critChance",
@@ -248,6 +217,12 @@ const BattleGame = () => {
       } else {
         newPlayer[option.key] += value;
       }
+      newPlayer.effects = {
+        burnDot: 0,
+        poisonBase: 0,
+        poisonDot: 0,
+        isStuned: false,
+      };
       const currentTurnLogs = [];
       const actualValue =
         option.key === "minAttack"
@@ -269,18 +244,6 @@ const BattleGame = () => {
     });
     setLevel((prev) => prev + 1);
     setEnemy(initEnemy(level + 1));
-    setEnemyEffects({
-      burnDot: 0,
-      poisonBase: 0,
-      poisonDot: 0,
-      stunned: false,
-    });
-    setPlayerEffects({
-      burnDot: 0,
-      poisonBase: 0,
-      poisonDot: 0,
-      stunned: false,
-    });
     setTurnCount(1);
     setShowUpgradeOptions(false);
     if (level % 10 === 9) {
@@ -290,7 +253,6 @@ const BattleGame = () => {
     }
   };
 
-  // Centralized game over function
   const endGame = () => {
     const gained = earnTickets(level);
     const currentTurnLogs = [];
@@ -301,20 +263,12 @@ const BattleGame = () => {
     setIsAuto(false);
   };
 
-  // Handle quit game
   const handleEndRun = () => {
     const newPlayer = { ...player, rareStats: { ...player.rareStats } };
     const newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
     const currentTurnLogs = [];
     const gameStatus = { isOver: true, levelUp: false };
-    endTurn(
-      newPlayer,
-      newEnemy,
-      currentTurnLogs,
-      gameStatus,
-      playerEffects,
-      enemyEffects
-    );
+    endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
   };
 
   const handleAttack = () => {
@@ -322,8 +276,6 @@ const BattleGame = () => {
 
     let newPlayer = { ...player, rareStats: { ...player.rareStats } };
     let newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
-    let localPlayerEffects = { ...playerEffects };
-    let localEnemyEffects = { ...enemyEffects };
     const currentTurn = turnCount;
     const currentTurnLogs = [];
 
@@ -332,44 +284,21 @@ const BattleGame = () => {
     const enemyAliveAfterPlayer = playerTurn(
       newPlayer,
       newEnemy,
-      currentTurnLogs,
-      localPlayerEffects,
-      localEnemyEffects
+      currentTurnLogs
     );
     let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     if (gameStatus.isOver || gameStatus.levelUp) {
       newPlayer.level++;
-      // console.log("Player level increased to:", newPlayer.level);
-      endTurn(
-        newPlayer,
-        newEnemy,
-        currentTurnLogs,
-        gameStatus,
-        localPlayerEffects,
-        localEnemyEffects
-      );
+      endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
       return;
     }
 
     if (enemyAliveAfterPlayer) {
-      enemyTurn(
-        newPlayer,
-        newEnemy,
-        currentTurnLogs,
-        localPlayerEffects,
-        localEnemyEffects
-      );
+      enemyTurn(newPlayer, newEnemy, currentTurnLogs);
       gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     }
 
-    endTurn(
-      newPlayer,
-      newEnemy,
-      currentTurnLogs,
-      gameStatus,
-      localPlayerEffects,
-      localEnemyEffects
-    );
+    endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
 
     setGlobalTurnCount((prev) => prev + 1);
     if (!gameStatus.levelUp) {
@@ -384,8 +313,24 @@ const BattleGame = () => {
   };
 
   const resetGame = () => {
-    setPlayer(initPlayer());
-    setEnemy(initEnemy(1));
+    setPlayer({
+      ...initPlayer(),
+      effects: {
+        burnDot: 0,
+        poisonBase: 0,
+        poisonDot: 0,
+        isStuned: false,
+      },
+    });
+    setEnemy({
+      ...initEnemy(1),
+      effects: {
+        burnDot: 0,
+        poisonBase: 0,
+        poisonDot: 0,
+        isStuned: false,
+      },
+    });
     setTurnLogs([]);
     setGameOver(false);
     setTurnCount(1);
@@ -399,18 +344,6 @@ const BattleGame = () => {
     setShowShop(false);
     setShopOptions([]);
     resetShopState();
-    setPlayerEffects({
-      burnDot: 0,
-      poisonBase: 0,
-      poisonDot: 0,
-      stunned: false,
-    });
-    setEnemyEffects({
-      burnDot: 0,
-      poisonBase: 0,
-      poisonDot: 0,
-      stunned: false,
-    });
     setShowRareStats(true);
   };
 
@@ -440,11 +373,9 @@ const BattleGame = () => {
             💡
           </h1>
 
-          {/* Overlay + Popup */}
           {openTips && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
               <div className="bg-game-secondary rounded-lg shadow-lg p-6 max-w-lg w-full relative">
-                {/* Nút đóng */}
                 <button
                   onClick={() => setOpenTips(false)}
                   className="absolute top-2 right-2 text-gray-600 hover:text-black"

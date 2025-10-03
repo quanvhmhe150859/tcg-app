@@ -20,6 +20,7 @@ export const initPlayer = () => ({
   },
   effects: {
     burnDot: 0,
+    poisonBase: 0,
     poisonDot: 0,
     isStuned: false
   }
