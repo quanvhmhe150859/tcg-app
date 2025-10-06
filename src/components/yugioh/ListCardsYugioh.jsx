@@ -194,28 +194,29 @@ export default function ListCardsYugioh() {
         ) : cards.length === 0 ? (
           <p>{t("noResultsFound")}.</p>
         ) : (
-          <div className={styles.cardList}>
-            <AnimatePresence>
-              {cards.filter(Boolean).map((card, index) => (
-                <motion.div
-                  key={`${card.cardId}-${index}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <CardItemYugioh card={card} index={index} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            
+          <>
+            <div className={styles.cardList}>
+              <AnimatePresence>
+                {cards.filter(Boolean).map((card, index) => (
+                  <motion.div
+                    key={`${card.cardId}-${index}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <CardItemYugioh card={card} index={index} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
             <Pagination
               page={page}
               totalPages={totalPages}
               setPage={setPage}
               isLoading={loading}
             />
-          </div>
+          </>
         )}
       </div>
 

@@ -26,3 +26,6 @@ dist-ssr
 *.pem
 *.key
 *.crt
+
+# Ignore sprite images
+public/sprites/
