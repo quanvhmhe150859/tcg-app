@@ -10,6 +10,8 @@ import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 
+import MultiSpriteAnimation from "../../../test/sprite/SpriteAnimation";
+
 const BattleGame = () => {
   const { earnTickets } = useTickets();
 
@@ -33,6 +35,8 @@ const BattleGame = () => {
   const [showNormalStats, setShowNormalStats] = useState(true);
   const [autoSpeed, setAutoSpeed] = useState(150);
   const logContainerRef = useRef(null);
+  const playerSpriteRef = useRef(null);
+  const enemySpriteRef = useRef(null);
 
   const {
     handlePurchase,
@@ -106,9 +110,37 @@ const BattleGame = () => {
     setShowNormalStats((prev) => !prev);
   };
 
+  // Modified handleAttack to trigger handlePlayOnce for both sprites
+  const enhancedHandleAttack = () => {
+    handleAttack();
+    if (playerSpriteRef.current) {
+      playerSpriteRef.current.handlePlayOnce();
+    }
+    if (enemySpriteRef.current) {
+      enemySpriteRef.current.handlePlayOnce();
+    }
+  };
+
+  // Modified toggleAuto to trigger handleToggleLoop for both sprites
+  const enhancedToggleAuto = () => {
+    toggleAuto();
+    if (playerSpriteRef.current) {
+      playerSpriteRef.current.handleToggleLoop();
+    }
+    if (enemySpriteRef.current) {
+      enemySpriteRef.current.handleToggleLoop();
+    }
+  };
+
   return (
     <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
       <Header level={level} />
+
+      <div className="flex justify-between items-center gap-4">
+        <MultiSpriteAnimation name="agathe" ref={playerSpriteRef} />
+        <MultiSpriteAnimation name="bardrey" ref={enemySpriteRef} />
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <StatsPanel entity={player} name="Player" showNormalStats={showNormalStats} showRareStats={showRareStats} />
         <StatsPanel entity={enemy} name="Enemy" showNormalStats={showNormalStats} showRareStats={showRareStats} />
@@ -122,8 +154,8 @@ const BattleGame = () => {
       <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>
       <GameControls
         isAuto={isAuto}
-        toggleAuto={toggleAuto}
-        handleAttack={handleAttack}
+        toggleAuto={enhancedToggleAuto}
+        handleAttack={enhancedHandleAttack}
         handleEndRun={handleEndRun}
         autoSpeed={autoSpeed}
         setAutoSpeed={setAutoSpeed}

@@ -11,7 +11,6 @@ import SaveLoadData from "./SaveLoadData";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import MultiSpriteAnimation from "../../../test/sprite/SpriteAnimation";
 
 const AdminSettings = () => {
   const { t } = useTranslation();
@@ -71,8 +70,6 @@ const AdminSettings = () => {
         <span className="hidden sm:inline">🛠️ </span>
         {t("settings")}
       </h1>
-
-      <MultiSpriteAnimation name="bardrey" />
 
       {/* Tab Buttons */}
       <div className="mb-6 flex gap-4 justify-center">

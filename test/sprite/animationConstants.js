@@ -19,8 +19,9 @@ export const ANIMATION_CONFIGS = {
         speed: 120,
         delay: 480,
         flip: true,
-        moving: true,
-        stopMovingAtFrame: 3, // Stop moving at frame 3 (index 2)
+        moving: false,
+        movingFrameCount: 5, // Number of moving frames (1-5)
+        moveStopDistance: 250, // Stop after moving 100 pixels, adjusting moving speed accordingly
       },
     ],
   },
@@ -34,8 +35,9 @@ export const ANIMATION_CONFIGS = {
         frameCount: 3,
         speed: 240,
         delay: 0,
-        flip: true,
+        flip: false, // Faces right, moves left
         moving: false,
+        stopMovingAtFrame: 3, // Stop moving at frame 3
       },
       {
         name: "slash",
@@ -43,10 +45,20 @@ export const ANIMATION_CONFIGS = {
         frameCount: 8,
         speed: 120,
         delay: 480,
-        flip: true,
+        flip: false, // Faces right, moves left
         moving: true,
-        stopMovingAtFrame: 4, // Stop moving at frame 3 (index 2)
+        movingFrameCount: 5, // Number of moving frames (1-5)
+        moveStopDistance: 250, // Stop after moving 100 pixels, adjusting moving speed accordingly
       },
     ],
   },
 };
+
+{/* <div className="flex justify-between items-center gap-4">
+        <MultiSpriteAnimation name="agathe" />
+        <MultiSpriteAnimation name="bardrey" />
+      </div> 
+      
+      moveStopDistance: 435, 768px
+      moveStopDistance: 690, 1024px
+      */}
