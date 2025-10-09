@@ -39,33 +39,26 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
     <div>
       <h2 className="font-semibold">{name} Stats:</h2>
       <div className="p-1 relative">
-        {showNormalStats ? (
-          <>
-            <div className="flex justify-between text-sm">
-              <span>Health:</span>
-              <span>
-                {entity.currentHealth} / {entity.maxHealth}
-              </span>
-            </div>
-            {renderStat("Regeneration", entity.regeneration)}
-            {renderStat("Armor", entity.armor)}
-            <div className="flex justify-between text-sm">
-              <span>Attack:</span>
-              <span>
-                {entity.minAttack} - {entity.maxAttack}
-              </span>
-            </div>
-            {renderStat("Crit Chance", entity.critChance, true)}
-            {renderStat("Crit Damage", entity.critDamage, true)}
-            {renderStat("Life Steal", entity.lifeSteal, true)}
-            {renderStat("Dodge", entity.dodge < 0.6 ? entity.dodge : 0.6, true)}
-          </>
-        ) : (
-          renderHealthBar(entity.currentHealth, entity.maxHealth)
-        )}
+        {renderHealthBar(entity.currentHealth, entity.maxHealth)}
       </div>
-      <div className="mt-2">
-        {showRareStats && (
+      {showNormalStats && (
+        <div className="p-1 mt-2">
+          {renderStat("Regeneration", entity.regeneration)}
+          {renderStat("Armor", entity.armor)}
+          <div className="flex justify-between text-sm">
+            <span>Attack:</span>
+            <span>
+              {entity.minAttack} - {entity.maxAttack}
+            </span>
+          </div>
+          {renderStat("Crit Chance", entity.critChance, true)}
+          {renderStat("Crit Damage", entity.critDamage, true)}
+          {renderStat("Life Steal", entity.lifeSteal, true)}
+          {renderStat("Dodge", entity.dodge < 0.6 ? entity.dodge : 0.6, true)}
+        </div>
+      )}
+      {showRareStats && (
+        <div className="mt-2">
           <div className="bg-game-secondary">
             {renderRareStat("Burn", entity.rareStats.burn)}
             {renderRareStat("Poison", entity.rareStats.poison)}
@@ -75,19 +68,11 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
               entity.rareStats.counterattack,
               true
             )}
-            {renderRareStat(
-              "Stun Chance",
-              entity.rareStats.stunChance,
-              true
-            )}
-            {renderRareStat(
-              "Swiftness",
-              entity.rareStats.swiftness,
-              true
-            )}
+            {renderRareStat("Stun Chance", entity.rareStats.stunChance, true)}
+            {renderRareStat("Swiftness", entity.rareStats.swiftness, true)}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

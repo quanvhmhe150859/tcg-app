@@ -10,7 +10,7 @@ import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 
-import MultiSpriteAnimation from "../../../test/sprite/SpriteAnimation";
+import SpriteAnimation from "./animations/SpriteAnimation";
 
 const BattleGame = () => {
   const { earnTickets } = useTickets();
@@ -161,8 +161,8 @@ const BattleGame = () => {
       <Header level={level} />
 
       <div className="flex justify-between items-center gap-4">
-        <MultiSpriteAnimation name="agathe" ref={playerSpriteRef} distance={distance}/>
-        <MultiSpriteAnimation name="bardrey" ref={enemySpriteRef} distance={distance}/>
+        <SpriteAnimation name="agathe" ref={playerSpriteRef} distance={distance} health={player.currentHealth}/>
+        <SpriteAnimation name="bardrey" ref={enemySpriteRef} distance={distance} health={enemy.currentHealth}/>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

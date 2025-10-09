@@ -5,8 +5,9 @@ import { ANIMATION_CONFIGS } from "./animationConstants";
  * MultiSpriteAnimation
  * - Nhiều layer sprite song song
  * - Hỗ trợ ref để cha đo vị trí (getBoundingClientRect)
+ * - Giảm opacity dần xuống 0 khi health = 0
  */
-const MultiSpriteAnimation = forwardRef(
+const SpriteAnimation = forwardRef(
   (
     {
       name,
@@ -16,6 +17,7 @@ const MultiSpriteAnimation = forwardRef(
       width = 128,
       height = 128,
       distance,
+      health,
       ...rest
     },
     ref
@@ -36,9 +38,10 @@ const MultiSpriteAnimation = forwardRef(
     const [stopPositions, setStopPositions] = useState(
       finalLayers.map(() => null)
     );
+    const [opacity, setOpacity] = useState(1); // State for opacity
 
     const frameReq = useRef(null);
-    const startTime = useRef(0);
+    const startTime = useRef(null);
 
     // ✅ ref chính để cha có thể đo vị trí
     const containerRef = useRef(null);
@@ -77,6 +80,27 @@ const MultiSpriteAnimation = forwardRef(
         0
       );
     }, [finalLayers, distance]);
+
+    // ✅ Handle opacity fade-out when health is 0
+    useEffect(() => {
+      if (health === 0) {
+        // Start fading out
+        const fadeDuration = 900; // 1 second fade-out
+        const start = performance.now();
+        const tick = (now) => {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / fadeDuration, 1);
+          setOpacity(1 - progress); // Linearly reduce opacity from 1 to 0
+          if (progress < 1) {
+            frameReq.current = requestAnimationFrame(tick);
+          }
+        };
+        frameReq.current = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frameReq.current);
+      } else {
+        setOpacity(1); // Reset opacity when health is not 0
+      }
+    }, [health]);
 
     // ✅ Animation loop
     useEffect(() => {
@@ -180,6 +204,7 @@ const MultiSpriteAnimation = forwardRef(
       <div
         ref={containerRef}
         className="flex flex-col items-center gap-3 mb-4"
+        style={{ opacity, transition: 'opacity 1s ease' }} // Apply opacity with transition
       >
         <div
           className="relative border border-gray-400 rounded-md"
@@ -222,4 +247,4 @@ const MultiSpriteAnimation = forwardRef(
   }
 );
 
-export default MultiSpriteAnimation;
+export default SpriteAnimation;
