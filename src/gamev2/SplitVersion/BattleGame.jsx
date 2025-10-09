@@ -31,8 +31,8 @@ const BattleGame = () => {
   const [shopOptions, setShopOptions] = useState([]);
   const [rerollPrice, setRerollPrice] = useState(50);
   const [boughtOptions, setBoughtOptions] = useState([]);
-  const [showRareStats, setShowRareStats] = useState(true);
-  const [showNormalStats, setShowNormalStats] = useState(true);
+  const [showRareStats, setShowRareStats] = useState(false);
+  const [showNormalStats, setShowNormalStats] = useState(false);
   const [autoSpeed, setAutoSpeed] = useState(150);
   const logContainerRef = useRef(null);
   const playerSpriteRef = useRef(null);
@@ -132,13 +132,37 @@ const BattleGame = () => {
     }
   };
 
+  const [distance, setDistance] = useState(0);
+
+  useEffect(() => {
+    const measure = () => {
+      const playerEl = playerSpriteRef.current?.getElement?.();
+      const enemyEl = enemySpriteRef.current?.getElement?.();
+      if (!playerEl || !enemyEl) return;
+
+      const rect1 = playerEl.getBoundingClientRect();
+      const rect2 = enemyEl.getBoundingClientRect();
+      const x1 = rect1.left + rect1.width / 2;
+      const x2 = rect2.left + rect2.width / 2;
+      setDistance(Math.abs(x2 - x1).toFixed(1));
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    const interval = setInterval(measure, 100);
+    return () => {
+      window.removeEventListener("resize", measure);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
       <Header level={level} />
 
       <div className="flex justify-between items-center gap-4">
-        <MultiSpriteAnimation name="agathe" ref={playerSpriteRef} />
-        <MultiSpriteAnimation name="bardrey" ref={enemySpriteRef} />
+        <MultiSpriteAnimation name="agathe" ref={playerSpriteRef} distance={distance}/>
+        <MultiSpriteAnimation name="bardrey" ref={enemySpriteRef} distance={distance}/>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

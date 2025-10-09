@@ -44,7 +44,7 @@ export const ANIMATION_CONFIGS = {
         folder: "/sprites/bardrey/slash/",
         frameCount: 8,
         speed: 120,
-        delay: 480,
+        delay: 180,
         flip: false, // Faces right, moves left
         moving: true,
         movingFrameCount: 5, // Number of moving frames (1-5)

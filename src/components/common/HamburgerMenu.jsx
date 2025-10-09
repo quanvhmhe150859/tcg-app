@@ -67,12 +67,7 @@ const HamburgerMenu = () => {
                 </li>
                 <li>
                   <Link to="/game" onClick={() => setOpen(false)}>
-                    🧩 {t("game")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/gamev2" onClick={() => setOpen(false)}>
-                    🕹️ {t("game")} V2
+                    🕹️ {t("game")}
                   </Link>
                 </li>
                 <li>
@@ -244,6 +239,11 @@ const HamburgerMenu = () => {
                       </motion.ul>
                     )}
                   </AnimatePresence>
+                </li>
+                <li>
+                  <Link to="/test" onClick={() => setOpen(false)}>
+                    🧩 Test
+                  </Link>
                 </li>
               </ul>
             </div>

@@ -45,7 +45,7 @@ export default function BgmPlayer() {
     };
     audio.addEventListener("timeupdate", handleTimeUpdate);
     return () => audio.removeEventListener("timeupdate", handleTimeUpdate);
-  }, []);
+  }, [audioRef]);
 
   const handleChangeMode = () => {
     setMode((prev) => {
@@ -62,6 +62,14 @@ export default function BgmPlayer() {
 
   const handleTogglePersistAudio = () => {
     setPersistAudio((prev) => !prev);
+  };
+
+  const handleSeek = (e) => {
+    const newTime = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
   };
 
   const formatTime = (sec) => {
@@ -109,7 +117,19 @@ export default function BgmPlayer() {
       <Tooltip id="persist-audio-tooltip" place="bottom" effect="solid" />
 
       <div className="text-sm mb-4">
-        {formatTime(currentTime)} / {formatTime(duration)}
+        <label className="block mb-1 text-sm font-medium">{t("duration")}:</label>
+        <input
+          type="range"
+          min={0}
+          max={duration || 100}
+          step={0.1}
+          value={currentTime}
+          onChange={handleSeek}
+          className="w-1/2"
+        />
+        <div className="mt-1">
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
       </div>
 
       <label className="block mb-1 text-sm font-medium">{t("volume")}:</label>

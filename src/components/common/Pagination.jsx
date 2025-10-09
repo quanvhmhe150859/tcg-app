@@ -9,13 +9,26 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
 
   const handleInputChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, ""); // Chỉ cho phép nhập số
-    setInputPage(value);
+    if (value === "") {
+      setInputPage("");
+    } else {
+      const parsedValue = parseInt(value, 10);
+      if (parsedValue > totalPages) {
+        setInputPage(totalPages.toString()); // Nếu nhập quá totalPages, đặt thành totalPages
+      } else if (parsedValue >= 1) {
+        setInputPage(value);
+      }
+    }
   };
 
   const handleInputSubmit = (position) => {
-    const pageNumber = parseInt(inputPage, 10);
-    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
-      setPage(pageNumber);
+    let pageNumber = parseInt(inputPage, 10);
+    if (!isNaN(pageNumber)) {
+      // Giới hạn pageNumber không vượt quá totalPages
+      pageNumber = Math.min(pageNumber, totalPages);
+      if (pageNumber >= 1) {
+        setPage(pageNumber);
+      }
     }
     setInputPage("");
     setShowInput({ ...showInput, [position]: false });
@@ -35,18 +48,16 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
         {t("prev")}
       </button>
 
-      {/* Trang đầu */}
-      <button
-        className={`px-3 py-1 rounded ${page === 1 ? "selected-tab" : ""}`}
-        disabled={isLoading}
-        onClick={() => setPage(1)}
-      >
-        1
-      </button>
-
-      {/* Dấu ... nếu cách xa trang đầu */}
-      {page > 3 &&
-        (showInput.start ? (
+      {/* Simplified view for screens < 640px */}
+      <div className="sm:hidden flex items-center gap-1">
+        <button
+          className={`px-3 py-1 rounded ${page ? "selected-tab" : ""}`}
+          disabled={isLoading}
+          onClick={() => setPage(page)}
+        >
+          {page}
+        </button>
+        {showInput.start ? (
           <input
             type="text"
             value={inputPage}
@@ -72,65 +83,107 @@ export default function Pagination({ page, totalPages, setPage, isLoading }) {
           >
             ...
           </span>
-        ))}
+        )}
+      </div>
 
-      {/* Các trang quanh trang hiện tại */}
-      {/* {Array.from({ length: 5 }, (_, i) => page - 2 + i) */}
-      {Array.from({ length: 3 }, (_, i) => page - 1 + i)
-        .filter((p) => p > 1 && p < totalPages)
-        .map((p) => (
-          <button
-            key={p}
-            className={`px-3 py-1 rounded ${p === page ? "selected-tab" : ""}`}
-            disabled={isLoading}
-            onClick={() => setPage(p)}
-          >
-            {p}
-          </button>
-        ))}
-
-      {/* Dấu ... nếu cách xa trang cuối */}
-      {page < totalPages - 2 &&
-        (showInput.end ? (
-          <input
-            type="text"
-            value={inputPage}
-            onChange={handleInputChange}
-            onBlur={() => handleInputSubmit("end")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleInputSubmit("end");
-            }}
-            className="w-12 border p-1 rounded text-center"
-            style={{
-              appearance: "none",
-              WebkitAppearance: "none",
-              MozAppearance: "none",
-            }}
-            placeholder="Page"
-            autoFocus
-            disabled={isLoading}
-          />
-        ) : (
-          <span
-            className={`px-2 ${isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-blue-500"}`}
-            onClick={() => !isLoading && handleEllipsisClick("end")}
-          >
-            ...
-          </span>
-        ))}
-
-      {/* Trang cuối */}
-      {totalPages > 1 && (
+      {/* Full pagination for screens >= 640px */}
+      <div className="hidden sm:flex sm:items-center sm:gap-1">
+        {/* Trang đầu */}
         <button
-          className={`px-3 py-1 rounded ${
-            page === totalPages ? "selected-tab" : ""
-          }`}
+          className={`px-3 py-1 rounded ${page === 1 ? "selected-tab" : ""}`}
           disabled={isLoading}
-          onClick={() => setPage(totalPages)}
+          onClick={() => setPage(1)}
         >
-          {totalPages}
+          1
         </button>
-      )}
+
+        {/* Dấu ... nếu cách xa trang đầu */}
+        {page > 3 &&
+          (showInput.start ? (
+            <input
+              type="text"
+              value={inputPage}
+              onChange={handleInputChange}
+              onBlur={() => handleInputSubmit("start")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleInputSubmit("start");
+              }}
+              className="w-12 border p-1 rounded text-center"
+              style={{
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+              }}
+              placeholder="Page"
+              autoFocus
+              disabled={isLoading}
+            />
+          ) : (
+            <span
+              className={`px-2 ${isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-blue-500"}`}
+              onClick={() => !isLoading && handleEllipsisClick("start")}
+            >
+              ...
+            </span>
+          ))}
+
+        {/* Các trang quanh trang hiện tại */}
+        {Array.from({ length: 3 }, (_, i) => page - 1 + i)
+          .filter((p) => p > 1 && p < totalPages)
+          .map((p) => (
+            <button
+              key={p}
+              className={`px-3 py-1 rounded ${p === page ? "selected-tab" : ""}`}
+              disabled={isLoading}
+              onClick={() => setPage(p)}
+            >
+              {p}
+            </button>
+          ))}
+
+        {/* Dấu ... nếu cách xa trang cuối */}
+        {page < totalPages - 2 &&
+          (showInput.end ? (
+            <input
+              type="text"
+              value={inputPage}
+              onChange={handleInputChange}
+              onBlur={() => handleInputSubmit("end")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleInputSubmit("end");
+              }}
+              className="w-12 border p-1 rounded text-center"
+              style={{
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+              }}
+              placeholder="Page"
+              autoFocus
+              disabled={isLoading}
+            />
+          ) : (
+            <span
+              className={`px-2 ${isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-blue-500"}`}
+              onClick={() => !isLoading && handleEllipsisClick("end")}
+            >
+              ...
+            </span>
+          ))}
+
+        {/* Trang cuối */}
+        {totalPages > 1 && (
+          <button
+            className={`px-3 py-1 rounded ${
+              page === totalPages ? "selected-tab" : ""
+            }`}
+            disabled={isLoading}
+            onClick={() => setPage(totalPages)}
+          >
+            {totalPages}
+          </button>
+        )}
+      </div>
 
       <button
         className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
