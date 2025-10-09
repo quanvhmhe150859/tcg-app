@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useMemo, useRef, useImperativeHandle, forwardRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { ANIMATION_CONFIGS } from "./animationConstants";
 
 /**
@@ -18,11 +25,13 @@ const SpriteAnimation = forwardRef(
       height = 128,
       distance,
       health,
+      flip,
       ...rest
     },
     ref
   ) => {
-    const config = name && ANIMATION_CONFIGS[name] ? ANIMATION_CONFIGS[name] : {};
+    const config =
+      name && ANIMATION_CONFIGS[name] ? ANIMATION_CONFIGS[name] : {};
     const finalLayers = config.layers || layers;
     const finalWidth = config.width || width;
     const finalHeight = config.height || height;
@@ -71,7 +80,8 @@ const SpriteAnimation = forwardRef(
             const moveSpeed = 300;
             const movingDuration = (distance / moveSpeed) * 1000;
             const movingSpeed = movingDuration / layer.movingFrameCount;
-            const explosionFrameCount = layer.frameCount - layer.movingFrameCount;
+            const explosionFrameCount =
+              layer.frameCount - layer.movingFrameCount;
             const explosionDuration = explosionFrameCount * layer.speed;
             return layer.delay + movingDuration + explosionDuration;
           }
@@ -85,7 +95,7 @@ const SpriteAnimation = forwardRef(
     useEffect(() => {
       if (health === 0) {
         // Start fading out
-        const fadeDuration = 900; // 1 second fade-out
+        const fadeDuration = 500; // 1 second fade-out
         const start = performance.now();
         const tick = (now) => {
           const elapsed = now - start;
@@ -96,7 +106,7 @@ const SpriteAnimation = forwardRef(
           }
         };
         frameReq.current = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(frameReq.current);
+        // return () => cancelAnimationFrame(frameReq.current);
       } else {
         setOpacity(1); // Reset opacity when health is not 0
       }
@@ -135,9 +145,7 @@ const SpriteAnimation = forwardRef(
             } else {
               const explosionElapsed = frameElapsed - movingDuration;
               const explosionProgress = explosionElapsed / layer.speed;
-              return (
-                layer.movingFrameCount + Math.floor(explosionProgress)
-              );
+              return layer.movingFrameCount + Math.floor(explosionProgress);
             }
           } else {
             const frameProgress = Math.min(
@@ -155,8 +163,7 @@ const SpriteAnimation = forwardRef(
 
           const newStopPositions = finalLayers.map((layer, i) => {
             if (!layer.moving) return stopPositions[i];
-            if (distance && moveDistance >= distance)
-              return distance;
+            if (distance && moveDistance >= distance) return distance;
             return stopPositions[i];
           });
           setStopPositions(newStopPositions);
@@ -169,7 +176,14 @@ const SpriteAnimation = forwardRef(
 
       frameReq.current = requestAnimationFrame(tick);
       return () => cancelAnimationFrame(frameReq.current);
-    }, [isPlaying, isLooping, totalDuration, finalLayers, distance, resetCount]);
+    }, [
+      isPlaying,
+      isLooping,
+      totalDuration,
+      finalLayers,
+      distance,
+      resetCount,
+    ]);
 
     // ✅ Functions exposed to parent
     const handlePlayOnce = () => {
@@ -204,11 +218,15 @@ const SpriteAnimation = forwardRef(
       <div
         ref={containerRef}
         className="flex flex-col items-center gap-3 mb-4"
-        style={{ opacity, transition: 'opacity 1s ease' }} // Apply opacity with transition
+        style={{ opacity, transition: "opacity 1s ease" }} // Apply opacity with transition
       >
         <div
           className="relative border border-gray-400 rounded-md"
-          style={{ width: finalWidth, height: finalHeight, overflow: "visible" }}
+          style={{
+            width: finalWidth,
+            height: finalHeight,
+            overflow: "visible",
+          }}
         >
           {finalLayers.map((layer, i) => {
             const index = indices[i];
@@ -217,8 +235,10 @@ const SpriteAnimation = forwardRef(
 
             const layerTranslateX = layer.moving
               ? stopPositions[i] !== null
-                ? (layer.flip ? stopPositions[i] : -stopPositions[i])
-                : layer.flip
+                ? flip
+                  ? stopPositions[i]
+                  : -stopPositions[i] //layer.flip
+                : flip //layer.flip
                 ? translateX
                 : -translateX
               : 0;
@@ -233,7 +253,7 @@ const SpriteAnimation = forwardRef(
                   width: finalWidth,
                   height: finalHeight,
                   objectFit: "none",
-                  transform: layer.flip
+                  transform: flip //layer.flip
                     ? `translateX(${layerTranslateX}px) scaleX(-1)`
                     : `translateX(${layerTranslateX}px)`,
                   zIndex: layer.name === "slash" ? 20 : 10,

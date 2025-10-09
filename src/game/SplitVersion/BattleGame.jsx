@@ -100,7 +100,17 @@ const BattleGame = () => {
 
       return () => clearInterval(interval);
     }
-  }, [isAuto, gameOver, showUpgradeOptions, showShop, player, enemy, turnCount, level, autoSpeed]);
+  }, [
+    isAuto,
+    gameOver,
+    showUpgradeOptions,
+    showShop,
+    player,
+    enemy,
+    turnCount,
+    level,
+    autoSpeed,
+  ]);
 
   const toggleRareStats = () => {
     setShowRareStats((prev) => !prev);
@@ -113,10 +123,10 @@ const BattleGame = () => {
   // Modified handleAttack to trigger handlePlayOnce for both sprites
   const enhancedHandleAttack = () => {
     handleAttack();
-    if (playerSpriteRef.current) {
+    if (playerSpriteRef.current && player.currentHealth > 0) {
       playerSpriteRef.current.handlePlayOnce();
     }
-    if (enemySpriteRef.current) {
+    if (enemySpriteRef.current && enemy.currentHealth > 0) {
       enemySpriteRef.current.handlePlayOnce();
     }
   };
@@ -156,18 +166,53 @@ const BattleGame = () => {
     };
   }, []);
 
+  // Stop sprite animations and setIsAuto(false) when gameOver
+  useEffect(() => {
+    if (gameOver) {
+      // setIsAuto(false);
+      if (playerSpriteRef.current) {
+        playerSpriteRef.current.handlePlayOnce();
+      }
+      if (enemySpriteRef.current) {
+        enemySpriteRef.current.handlePlayOnce();
+      }
+    }
+  }, [gameOver]);
+
   return (
     <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
       <Header level={level} />
 
       <div className="flex justify-between items-center gap-4">
-        <SpriteAnimation name="agathe" ref={playerSpriteRef} distance={distance} health={player.currentHealth}/>
-        <SpriteAnimation name="bardrey" ref={enemySpriteRef} distance={distance} health={enemy.currentHealth}/>
+        <SpriteAnimation
+          name="agathe"
+          flip={true}
+          ref={playerSpriteRef}
+          distance={distance}
+          health={player.currentHealth}
+        />
+        <SpriteAnimation
+          name="bardrey"
+          flip={false}
+          ref={enemySpriteRef}
+          distance={distance}
+          health={enemy.currentHealth}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <StatsPanel entity={player} name="Player" showNormalStats={showNormalStats} showRareStats={showRareStats} />
-        <StatsPanel entity={enemy} name="Enemy" showNormalStats={showNormalStats} showRareStats={showRareStats} />
+        <StatsPanel
+          entity={player}
+          name="Player"
+          showNormalStats={showNormalStats}
+          showRareStats={showRareStats}
+        />
+        <StatsPanel
+          entity={enemy}
+          name="Enemy"
+          showNormalStats={showNormalStats}
+          showRareStats={showRareStats}
+        />
       </div>
       <ToggleButtons
         showNormalStats={showNormalStats}
