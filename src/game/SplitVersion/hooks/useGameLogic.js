@@ -357,9 +357,9 @@ const useGameLogic = ({
    * Toggles auto-attack mode.
    */
   const toggleAuto = () => {
-    if (!showUpgradeOptions && !showShop) {
+    // if (!showUpgradeOptions && !showShop) {
       setIsAuto((prev) => !prev);
-    }
+    // }
   };
 
   /**

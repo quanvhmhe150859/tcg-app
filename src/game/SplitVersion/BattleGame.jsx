@@ -192,7 +192,7 @@ const BattleGame = () => {
           health={player.currentHealth}
         />
         <SpriteAnimation
-          name="bardrey"
+          name="random"
           flip={false}
           ref={enemySpriteRef}
           distance={distance}

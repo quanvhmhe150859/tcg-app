@@ -13,7 +13,7 @@ const GameControls = ({
   gameOver,
   showUpgradeOptions,
   showShop,
-  resetGame
+  resetGame,
 }) => {
   return (
     <>
@@ -32,21 +32,25 @@ const GameControls = ({
         />
       </div>
 
-      {!gameOver && !showUpgradeOptions && !showShop && (
-        <div className="space-x-2">
+      {!gameOver && (
+        <div className="flex space-x-2 items-stretch">
           <button
             onClick={toggleAuto}
-            className={`${isAuto ? "w-[100%]" : "w-[40%]"}`}
+            className={`flex-1`}
           >
             {isAuto ? "Stop Auto" : "Auto"}
           </button>
 
-          {!isAuto && (
+          {!isAuto && !showUpgradeOptions && !showShop && (
             <>
-              <button onClick={handleAttack} className="w-[40%]">
+              <button onClick={handleAttack} className="flex-1">
                 Next Turn
               </button>
-              <button onClick={handleEndRun} title="End Run">
+              <button
+                onClick={handleEndRun}
+                title="End Run"
+                className="w-12 flex justify-center items-center"
+              >
                 ☠️
               </button>
             </>
@@ -56,7 +60,7 @@ const GameControls = ({
       {gameOver && (
         <button
           onClick={resetGame}
-          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+          className="px-4 py-2 rounded"
         >
           Restart Game
         </button>

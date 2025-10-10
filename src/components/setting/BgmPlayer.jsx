@@ -117,7 +117,9 @@ export default function BgmPlayer() {
       <Tooltip id="persist-audio-tooltip" place="bottom" effect="solid" />
 
       <div className="text-sm mb-4">
-        <label className="block mb-1 text-sm font-medium">{t("duration")}:</label>
+        <label className="block mb-1 text-sm font-medium">
+          {t("duration")}:
+        </label>
         <input
           type="range"
           min={0}
@@ -125,7 +127,7 @@ export default function BgmPlayer() {
           step={0.1}
           value={currentTime}
           onChange={handleSeek}
-          className="w-1/2"
+          className="w-1/2 bgm-input-range-duration"
         />
         <div className="mt-1">
           {formatTime(currentTime)} / {formatTime(duration)}
@@ -140,7 +142,7 @@ export default function BgmPlayer() {
         step={0.01}
         value={volume}
         onChange={(e) => setVolume(parseFloat(e.target.value))}
-        className="w-1/2 mb-4"
+        className="w-1/2 mb-4 bgm-input-range-volume"
       />
 
       <div>

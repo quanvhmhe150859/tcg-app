@@ -10,11 +10,19 @@
   --color-card-bg: #000;
   --color-card-text: #fff;
 
+  --color-indigo-light:oklch(67.3% 0.182 276.935);
+  --color-indigo-dark:oklch(58.5% 0.233 277.117);
+  --color-violet-light: oklch(70.2% 0.183 293.541);
+  --color-violet-dark: oklch(60.6% 0.25 292.717);
+
   --color-background: var(--color-light-bg);
   --color-text: var(--color-dark-bg);
   --color-button-bg: var(--color-light);
   --color-button-hover: var(--color-center);
   --color-button-selected: var(--color-dark);
+
+  --color-input-range-duration: var(--color-violet-light);
+  --color-input-range-volume: var(--color-indigo-light);
 }
 
 body {
@@ -49,6 +57,9 @@ button:hover {
 
   --color-card-bg: #2c2c2c;
   --color-card-text: #f5f5f5;
+
+  --color-input-range-duration: var(--color-violet-light);
+  --color-input-range-volume: var(--color-indigo-light);
 }
 
 .dark-container button:hover,
@@ -67,6 +78,9 @@ button:hover {
 
   --color-card-bg: #fff;
   --color-card-text: #000;
+
+  --color-input-range-duration: var(--color-violet-dark);
+  --color-input-range-volume: var(--color-indigo-dark);
 }
 
 .light-container button:hover,
@@ -136,4 +150,12 @@ button:hover {
   border: 0 !important;
   background-color: transparent !important;
   color: inherit !important;
+}
+
+.bgm-input-range-duration{
+  accent-color: var(--color-input-range-duration);
+}
+
+.bgm-input-range-volume{
+  accent-color: var(--color-input-range-volume);
 }

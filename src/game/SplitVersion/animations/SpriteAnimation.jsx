@@ -8,12 +8,6 @@ import React, {
 } from "react";
 import { ANIMATION_CONFIGS } from "./animationConstants";
 
-/**
- * MultiSpriteAnimation
- * - Nhiều layer sprite song song
- * - Hỗ trợ ref để cha đo vị trí (getBoundingClientRect)
- * - Giảm opacity dần xuống 0 khi health = 0
- */
 const SpriteAnimation = forwardRef(
   (
     {
@@ -30,8 +24,49 @@ const SpriteAnimation = forwardRef(
     },
     ref
   ) => {
+    const [randomName, setRandomName] = useState(null);
+    const fadeDuration = 100; // ms
+
+    // 🟢 Khi mount hoặc name="random" => chọn sprite ngẫu nhiên ngay
+    useEffect(() => {
+      if (name === "random" && !randomName) {
+        const keys = Object.keys(ANIMATION_CONFIGS);
+        if (keys.length > 0) {
+          const newName = keys[Math.floor(Math.random() * keys.length)];
+          setRandomName(newName);
+        }
+      }
+    }, [name, randomName]);
+
+    // 🟥 Khi chết (health = 0) => đợi fade-out rồi đổi sprite khác
+    useEffect(() => {
+      if (name === "random" && health === 0) {
+        const timeout = setTimeout(() => {
+          const keys = Object.keys(ANIMATION_CONFIGS);
+          if (keys.length > 0) {
+            const newName = keys[Math.floor(Math.random() * keys.length)];
+            setRandomName(newName);
+            // console.log("test response");
+          }
+        }, fadeDuration + 100);
+        return () => clearTimeout(timeout);
+      }
+    }, [health, name]);
+
+    // 🔸 Reset randomName nếu không dùng "random"
+    useEffect(() => {
+      if (name !== "random") setRandomName(null);
+    }, [name]);
+
+    const spriteName = name === "random" ? randomName : name;
+
+    // ----------------------------
+    // 🔹 Config + layers
+    // ----------------------------
     const config =
-      name && ANIMATION_CONFIGS[name] ? ANIMATION_CONFIGS[name] : {};
+      spriteName && ANIMATION_CONFIGS[spriteName]
+        ? ANIMATION_CONFIGS[spriteName]
+        : {};
     const finalLayers = config.layers || layers;
     const finalWidth = config.width || width;
     const finalHeight = config.height || height;
@@ -47,22 +82,26 @@ const SpriteAnimation = forwardRef(
     const [stopPositions, setStopPositions] = useState(
       finalLayers.map(() => null)
     );
-    const [opacity, setOpacity] = useState(1); // State for opacity
+    const [opacity, setOpacity] = useState(1);
 
     const frameReq = useRef(null);
     const startTime = useRef(null);
-
-    // ✅ ref chính để cha có thể đo vị trí
     const containerRef = useRef(null);
 
-    // ✅ expose functions và ref DOM cho component cha
+    // Khi đổi sprite ngẫu nhiên => reset frame về ban đầu
+    useEffect(() => {
+      setIndices(getInitialIndices());
+    }, [spriteName]);
+
     useImperativeHandle(ref, () => ({
       handlePlayOnce,
       handleToggleLoop,
-      getElement: () => containerRef.current, // cho phép lấy DOM element
+      getElement: () => containerRef.current,
     }));
 
-    // ✅ Tạo danh sách frame
+    // ----------------------------
+    // 🔹 Frame list
+    // ----------------------------
     const allFrames = useMemo(() => {
       return finalLayers.map((layer) =>
         Array.from({ length: layer.frameCount }, (_, j) => {
@@ -72,7 +111,29 @@ const SpriteAnimation = forwardRef(
       );
     }, [finalLayers, pad, ext]);
 
-    // ✅ Tính toán totalDuration (sử dụng distance thay cho moveStopDistance)
+    // ----------------------------
+    // 🔹 Fade-out khi chết
+    // ----------------------------
+    useEffect(() => {
+      if (health === 0) {
+        const start = performance.now();
+        const tick = (now) => {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / fadeDuration, 1);
+          setOpacity(1 - progress);
+          if (progress < 1) {
+            frameReq.current = requestAnimationFrame(tick);
+          }
+        };
+        frameReq.current = requestAnimationFrame(tick);
+      } else {
+        setOpacity(1);
+      }
+    }, [health]);
+
+    // ----------------------------
+    // 🔹 Animation loop
+    // ----------------------------
     const totalDuration = useMemo(() => {
       return Math.max(
         ...finalLayers.map((layer) => {
@@ -91,28 +152,6 @@ const SpriteAnimation = forwardRef(
       );
     }, [finalLayers, distance]);
 
-    // ✅ Handle opacity fade-out when health is 0
-    useEffect(() => {
-      if (health === 0) {
-        // Start fading out
-        const fadeDuration = 500; // 1 second fade-out
-        const start = performance.now();
-        const tick = (now) => {
-          const elapsed = now - start;
-          const progress = Math.min(elapsed / fadeDuration, 1);
-          setOpacity(1 - progress); // Linearly reduce opacity from 1 to 0
-          if (progress < 1) {
-            frameReq.current = requestAnimationFrame(tick);
-          }
-        };
-        frameReq.current = requestAnimationFrame(tick);
-        // return () => cancelAnimationFrame(frameReq.current);
-      } else {
-        setOpacity(1); // Reset opacity when health is not 0
-      }
-    }, [health]);
-
-    // ✅ Animation loop
     useEffect(() => {
       if (!isPlaying && !isLooping) return;
 
@@ -185,7 +224,9 @@ const SpriteAnimation = forwardRef(
       resetCount,
     ]);
 
-    // ✅ Functions exposed to parent
+    // ----------------------------
+    // 🔹 Controls
+    // ----------------------------
     const handlePlayOnce = () => {
       cancelAnimationFrame(frameReq.current);
       setIsLooping(false);
@@ -214,11 +255,14 @@ const SpriteAnimation = forwardRef(
       }
     };
 
+    // ----------------------------
+    // 🔹 Render
+    // ----------------------------
     return (
       <div
         ref={containerRef}
         className="flex flex-col items-center gap-3 mb-4"
-        style={{ opacity, transition: "opacity 1s ease" }} // Apply opacity with transition
+        style={{ opacity, transition: `opacity ${fadeDuration}ms ease` }}
       >
         <div
           className="relative border border-gray-400 rounded-md"
@@ -237,8 +281,8 @@ const SpriteAnimation = forwardRef(
               ? stopPositions[i] !== null
                 ? flip
                   ? stopPositions[i]
-                  : -stopPositions[i] //layer.flip
-                : flip //layer.flip
+                  : -stopPositions[i]
+                : flip
                 ? translateX
                 : -translateX
               : 0;
@@ -253,7 +297,7 @@ const SpriteAnimation = forwardRef(
                   width: finalWidth,
                   height: finalHeight,
                   objectFit: "none",
-                  transform: flip //layer.flip
+                  transform: flip
                     ? `translateX(${layerTranslateX}px) scaleX(-1)`
                     : `translateX(${layerTranslateX}px)`,
                   zIndex: layer.name === "slash" ? 20 : 10,
