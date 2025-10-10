@@ -52,13 +52,31 @@ export const ANIMATION_CONFIGS = {
       },
     ],
   },
+  "alberon": {
+    width: 128,
+    height: 128,
+    layers: [
+      {
+        name: "player",
+        folder: "/sprites/alberon/player/",
+        frameCount: 3,
+        speed: 240,
+        delay: 0,
+        flip: false,
+        moving: false,
+        stopMovingAtFrame: 3,
+      },
+      {
+        name: "slash",
+        folder: "/sprites/alberon/slash/",
+        frameCount: 5,
+        speed: 120,
+        delay: 180,
+        flip: false,
+        moving: true,
+        movingFrameCount: 1,
+        moveStopDistance: 250,
+      },
+    ],
+  },
 };
-
-{/* <div className="flex justify-between items-center gap-4">
-        <MultiSpriteAnimation name="agathe" />
-        <MultiSpriteAnimation name="bardrey" />
-      </div> 
-      
-      moveStopDistance: 435, 768px
-      moveStopDistance: 690, 1024px
-      */}

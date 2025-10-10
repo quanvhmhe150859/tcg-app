@@ -185,7 +185,7 @@ const BattleGame = () => {
 
       <div className="flex justify-between items-center gap-4">
         <SpriteAnimation
-          name="agathe"
+          name="alberon"
           flip={true}
           ref={playerSpriteRef}
           distance={distance}

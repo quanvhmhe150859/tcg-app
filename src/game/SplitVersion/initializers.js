@@ -29,7 +29,7 @@ export const initPlayer = () => ({
 
 export const initEnemy = (level) => {
   const isBoss = level % 10 === 0;
-  const baseFactor = 0.5 + Math.random() * 0.2;
+  const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = isBoss ? 2 : 1;
   const health = Math.floor(10 * level * baseFactor * bossMultiplier);
   return {

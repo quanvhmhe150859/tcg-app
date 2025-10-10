@@ -38,12 +38,14 @@ export function useTickets() {
 
 function calculateTickets(level) {
   if (level < 20) {
-    return level * 0.7;
+    return level * 0.9;
   } else if (level < 30) {
-    return Math.floor(level * 1.1);
-  } else if (level < 40) {
     return Math.floor(level * 1.2);
+  } else if (level < 40) {
+    return Math.floor(level * 1.5);
+  } else if (level < 50) {
+    return Math.floor(level * 1.8);
   } else {
-    return Math.floor(level * 1.7);
+    return Math.floor(level * 2.1);
   }
 }
