@@ -3,10 +3,10 @@ import React from "react";
 const BattleLog = ({ turnLogs, logContainerRef }) => {
   return (
     <>
-      <h2 className="font-semibold mt-4">Battle Log:</h2>
+      <h2 className="font-semibold">Battle Log:</h2>
       <div
         ref={logContainerRef}
-        className="mt-2 max-h-64 overflow-y-auto bg-game-secondary"
+        className="mt-2 max-h-64 min-h-64 overflow-y-auto bg-game-secondary"
       >
         {turnLogs
           .slice()

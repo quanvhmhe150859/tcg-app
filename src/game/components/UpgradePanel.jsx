@@ -2,7 +2,7 @@ import React from "react";
 
 const UpgradePanel = ({ isRareUpgrade, upgradeOptions, handleUpgrade }) => {
   return (
-    <div className="mb-4">
+    <div className="mt-4">
       <h2 className="font-semibold">
         {isRareUpgrade ? "Choose a Rare Upgrade:" : "Choose an Upgrade:"}
       </h2>

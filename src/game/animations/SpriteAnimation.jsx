@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { ANIMATION_CONFIGS } from "./animationConstants";
+import { ANIMATION_CONFIGS } from "../constants/animationConstants";
 
 const SpriteAnimation = forwardRef(
   (
@@ -46,7 +46,7 @@ const SpriteAnimation = forwardRef(
           if (keys.length > 0) {
             const newName = keys[Math.floor(Math.random() * keys.length)];
             setRandomName(newName);
-            // console.log("test response");
+            console.log("new enemy sprites");
           }
         }, fadeDuration + 100);
         return () => clearTimeout(timeout);

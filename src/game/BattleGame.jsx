@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { initPlayer, initEnemy } from "./initializers";
-import { useTickets } from "../../components/context/TicketContext";
+import { useTickets } from "../components/context/TicketContext";
 import StatsPanel from "./components/StatsPanel";
 import BattleLog from "./components/BattleLog";
 import UpgradePanel from "./components/UpgradePanel";
@@ -13,6 +13,14 @@ import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
 
 const BattleGame = () => {
+  useEffect(() => {
+    document.body.style.minWidth = "425px";
+
+    return () => {
+      document.body.style.minWidth = ""; // reset khi rời trang
+    };
+  }, []);
+
   const { earnTickets } = useTickets();
 
   const [player, setPlayer] = useState(initPlayer());
@@ -33,6 +41,13 @@ const BattleGame = () => {
   const [boughtOptions, setBoughtOptions] = useState([]);
   const [showRareStats, setShowRareStats] = useState(false);
   const [showNormalStats, setShowNormalStats] = useState(false);
+
+  useEffect(() => {
+    const isDesktop = window.innerWidth >= 768;
+    setShowRareStats(isDesktop);
+    setShowNormalStats(isDesktop);
+  }, []);
+
   const [autoSpeed, setAutoSpeed] = useState(150);
   const logContainerRef = useRef(null);
   const playerSpriteRef = useRef(null);
@@ -169,7 +184,6 @@ const BattleGame = () => {
   // Stop sprite animations and setIsAuto(false) when gameOver
   useEffect(() => {
     if (gameOver) {
-      // setIsAuto(false);
       if (playerSpriteRef.current) {
         playerSpriteRef.current.handlePlayOnce();
       }
@@ -180,81 +194,96 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg bg-game">
+    <div className="p-4 max-w-7xl md:min-h-[770px] mx-auto bg-gray-100 rounded-lg bg-game">
       <Header level={level} />
 
-      <div className="flex justify-between items-center gap-4">
-        <SpriteAnimation
-          name="alberon"
-          flip={true}
-          ref={playerSpriteRef}
-          distance={distance}
-          health={player.currentHealth}
-        />
-        <SpriteAnimation
-          name="random"
-          flip={false}
-          ref={enemySpriteRef}
-          distance={distance}
-          health={enemy.currentHealth}
-        />
-      </div>
+      <div className="flex flex-col md:flex-row md:gap-4">
+        {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
+        <div className="flex-1">
+          <div className="flex justify-between items-center gap-4">
+            <SpriteAnimation
+              name="esthea"
+              flip={true}
+              ref={playerSpriteRef}
+              distance={distance}
+              health={player.currentHealth}
+            />
+            <SpriteAnimation
+              name="random"
+              flip={false}
+              ref={enemySpriteRef}
+              distance={distance}
+              health={enemy.currentHealth}
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <StatsPanel
-          entity={player}
-          name="Player"
-          showNormalStats={showNormalStats}
-          showRareStats={showRareStats}
-        />
-        <StatsPanel
-          entity={enemy}
-          name="Enemy"
-          showNormalStats={showNormalStats}
-          showRareStats={showRareStats}
-        />
+          <div className="grid grid-cols-2 gap-4">
+            <StatsPanel
+              entity={player}
+              name="Player"
+              showNormalStats={showNormalStats}
+              showRareStats={showRareStats}
+            />
+            <StatsPanel
+              entity={enemy}
+              name="Enemy"
+              showNormalStats={showNormalStats}
+              showRareStats={showRareStats}
+            />
+          </div>
+          <ToggleButtons
+            showNormalStats={showNormalStats}
+            showRareStats={showRareStats}
+            toggleNormalStats={toggleNormalStats}
+            toggleRareStats={toggleRareStats}
+          />
+          <p className="text-center text-yellow-500">
+            Gold: {player.gold} 💰
+          </p>
+        </div>
+
+        {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
+        <div className="flex-1 flex flex-col md:flex-col">
+          <div className="order-2 md:order-1 mt-4 md:mt-0">
+            <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
+          </div>
+          <div className="order-1 md:order-2 mt-4">
+            <GameControls
+              isAuto={isAuto}
+              toggleAuto={enhancedToggleAuto}
+              handleAttack={enhancedHandleAttack}
+              handleEndRun={handleEndRun}
+              autoSpeed={autoSpeed}
+              setAutoSpeed={setAutoSpeed}
+              min={100}
+              max={1000}
+              step={50}
+              gameOver={gameOver}
+              showUpgradeOptions={showUpgradeOptions}
+              showShop={showShop}
+              resetGame={resetGame}
+            />
+            {showUpgradeOptions && (
+              <UpgradePanel
+                isRareUpgrade={isRareUpgrade}
+                upgradeOptions={upgradeOptions}
+                handleUpgrade={handleUpgrade}
+              />
+            )}
+            {showShop && (
+              <ShopPanel
+                shopOptions={shopOptions}
+                boughtOptions={boughtOptions}
+                player={player}
+                handlePurchase={handlePurchase}
+                rerollPrice={rerollPrice}
+                handleReroll={handleReroll}
+                handleExitShop={handleExitShop}
+              />
+            )}
+          </div>
+        </div>
       </div>
-      <ToggleButtons
-        showNormalStats={showNormalStats}
-        showRareStats={showRareStats}
-        toggleNormalStats={toggleNormalStats}
-        toggleRareStats={toggleRareStats}
-      />
-      <p className="text-center text-yellow-500 mb-4">Gold: {player.gold}</p>
-      <GameControls
-        isAuto={isAuto}
-        toggleAuto={enhancedToggleAuto}
-        handleAttack={enhancedHandleAttack}
-        handleEndRun={handleEndRun}
-        autoSpeed={autoSpeed}
-        setAutoSpeed={setAutoSpeed}
-        min={100}
-        max={1000}
-        step={50}
-        gameOver={gameOver}
-        showUpgradeOptions={showUpgradeOptions}
-        showShop={showShop}
-        resetGame={resetGame}
-      />
-      {showUpgradeOptions && (
-        <UpgradePanel
-          isRareUpgrade={isRareUpgrade}
-          upgradeOptions={upgradeOptions}
-          handleUpgrade={handleUpgrade}
-        />
-      )}
-      {showShop && (
-        <ShopPanel
-          shopOptions={shopOptions}
-          boughtOptions={boughtOptions}
-          player={player}
-          handlePurchase={handlePurchase}
-          rerollPrice={rerollPrice}
-          handleReroll={handleReroll}
-          handleExitShop={handleExitShop}
-        />
-      )}
-      <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
     </div>
   );
 };

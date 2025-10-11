@@ -18,7 +18,7 @@ const GameControls = ({
   return (
     <>
       <div
-        className="flex justify-center items-center space-x-2 mb-2"
+        className="flex justify-center items-center space-x-2 mb-4"
         title={`Adjust Auto Speed: ${autoSpeed} ms`}
       >
         <span>Auto Speed:</span>
@@ -36,20 +36,20 @@ const GameControls = ({
         <div className="flex space-x-2 items-stretch">
           <button
             onClick={toggleAuto}
-            className={`flex-1`}
+            className={`flex-1 text-sm sm:text-base`}
           >
             {isAuto ? "Stop Auto" : "Auto"}
           </button>
 
           {!isAuto && !showUpgradeOptions && !showShop && (
             <>
-              <button onClick={handleAttack} className="flex-1">
+              <button onClick={handleAttack} className="flex-1 text-sm sm:text-base">
                 Next Turn
               </button>
               <button
                 onClick={handleEndRun}
                 title="End Run"
-                className="w-12 flex justify-center items-center"
+                className="w-12 flex justify-center items-center text-sm sm:text-base"
               >
                 ☠️
               </button>

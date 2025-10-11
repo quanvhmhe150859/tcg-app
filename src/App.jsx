@@ -14,7 +14,7 @@ import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 import OwnedYugiohCards from "./components/yugioh/OwnedYugiohCards";
 
 // import DistanceDemo from "../test/sprite/DistanceDemo";
-import BattleGame from "./game/SplitVersion/BattleGame";
+import BattleGame from "./game/BattleGame";
 
 import Chatbot from "./bot/Chatbot";
 import ImageGenerator from "./bot/Artbot";
