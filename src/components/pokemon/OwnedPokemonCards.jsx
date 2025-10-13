@@ -25,8 +25,6 @@ const OwnedPokemonCards = () => {
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cards") || "{}");
     const owned = stored.pokemon || [];
-    // console.log("Initial allOwned quantities:", owned.map(card => card.quantity));
-    // console.log("Initial allOwned IDs:", owned.map(card => card.cardID));
     setAllOwned(owned);
     setTotal(owned.length);
   }, []);
@@ -39,9 +37,6 @@ const OwnedPokemonCards = () => {
 
     // Sort allOwned theo sortBy + sortOrder
     const sortedCards = [...allOwned].sort((a, b) => {
-      // console.log(`Sorting by ${sortBy}, order: ${sortOrder}`);
-      // console.log(`Comparing card ${a.cardID} (quantity: ${a.quantity}) with card ${b.cardID} (quantity: ${b.quantity})`);
-
       if (sortBy === "id") {
         return sortOrder === "asc"
           ? a.cardID.localeCompare(b.cardID)
@@ -53,12 +48,8 @@ const OwnedPokemonCards = () => {
       }
     });
 
-    // console.log("Sorted quantities:", sortedCards.map(card => card.quantity));
-    // console.log("Sorted IDs:", sortedCards.map(card => card.cardID));
-
     const start = (page - 1) * pageSize;
     const pageCards = sortedCards.slice(start, start + pageSize);
-    // console.log("Page cards sent to API:", pageCards.map(card => ({ cardID: card.cardID, quantity: card.quantity })));
 
     const cacheKey = `${page}-${sortBy}-${sortOrder}`;
     if (cacheRef.current[cacheKey]) {
@@ -76,8 +67,6 @@ const OwnedPokemonCards = () => {
       });
 
       setCards(cached);
-      // console.log("Using cached cards, quantities:", cached.map(c => c.quantity));
-      // console.log("Using cached cards, IDs:", cached.map(c => c.id));
       return;
     }
 
@@ -102,11 +91,6 @@ const OwnedPokemonCards = () => {
 
       cacheRef.current[cacheKey] = sortedRes;
       setCards(sortedRes);
-
-      // console.log("Raw API response quantities:", res.data.map(c => c.quantity));
-      // console.log("Raw API response IDs:", res.data.map(c => c.id));
-      // console.log("Fetched cards, quantities:", sortedRes.map(c => c.quantity));
-      // console.log("Fetched cards, IDs:", sortedRes.map(c => c.id));
     } catch (err) {
       console.error("Failed to fetch owned pokemon cards", err);
     } finally {

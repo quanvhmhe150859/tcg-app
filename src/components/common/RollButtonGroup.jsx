@@ -41,7 +41,7 @@ const RollButtonGroup = ({
               id={`tooltip-roll-${rollCount}`}
               place="bottom"
               multiline
-              className="max-w-[200px] break-words text-sm"
+              className="max-w-[200px] break-words text-sm z-50"
             />
           </React.Fragment>
         );

@@ -56,7 +56,6 @@ export default function BgmPlayer() {
   };
 
   const handleTrackSelect = (i) => {
-    console.log(`Selecting track index: ${i}, track: ${tracks[i]}`);
     setIndex(i);
   };
 

@@ -15,12 +15,11 @@ const RandomCardsPokemon = () => {
   const { t } = useTranslation();
 
   const [cards, setCards] = useState([]);
+  const [flippedStates, setFlippedStates] = useState([]); // State cho trạng thái lật
   const [isRolling, setIsRolling] = useState(false);
-
   const [selectedType, setSelectedType] = useState("");
   const [selectedRarity, setSelectedRarity] = useState("");
   const [selectedSuperType, setSelectedSuperType] = useState("");
-
   const [noResultWarning, setNoResultWarning] = useState(false);
 
   const allowedTypes =
@@ -40,6 +39,24 @@ const RandomCardsPokemon = () => {
 
   const spinMode = localStorage.getItem("spinMode");
   const { tickets, updateTickets } = useTickets();
+
+  // Hàm xử lý khi lật lá bài
+  const handleCardFlip = (index) => {
+    if (flippedStates[index]) {
+      return;
+    }
+    setFlippedStates((prev) => {
+      const newStates = [...prev];
+      newStates[index] = true;
+      return newStates;
+    });
+  };
+
+  // Hàm lật tất cả lá bài
+  const handleFlipAll = () => {
+    const newFlippedStates = cards.map(() => true);
+    setFlippedStates(newFlippedStates);
+  };
 
   const calcTicketCost = (baseCount = 1) => {
     let extraMultiplier = 0;
@@ -65,6 +82,7 @@ const RandomCardsPokemon = () => {
   };
 
   const handleRoll = async (baseCount = 1) => {
+    setFlippedStates(Array(baseCount).fill(false)); // Reset trạng thái lật
     const ticketCost = calcTicketCost(baseCount);
 
     if (
@@ -73,9 +91,7 @@ const RandomCardsPokemon = () => {
       return;
     }
 
-    // Lấy giá trị tickets mới từ context
     const updatedTickets = tickets - ticketCost;
-
     setIsRolling(true);
     setNoResultWarning(false);
 
@@ -94,6 +110,7 @@ const RandomCardsPokemon = () => {
 
       await new Promise((res) => setTimeout(res, 500));
       setCards(result);
+      setFlippedStates(Array(result.length).fill(false)); // Khởi tạo trạng thái úp
 
       addCardsToLocalStorage(result, "pokemon", spinMode);
     } catch (err) {
@@ -166,13 +183,25 @@ const RandomCardsPokemon = () => {
           )}
         </div>
 
-        {/* Roll Buttons */}
         <RollButtonGroup
           handleRoll={handleRoll}
           isRolling={isRolling}
           spinMode={spinMode}
           ticketOptions={[calcTicketCost(1), calcTicketCost(1) * 10]}
         />
+        <div className="flex justify-center mt-2">
+          {!isRolling &&
+            cards.length > 0 &&
+            !flippedStates.every((state) => state) && (
+              <button
+                onClick={handleFlipAll}
+                disabled={flippedStates.every((state) => state)} // Vô hiệu hóa nếu tất cả đã lật
+                className="toggle-button"
+              >
+                {t("openAllCards")}
+              </button>
+            )}
+        </div>
       </div>
 
       {isRolling && (
@@ -198,7 +227,12 @@ const RandomCardsPokemon = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <CardItemPokemon card={card} index={index} />
+              <CardItemPokemon
+                card={card}
+                index={index}
+                isFlipped={flippedStates[index] || false}
+                onCardFlip={() => handleCardFlip(index)}
+              />
             </motion.div>
           ))}
         </AnimatePresence>

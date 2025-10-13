@@ -31,15 +31,46 @@ const RandomCardsYugioh = () => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [selectedSet, setSelectedSet] = useState(defaultSet);
   const [cards, setCards] = useState([]);
+  const [flippedStates, setFlippedStates] = useState([]); // State cho trạng thái lật của mỗi lá bài
   const [isRolling, setIsRolling] = useState(false);
   const [noResultWarning, setNoResultWarning] = useState(false);
   const [inputValue, setInputValue] = useState("");
-
+  const [totalPrice, setTotalPrice] = useState(0); // Khởi tạo totalPrice = 0
   const [typeOptions, setTypeOptions] = useState([]);
-  const [selectedType, setSelectedType] = useState(""); // "" = All types
+  const [selectedType, setSelectedType] = useState("");
   const [raw] = useState(localStorage.getItem("allowedRaritiesYugiohWeights"));
-
   const navigate = useNavigate();
+
+  // Hàm xử lý khi lật lá bài (gộp cả lật và cộng tiền)
+  const handleCardFlip = (price, index) => {
+    // Kiểm tra nếu lá bài đã lật thì không làm gì
+    if (flippedStates[index]) {
+      return;
+    }
+
+    // Cập nhật trạng thái lật
+    setFlippedStates((prev) => {
+      const newStates = [...prev];
+      newStates[index] = true;
+      return newStates;
+    });
+
+    // Cập nhật totalPrice
+    setTotalPrice((prev) => {
+      const newTotal = (parseFloat(prev) + (price || 0)).toFixed(2);
+      return newTotal;
+    });
+  };
+
+  // Hàm lật tất cả lá bài (giữ nguyên)
+  const handleFlipAll = () => {
+    const newFlippedStates = cards.map(() => true);
+    setFlippedStates(newFlippedStates);
+    const total = cards
+      .reduce((sum, card) => sum + (card.price || 0), 0)
+      .toFixed(2);
+    setTotalPrice(total);
+  };
 
   useEffect(() => {
     let parsedRaw;
@@ -113,45 +144,37 @@ const RandomCardsYugioh = () => {
   const spinMode = localStorage.getItem("spinMode");
   const { tickets, updateTickets } = useTickets();
 
-  // ✅ Hàm tính vé cần dùng
   const calcTicketCost = (baseCount = 1) => {
     let extraMultiplier = 0;
-
-    // Nếu chọn pack (không phải All, không phải Random)
     if (selectedSet?.value && selectedSet.value === "__random_pack__") {
       extraMultiplier += 30;
     } else if (selectedSet?.value && selectedSet.value !== "") {
       extraMultiplier += 50;
     }
-
-    // Nếu chọn type (không phải All)
     if (selectedType && selectedType !== "") {
       extraMultiplier += 10;
     }
-
     return baseCount * (extraMultiplier > 0 ? extraMultiplier : 1);
   };
 
   const handleRoll = async (baseCount = 1) => {
+    setTotalPrice(0); // Reset totalPrice về 0 khi roll mới
+    setFlippedStates(Array(baseCount).fill(false)); // Reset trạng thái lật
     const ticketCost = calcTicketCost(baseCount);
 
-    // 🛑 kiểm tra vé
     if (
       !spendTicketsIfNeeded(ticketCost, spinMode, tickets, updateTickets, t)
     ) {
       return;
     }
 
-    // Lấy giá trị tickets mới từ context
     const updatedTickets = tickets - ticketCost;
-
     setIsRolling(true);
     setNoResultWarning(false);
 
     let actualSet = selectedSet?.value;
 
     try {
-      // 🔀 Nếu là pack ngẫu nhiên
       if (actualSet === "__random_pack__") {
         const filtered = allSets.filter(
           (s) => s.value !== "__random_pack__" && s.value !== ""
@@ -162,9 +185,7 @@ const RandomCardsYugioh = () => {
       }
 
       let result = [];
-
       const fullWeights = JSON.parse(raw);
-
       let filteredWeights = fullWeights;
 
       if (actualSet || selectedType) {
@@ -172,24 +193,19 @@ const RandomCardsYugioh = () => {
           actualSet || null,
           selectedType || null
         );
-
         filteredWeights = Object.fromEntries(
           Object.entries(fullWeights).filter(([rarity]) =>
             raritiesInPack.includes(rarity)
           )
         );
-
         if (Object.keys(filteredWeights).length === 0) {
           throw new Error("Không tìm thấy rarity phù hợp với bộ lọc");
         }
       }
 
-      // Roll rarity theo weight (dù là pack hay all)
       const rolledRarities = Array.from({ length: baseCount }, () =>
         rollWithWeight(filteredWeights)
       );
-
-      // Gọi API roll bài
       result = await getCardsByRarities(
         rolledRarities,
         selectedType || null,
@@ -204,9 +220,9 @@ const RandomCardsYugioh = () => {
         refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       } else {
         setCards(result);
+        setFlippedStates(Array(result.length).fill(false)); // Khởi tạo trạng thái úp cho tất cả lá bài
       }
 
-      // 🆕 Lưu vào localStorage
       addCardsToLocalStorage(result, "yugioh", spinMode);
     } catch (err) {
       console.error("Lỗi khi roll:", err);
@@ -218,11 +234,6 @@ const RandomCardsYugioh = () => {
     }
   };
 
-  const totalPrice = cards
-    .reduce((sum, card) => sum + (card?.price ?? 0), 0)
-    .toFixed(2);
-  const placeholder = defaultSet.label;
-
   return (
     <div className={styles.container}>
       <div className={styles.rollContainer}>
@@ -232,7 +243,6 @@ const RandomCardsYugioh = () => {
           <span className="hidden sm:inline"> Gacha</span>
         </h1>
 
-        {/* Dropdown chọn pack */}
         <div
           className={styles.comboControls}
           data-tooltip-id="select-pack-tooltip"
@@ -254,7 +264,7 @@ const RandomCardsYugioh = () => {
                 ? t("enter3CharatersToSearch") + " pack"
                 : t("noPacksFound")
             }
-            placeholder={placeholder}
+            placeholder={defaultSet.label}
           />
 
           <Tooltip id="select-pack-tooltip" place="top" />
@@ -271,12 +281,23 @@ const RandomCardsYugioh = () => {
           )}
         </div>
 
-        <RollButtonGroup
-          handleRoll={handleRoll}
-          isRolling={isRolling}
-          spinMode={spinMode}
-          ticketOptions={[calcTicketCost(1), calcTicketCost(10)]}
-        />
+          <RollButtonGroup
+            handleRoll={handleRoll}
+            isRolling={isRolling}
+            spinMode={spinMode}
+            ticketOptions={[calcTicketCost(1), calcTicketCost(10)]}
+          />
+        <div className="flex justify-center mt-2">
+          {!isRolling && cards.length > 0 && !flippedStates.every((state) => state) && (
+            <button
+              onClick={handleFlipAll}
+              disabled={flippedStates.every((state) => state)} // Vô hiệu hóa nếu tất cả đã lật
+              className="toggle-button"
+            >
+              {t("openAllCards")}
+            </button>
+          )}
+        </div>
       </div>
 
       {isRolling && (
@@ -310,7 +331,13 @@ const RandomCardsYugioh = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <CardItemYugioh card={card} index={index} type={"gacha"} />
+              <CardItemYugioh
+                card={card}
+                index={index}
+                isFlipped={flippedStates[index] || false}
+                type="gacha"
+                onCardFlip={() => handleCardFlip(card.price || 0, index)} // ← Chỉ cập nhật totalPrice
+              />
             </motion.div>
           ))}
         </AnimatePresence>
