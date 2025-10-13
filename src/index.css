@@ -10,10 +10,23 @@
   --color-card-bg: #000;
   --color-card-text: #fff;
 
-  --color-indigo-light:oklch(67.3% 0.182 276.935);
-  --color-indigo-dark:oklch(58.5% 0.233 277.117);
+  --color-indigo-light: oklch(67.3% 0.182 276.935);
+  --color-indigo-dark: oklch(58.5% 0.233 277.117);
   --color-violet-light: oklch(70.2% 0.183 293.541);
   --color-violet-dark: oklch(60.6% 0.25 292.717);
+
+  /* Success */
+  --color-success: #6fbfa5;
+  --color-success-hover: #5ba78f;
+  /* Warning */
+  --color-warning: #d9a25f;
+  --color-warning-hover: #c48847;
+  /* Danger */
+  --color-danger: #c96a7b;
+  --color-danger-hover: #b15868;
+  /* Info */
+  --color-info: #7a9acb;
+  --color-info-hover: #6784b3;
 
   --color-background: var(--color-light-bg);
   --color-text: var(--color-dark-bg);
@@ -44,6 +57,31 @@ button {
 
 button:hover {
   background-color: var(--color-button-hover);
+}
+
+.button-success {
+  background-color: var(--color-success);
+}
+.button-success:hover {
+  background-color: var(--color-success-hover);
+}
+.button-warning {
+  background-color: var(--color-warning);
+}
+.button-warning:hover {
+  background-color: var(--color-warning-hover);
+}
+.button-danger {
+  background-color: var(--color-danger);
+}
+.button-danger:hover {
+  background-color: var(--color-danger-hover);
+}
+.button-info {
+  background-color: var(--color-info);
+}
+.button-info:hover {
+  background-color: var(--color-info-hover);
 }
 
 .dark-container {
@@ -129,21 +167,21 @@ button:hover {
   }
 }
 
-.bg-game{
+.bg-game {
   background: var(--color-card-bg);
   color: var(--color-card-text);
 }
 
-.bg-game-secondary{
+.bg-game-secondary {
   background: var(--color-background);
   color: var(--color-text);
 }
 
-.bg-game-secondary:has(div){
+.bg-game-secondary:has(div) {
   padding: 0.25rem;
 }
 
-.toggle-game-stats{
+.toggle-game-stats {
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -152,10 +190,22 @@ button:hover {
   color: inherit !important;
 }
 
-.bgm-input-range-duration{
+.bgm-input-range-duration {
   accent-color: var(--color-input-range-duration);
 }
 
-.bgm-input-range-volume{
+.bgm-input-range-volume {
   accent-color: var(--color-input-range-volume);
 }
+
+.new-icon {
+  mix-blend-mode: multiply;
+  transition: mix-blend-mode 0.2s ease, filter 0.2s ease;
+}
+.dark-container .new-icon {
+  mix-blend-mode: color;
+}
+.dark-container a:hover .new-icon {
+  mix-blend-mode: multiply;
+}
+

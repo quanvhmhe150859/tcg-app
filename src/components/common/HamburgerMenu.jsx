@@ -66,8 +66,16 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/game" onClick={() => setOpen(false)}>
-                    🕹️ {t("game")}
+                  <Link
+                    to="/game"
+                    onClick={() => setOpen(false)}
+                  >
+                    🕹️ {t("game")} 
+                    <img
+                      src="/icons/new_icon.gif"
+                      alt="new"
+                      className="inline-block new-icon ml-1"
+                    />
                   </Link>
                 </li>
                 <li>

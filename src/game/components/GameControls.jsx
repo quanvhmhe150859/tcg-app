@@ -36,20 +36,20 @@ const GameControls = ({
         <div className="flex space-x-2 items-stretch">
           <button
             onClick={toggleAuto}
-            className={`flex-1 text-sm sm:text-base`}
+            className={`flex-1 text-sm sm:text-base ${isAuto ? "button-warning" : "button-success"}`}
           >
             {isAuto ? "Stop Auto" : "Auto"}
           </button>
 
           {!isAuto && !showUpgradeOptions && !showShop && (
             <>
-              <button onClick={handleAttack} className="flex-1 text-sm sm:text-base">
+              <button onClick={handleAttack} className="flex-1 text-sm sm:text-base button-info">
                 Next Turn
               </button>
               <button
                 onClick={handleEndRun}
                 title="End Run"
-                className="w-12 flex justify-center items-center text-sm sm:text-base"
+                className="w-12 flex justify-center items-center text-sm sm:text-base button-danger"
               >
                 ☠️
               </button>

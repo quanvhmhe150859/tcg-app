@@ -141,7 +141,7 @@ const AdminSettings = () => {
       </div>
 
       {(tab === "pokemon" || tab === "yugioh") && (
-        <button onClick={handleSave}>{t("save")}</button>
+        <button className="" onClick={handleSave}>{t("save")}</button>
       )}
     </div>
   );

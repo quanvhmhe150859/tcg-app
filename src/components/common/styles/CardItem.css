@@ -45,6 +45,7 @@
 
 .card-image.pokemon {
   border-radius: 15px;
+  backface-visibility: hidden;
 }
 
 .image-container {
@@ -158,7 +159,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("/sparkles.gif"), url("/holo.png");
+  background-image: url("/effects/sparkles.gif"), url("/effects/holo.png");
   background-position: center;
   background-size: 160%;
   background-repeat: repeat;

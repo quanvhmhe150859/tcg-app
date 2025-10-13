@@ -90,6 +90,7 @@ export default function CardSaveLoad() {
           onClick={toggleMode}
           data-tooltip-id="roll-mode-tooltip"
           data-tooltip-content={freeMode ? t("cardsWillNotBeSavedToYourCollection") : t("cardsWillBeSavedToYourCollection")}
+          className=""
         >
           {freeMode ? t("freeSpin") : t("ticketSpin")}
         </button>
