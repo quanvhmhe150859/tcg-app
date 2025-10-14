@@ -70,7 +70,7 @@ const HamburgerMenu = () => {
                     to="/game"
                     onClick={() => setOpen(false)}
                   >
-                    🕹️ {t("game")} 
+                    🧩 {t("game")} 
                     <img
                       src="/icons/new_icon.gif"
                       alt="new"
@@ -247,11 +247,6 @@ const HamburgerMenu = () => {
                       </motion.ul>
                     )}
                   </AnimatePresence>
-                </li>
-                <li>
-                  <Link to="/test" onClick={() => setOpen(false)}>
-                    🧩 Test
-                  </Link>
                 </li>
               </ul>
             </div>

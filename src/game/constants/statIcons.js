@@ -48,7 +48,7 @@ export const statIcons = {
     desc: "Deals damage back when hit by an attack.",
   },
   Counterattack: {
-    icon: "🔁",
+    icon: "🤺",
     desc: "Chance to attack back at the attacker when hit.",
   },
   "Stun Chance": {

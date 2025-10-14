@@ -297,7 +297,7 @@ const SpriteAnimation = forwardRef(
                   width: finalWidth,
                   height: finalHeight,
                   objectFit: "none",
-                  transform: flip
+                  transform: (flip ? layer.flip : !layer.flip)
                     ? `translateX(${layerTranslateX}px) scaleX(-1)`
                     : `translateX(${layerTranslateX}px)`,
                   zIndex: layer.name === "slash" ? 20 : 10,

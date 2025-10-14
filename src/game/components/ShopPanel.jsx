@@ -17,10 +17,13 @@ const ShopPanel = ({
         {shopOptions.map((option, index) => {
           let icon = "";
           // Lấy icon nếu có trong statIcons, nếu không thì bỏ trống
-          if(option.name.includes("Attack"))
-            icon = statIcons["Attack"]?.icon
-          else
-            icon = statIcons[option.name]?.icon || "";
+          if (option.name.includes("Attack"))
+            if (option.name.includes("Min")) icon = "🗡️";
+            else icon = statIcons["Attack"]?.icon;
+          else if (option.name.includes("Health"))
+            if (option.name.includes("Current")) icon = "❤️‍🩹";
+            else icon = statIcons["Health"]?.icon;
+          else icon = statIcons[option.name]?.icon || "";
 
           return (
             <button
@@ -35,7 +38,7 @@ const ShopPanel = ({
               {/* 🔹 Nếu màn hình to → hiện tên, nhỏ → hiện icon */}
               <span className="hidden sm:inline">{option.name}: </span>
               <span className="sm:hidden">{icon} </span>
-               {option.format(option.value)} | {option.price} 💰
+              {option.format(option.value)} | {option.price} 💰
             </button>
           );
         })}

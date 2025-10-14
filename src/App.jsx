@@ -13,7 +13,6 @@ import RandomCardsYugioh from "./components/yugioh/RandomCardsYugioh";
 import ListCardsYugioh from "./components/yugioh/ListCardsYugioh";
 import OwnedYugiohCards from "./components/yugioh/OwnedYugiohCards";
 
-// import DistanceDemo from "../test/sprite/DistanceDemo";
 import BattleGame from "./game/BattleGame";
 
 import Chatbot from "./bot/Chatbot";
@@ -113,7 +112,6 @@ function App() {
           <Route path="/game" element={<BattleGame />} />
           <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/imagegenerator" element={<ImageGenerator />} />
-          {/* <Route path="/test" element={<DistanceDemo />} /> */}
         </Routes>
       </div>
     </Router>

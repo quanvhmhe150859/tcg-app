@@ -31,8 +31,7 @@ const Header = ({ level }) => {
               <ul className="list-none space-y-1 text-sm">
                 {statNames.map((name) => {
                   const { icon, desc } = statIcons[name];
-                  const isHealth = name === "Health";
-
+                  
                   return (
                     <li key={name}>
                       <span className="mr-2">{icon}</span>
