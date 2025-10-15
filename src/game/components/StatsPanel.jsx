@@ -18,22 +18,63 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
     );
   };
 
-  // 🔹 Thanh máu
-  const renderHealthBar = (currentHealth, maxHealth) => {
-    const healthPercentage = Math.max(0, (currentHealth / maxHealth) * 100);
-    const lostHealthPercentage = 100 - healthPercentage;
+  // 🔹 Thanh máu có shield & barrier
+  const renderHealthBar = (
+    currentHealth,
+    maxHealth,
+    shield = 0,
+    barrier = 0
+  ) => {
+    // Nếu có Barrier → hiển thị thanh màu xanh dương và thông tin Barrier
+    if (barrier > 0) {
+      return (
+        <div className="w-full rounded h-4 flex overflow-hidden relative">
+          <div className="bg-blue-500 h-full w-full"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+            {statIcons["Barrier"]?.icon} ×{barrier}
+          </div>
+        </div>
+      );
+    }
+
+    // Nếu không có Barrier → tính phần Shield và Health
+    const effectiveHealth = currentHealth + shield;
+    const totalCapacity = maxHealth + shield;
+
+    const healthPercentage = Math.max(0, (currentHealth / totalCapacity) * 100);
+    const shieldPercentage = Math.max(0, (shield / totalCapacity) * 100);
+    const lostHealthPercentage = 100 - healthPercentage - shieldPercentage;
+
     return (
       <div className="w-full rounded h-4 flex overflow-hidden relative">
+        {/* Health (màu xanh lá) */}
         <div
           className="bg-green-500 h-full"
           style={{ width: `${healthPercentage}%` }}
         ></div>
+
+        {/* Shield (màu bạc) */}
+        {shield > 0 && (
+          <div
+            className="bg-gray-300 h-full"
+            style={{ width: `${shieldPercentage}%` }}
+          ></div>
+        )}
+
+        {/* Lost health (màu đỏ) */}
         <div
           className="bg-red-500 h-full"
           style={{ width: `${lostHealthPercentage}%` }}
         ></div>
+
+        {/* Text overlay */}
         <div className="absolute inset-0 flex items-center justify-center text-sm text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-          {statIcons["Health"]?.icon} {currentHealth} / {maxHealth}
+          {statIcons["Health"]?.icon} {currentHealth+shield} / {maxHealth}
+          {/* {shield > 0 && (
+            <span className="ml-2 text-gray-200">
+              {statIcons["Shield"]?.icon} {shield}
+            </span>
+          )} */}
         </div>
       </div>
     );
@@ -45,7 +86,12 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
 
       {/* Health luôn hiện chữ đầy đủ */}
       <div className="p-1 relative">
-        {renderHealthBar(entity.currentHealth, entity.maxHealth)}
+        {renderHealthBar(
+          entity.currentHealth,
+          entity.maxHealth,
+          entity.effects.shield,
+          entity.effects.barrier
+        )}
       </div>
 
       {/* Normal Stats */}
@@ -79,6 +125,8 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
             {renderStat("Counterattack", entity.rareStats.counterattack, true)}
             {renderStat("Stun Chance", entity.rareStats.stunChance, true)}
             {renderStat("Swiftness", entity.rareStats.swiftness, true)}
+            {renderStat("Shield", entity.rareStats.shield)}
+            {renderStat("Barrier", entity.rareStats.barrier)}
           </div>
         </div>
       )}

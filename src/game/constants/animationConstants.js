@@ -136,6 +136,29 @@ const rawConfigs = {
       },
     },
   },
+  "haerang": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 3,
+        speed: 240,
+        delay: 0,
+        flip: true,
+        moving: false,
+        stopMovingAtFrame: 3,
+      },
+      slash: {
+        frameCount: 7,
+        speed: 120,
+        delay: 180,
+        flip: false,
+        moving: true,
+        movingFrameCount: 1,
+        moveStopDistance: 250,
+      },
+    },
+  },
 };
 
 export const ANIMATION_CONFIGS = Object.fromEntries(
@@ -158,3 +181,25 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
     },
   ])
 );
+
+// const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
+// export const ANIMATION_CONFIGS = Object.fromEntries(
+//   Object.entries(rawConfigs).map(([key, config]) => [
+//     key,
+//     {
+//       ...config,
+//       layers: [
+//         {
+//           name: "player",
+//           folder: `${BACKEND_URL}/sprites/${key}/player/`,
+//           ...config.layers.player,
+//         },
+//         {
+//           name: "slash",
+//           folder: `${BACKEND_URL}/sprites/${key}/slash/`,
+//           ...config.layers.slash,
+//         },
+//       ],
+//     },
+//   ])
+// );

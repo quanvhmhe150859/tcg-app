@@ -1,38 +1,51 @@
-export const initPlayer = () => ({
-  level: 1,
-  maxHealth: 1000,
-  currentHealth: 1000,
-  regeneration: 2,
-  armor: 5,
-  minAttack: 5,
-  maxAttack: 10,
-  critChance: 0.05,
-  critDamage: 1.5,
-  lifeSteal: 0.05,
-  dodge: 0.01,
-  gold: 0,
-  rareStats: {
-    burn: 0,
-    poison: 0,
-    thorn: 0,
-    stunChance: 0,
-    counterattack: 0,
-    swiftness: 0,
-  },
-  effects: {
+export const resetEffects = (entity) => {
+  return {
     burnDot: 0,
     poisonBase: 0,
     poisonDot: 0,
     isStuned: false,
-  },
-});
+    shield: entity?.rareStats?.shield || 0,
+    barrier: entity?.rareStats?.barrier || 0,
+  };
+};
+
+export const initPlayer = () => {
+  const player = {
+    level: 1,
+    maxHealth: 1000,
+    currentHealth: 1000,
+    regeneration: 2,
+    armor: 5,
+    minAttack: 5,
+    maxAttack: 10,
+    critChance: 0.05,
+    critDamage: 1.5,
+    lifeSteal: 0.05,
+    dodge: 0.01,
+    gold: 0,
+    rareStats: {
+      burn: 0,
+      poison: 0,
+      thorn: 0,
+      stunChance: 0,
+      counterattack: 0,
+      swiftness: 0,
+      shield: 0,
+      barrier: 0,
+    },
+  };
+  return {
+    ...player,
+    effects: resetEffects(player),
+  };
+};
 
 export const initEnemy = (level) => {
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = isBoss ? 2 : 1;
   const health = Math.floor(10 * level * baseFactor * bossMultiplier);
-  return {
+  const enemy = {
     maxHealth: health,
     currentHealth: health,
     minAttack: Math.floor(3 * level * baseFactor * bossMultiplier),
@@ -56,13 +69,13 @@ export const initEnemy = (level) => {
       stunChance: 0.002 * (level >= 20 ? level : 0) * baseFactor,
       counterattack: 0.01 * (level >= 20 ? level : 0) * baseFactor,
       swiftness: 0.005 * (level >= 20 ? level : 0) * baseFactor,
+      shield: 0.5 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier,
+      barrier: 0.1 * (level >= 30 ? level : 0) * baseFactor * bossMultiplier,
     },
-    effects: {
-      burnDot: 0,
-      poisonBase: 0,
-      poisonDot: 0,
-      isStuned: false,
-    },
+  };
+  return {
+    ...enemy,
+    effects: resetEffects(enemy),
   };
 };
 
@@ -209,6 +222,20 @@ export const generateRareUpgradeOptions = (player) => {
       min: 5,
       max: 10,
       format: (val) => `+${val}%`,
+    },
+    {
+      key: "shield",
+      name: "Shield",
+      min: 50,
+      max: 100,
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "barrier",
+      name: "Barrier",
+      min: 1,
+      max: 3,
+      format: (val) => `+${val}`,
     },
   ];
   const shuffled = rareStats.sort(() => Math.random() - 0.5).slice(0, 3);

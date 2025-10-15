@@ -3,6 +3,7 @@ import {
   initEnemy,
   generateUpgradeOptions,
   generateRareUpgradeOptions,
+  resetEffects
 } from "../initializers";
 import { playerTurn, enemyTurn } from "../gameLogic";
 import { addLog, checkGameOver, startTurn } from "../utils";
@@ -137,7 +138,14 @@ const useGameLogic = ({
     setPlayer((prev) => {
       const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
       const currentTurnLogs = [];
-      const value = ["critChance", "lifeSteal", "dodge", "stunChance", "counterattack", "swiftness"].includes(option.key)
+      const value = [
+        "critChance",
+        "lifeSteal",
+        "dodge",
+        "stunChance",
+        "counterattack",
+        "swiftness",
+      ].includes(option.key)
         ? option.value / 100
         : ["critDamage"].includes(option.key)
         ? option.value / 100
@@ -154,7 +162,10 @@ const useGameLogic = ({
         );
       } else if (option.key === "maxHealth") {
         newPlayer.maxHealth += value;
-        newPlayer.currentHealth = Math.min(newPlayer.currentHealth + value, newPlayer.maxHealth);
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
         addLog(
           `Player purchased ${option.name} by +${value} for ${option.price} gold!`,
           "purchase",
@@ -163,7 +174,15 @@ const useGameLogic = ({
       } else if (option.key in newPlayer.rareStats) {
         newPlayer.rareStats[option.key] += value;
         addLog(
-          ["critChance", "critDamage", "lifeSteal", "dodge", "stunChance", "counterattack", "swiftness"].includes(option.key)
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
             ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
             : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
           "purchase",
@@ -172,7 +191,15 @@ const useGameLogic = ({
       } else {
         newPlayer[option.key] += value;
         addLog(
-          ["critChance", "critDamage", "lifeSteal", "dodge", "stunChance", "counterattack", "swiftness"].includes(option.key)
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
             ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
             : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
           "purchase",
@@ -246,7 +273,10 @@ const useGameLogic = ({
         );
       } else if (option.key === "maxHealth") {
         newPlayer.maxHealth += value;
-        newPlayer.currentHealth = Math.min(newPlayer.currentHealth + value, newPlayer.maxHealth);
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
         addLog(
           `Player upgraded ${option.name} by +${option.value}!`,
           "upgrade",
@@ -255,7 +285,15 @@ const useGameLogic = ({
       } else if (option.key in newPlayer.rareStats) {
         newPlayer.rareStats[option.key] += value;
         addLog(
-          ["critChance", "critDamage", "lifeSteal", "dodge", "stunChance", "counterattack", "swiftness"].includes(option.key)
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
             ? `Player upgraded ${option.name} by +${option.value}%!`
             : `Player upgraded ${option.name} by +${option.value}!`,
           "upgrade",
@@ -264,19 +302,22 @@ const useGameLogic = ({
       } else {
         newPlayer[option.key] += value;
         addLog(
-          ["critChance", "critDamage", "lifeSteal", "dodge", "stunChance", "counterattack", "swiftness"].includes(option.key)
+          [
+            "critChance",
+            "critDamage",
+            "lifeSteal",
+            "dodge",
+            "stunChance",
+            "counterattack",
+            "swiftness",
+          ].includes(option.key)
             ? `Player upgraded ${option.name} by +${option.value}%!`
             : `Player upgraded ${option.name} by +${option.value}!`,
           "upgrade",
           currentTurnLogs
         );
       }
-      newPlayer.effects = {
-        burnDot: 0,
-        poisonBase: 0,
-        poisonDot: 0,
-        isStuned: false,
-      };
+      newPlayer.effects = resetEffects(newPlayer);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
@@ -358,7 +399,7 @@ const useGameLogic = ({
    */
   const toggleAuto = () => {
     // if (!showUpgradeOptions && !showShop) {
-      setIsAuto((prev) => !prev);
+    setIsAuto((prev) => !prev);
     // }
   };
 
@@ -366,24 +407,8 @@ const useGameLogic = ({
    * Resets the game to initial state.
    */
   const resetGame = () => {
-    setPlayer({
-      ...initPlayer(),
-      effects: {
-        burnDot: 0,
-        poisonBase: 0,
-        poisonDot: 0,
-        isStuned: false,
-      },
-    });
-    setEnemy({
-      ...initEnemy(1),
-      effects: {
-        burnDot: 0,
-        poisonBase: 0,
-        poisonDot: 0,
-        isStuned: false,
-      },
-    });
+    setPlayer(initPlayer());
+    setEnemy(initEnemy(1));
     setTurnLogs([]);
     setGameOver(false);
     setTurnCount(1);

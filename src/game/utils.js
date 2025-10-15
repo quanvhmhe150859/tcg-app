@@ -6,6 +6,8 @@ export const addLog = (message, type, currentTurnLogs) => {
     lifeSteal: "text-green-400",
     gameOver: "text-red-500",
     dodge: "text-blue-500",
+    shield: "text-blue-500",
+    barrier: "text-blue-500",
     stun: "text-yellow-300",
     counterattack: "text-yellow-600",
     swiftness: "text-cyan-400",
@@ -38,7 +40,9 @@ export const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
         newEnemy.rareStats.thorn +
         newEnemy.rareStats.counterattack * 100 +
         newEnemy.rareStats.stunChance * 100 +
-        newEnemy.rareStats.swiftness * 100
+        newEnemy.rareStats.swiftness * 100 +
+        newEnemy.rareStats.shield +
+        newEnemy.rareStats.barrier * 100
     );
     newPlayer.gold += goldGained;
     addLog(`Enemy defeated! Level up to ${level + 1}!`, "levelUp", currentTurnLogs);

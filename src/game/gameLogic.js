@@ -5,15 +5,81 @@ const limitHealth = (entity) => {
   entity.currentHealth = Math.min(entity.currentHealth, entity.maxHealth);
 };
 
+// Hàm nhận sát thương chung
+const receiveDamage = (entity, damage, entityName, damageType, currentTurnLogs) => {
+  let finalDamage = damage;
+
+  // Áp dụng giáp cho sát thương attack
+  if (damageType === "attack") {
+    finalDamage = applyArmor(entity, damage);
+  }
+
+  // Kiểm tra barrier (bỏ qua cho poison)
+  if (entity.effects.barrier > 0) {
+    entity.effects.barrier -= 1;
+    addLog(
+      `${entityName}'s barrier absorbs the damage!`,
+      "barrier",
+      currentTurnLogs
+    );
+    return checkHealth(entity, entityName, currentTurnLogs);
+  }
+
+  // Kiểm tra shield (bỏ qua cho poison)
+  if (damageType !== "poison" && entity.effects.shield > 0) {
+    if (entity.effects.shield >= finalDamage) {
+      entity.effects.shield -= finalDamage;
+      addLog(
+        `${entityName}'s shield absorbs ${finalDamage} damage!`,
+        "shield",
+        currentTurnLogs
+      );
+      return checkHealth(entity, entityName, currentTurnLogs);
+    } else {
+      finalDamage -= entity.effects.shield;
+      addLog(
+        `${entityName}'s shield absorbs ${entity.effects.shield} damage!`,
+        "shield",
+        currentTurnLogs
+      );
+      entity.effects.shield = 0;
+    }
+  }
+
+  // Trừ sát thương vào máu
+  entity.currentHealth = Math.max(0, entity.currentHealth - finalDamage);
+
+  let logMessage;
+  switch (damageType) {
+    case "attack":
+      logMessage = `${entityName} takes ${finalDamage} (${damage}) damage!`;
+      break;
+    case "burn":
+      logMessage = `${entityName} takes ${finalDamage} burn damage!`;
+      break;
+    case "poison":
+      logMessage = `${entityName} takes ${finalDamage} poison damage!`;
+      break;
+    case "thorn":
+      logMessage = `${entityName} takes ${finalDamage} thorn damage!`;
+      break;
+    default:
+      logMessage = `${entityName} takes ${finalDamage} damage!`;
+  }
+
+  addLog(logMessage, damageType, currentTurnLogs);
+  return checkHealth(entity, entityName, currentTurnLogs);
+};
+
 export const checkHealth = (entity, entityName, currentTurnLogs) => {
   if (entity.currentHealth <= 0) {
-    // addLog(`${entityName} has been defeated!`, "defeated", currentTurnLogs);
-    // Reset effects khi entity bị hạ gục
     entity.effects = {
       burnDot: 0,
       poisonDot: 0,
       poisonBase: 0,
       isStuned: false,
+      shield: 0,
+      barrier: 0,
     };
     return false;
   }
@@ -53,16 +119,13 @@ export const applyThorn = (
   currentTurnLogs
 ) => {
   if (defender.rareStats.thorn > 0) {
-    const thornDamage = defender.rareStats.thorn;
-    attacker.currentHealth = Math.max(0, attacker.currentHealth - thornDamage);
-    addLog(
-      `${attackerName} takes ${thornDamage} thorn damage from ${
-        attackerName === "Player" ? "Enemy" : "Player"
-      }!`,
+    return receiveDamage(
+      attacker,
+      defender.rareStats.thorn,
+      attackerName,
       "thorn",
       currentTurnLogs
     );
-    return checkHealth(attacker, attackerName, currentTurnLogs);
   }
   return true;
 };
@@ -201,32 +264,31 @@ export const attackPhase = (
     attacker,
     baseDamage
   );
-  const finalDamage = applyArmor(defender, preArmorDamage);
 
-  defender.currentHealth = Math.max(0, defender.currentHealth - finalDamage);
-  addLog(
-    `${attackerName} deals ${finalDamage} (${preArmorDamage}) damage to ${
-      attackerName === "Player" ? "Enemy" : "Player"
-    }!${isCritical ? " (Critical Hit)" : ""}`,
-    isCritical ? "attackCritical" : "",
-    currentTurnLogs
-  );
+  if (
+    !receiveDamage(
+      defender,
+      preArmorDamage,
+      attackerName === "Player" ? "Enemy" : "Player",
+      "attack",
+      currentTurnLogs
+    )
+  ) {
+    addLog(
+      `${attackerName} deals ${preArmorDamage} damage to ${
+        attackerName === "Player" ? "Enemy" : "Player"
+      }!${isCritical ? " (Critical Hit)" : ""}`,
+      isCritical ? "attackCritical" : "",
+      currentTurnLogs
+    );
+    return false;
+  }
 
   if (!applyThorn(attacker, defender, attackerName, currentTurnLogs)) {
     return false;
   }
 
-  applyLifeSteal(attacker, attackerName, finalDamage, currentTurnLogs);
-
-  if (
-    !checkHealth(
-      defender,
-      attackerName === "Player" ? "Enemy" : "Player",
-      currentTurnLogs
-    )
-  ) {
-    return false;
-  }
+  applyLifeSteal(attacker, attackerName, preArmorDamage, currentTurnLogs);
 
   applyStun(attacker, defender, attackerName, currentTurnLogs);
   applyBurnEffect(attacker, defender);
@@ -248,14 +310,13 @@ export const attackPhase = (
 
 export const applyBurn = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.burnDot > 0) {
-    const damage = entity.effects.burnDot;
-    entity.currentHealth = Math.max(0, entity.currentHealth - damage);
-    addLog(
-      `${entityName} takes ${damage} burn damage!`,
+    return receiveDamage(
+      entity,
+      entity.effects.burnDot,
+      entityName,
       "burn",
       currentTurnLogs
     );
-    return checkHealth(entity, entityName, currentTurnLogs);
   }
   return true;
 };
@@ -263,14 +324,15 @@ export const applyBurn = (entity, entityName, currentTurnLogs) => {
 export const applyPoison = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.poisonDot > 0) {
     const damage = entity.effects.poisonDot;
-    entity.currentHealth = Math.max(0, entity.currentHealth - damage);
-    addLog(
-      `${entityName} takes ${damage} poison damage!`,
+    const result = receiveDamage(
+      entity,
+      damage,
+      entityName,
       "poison",
       currentTurnLogs
     );
     entity.effects.poisonDot += entity.effects.poisonBase;
-    return checkHealth(entity, entityName, currentTurnLogs);
+    return result;
   }
   return true;
 };

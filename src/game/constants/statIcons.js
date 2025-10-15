@@ -59,4 +59,12 @@ export const statIcons = {
     icon: "⚡",
     desc: "Chance to perform a second attack in the same turn.",
   },
+  Shield: {
+    icon: "🩹",
+    desc: "Temporary health at the start of each battle.",
+  },
+  Barrier: {
+    icon: "🔰",
+    desc: "Negates incoming attacks.",
+  },
 };
