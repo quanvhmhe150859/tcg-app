@@ -261,7 +261,7 @@ const SpriteAnimation = forwardRef(
     return (
       <div
         ref={containerRef}
-        className="flex flex-col items-center gap-3 mb-4"
+        className="flex flex-col items-center gap-3"
         style={{ opacity, transition: `opacity ${fadeDuration}ms ease` }}
       >
         <div

@@ -177,10 +177,6 @@ button:hover {
   color: var(--color-text);
 }
 
-.bg-game-secondary:has(div) {
-  padding: 0.25rem;
-}
-
 .toggle-game-stats {
   font-weight: 600;
   display: flex;

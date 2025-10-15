@@ -6,7 +6,7 @@ const BattleLog = ({ turnLogs, logContainerRef }) => {
       <h2 className="font-semibold">Battle Log:</h2>
       <div
         ref={logContainerRef}
-        className="mt-2 max-h-64 min-h-64 overflow-y-auto bg-game-secondary"
+        className="mt-2 max-h-64 min-h-64 overflow-y-auto p-1 bg-game-secondary"
       >
         {turnLogs
           .slice()

@@ -16,7 +16,7 @@ const AdminSettings = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    document.body.style.minWidth = "672px";
+    document.body.style.minWidth = "640px";
 
     return () => {
       document.body.style.minWidth = ""; // reset khi rời trang

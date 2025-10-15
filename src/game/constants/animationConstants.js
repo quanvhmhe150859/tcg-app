@@ -128,7 +128,7 @@ const rawConfigs = {
       slash: {
         frameCount: 4,
         speed: 120,
-        delay: 180,
+        delay: 480,
         flip: false,
         moving: false,
         movingFrameCount: 4,
@@ -155,6 +155,29 @@ const rawConfigs = {
         flip: false,
         moving: true,
         movingFrameCount: 1,
+        moveStopDistance: 250,
+      },
+    },
+  },
+  "hansi": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 4,
+        speed: 180,
+        delay: 0,
+        flip: true,
+        moving: false,
+        stopMovingAtFrame: 3,
+      },
+      slash: {
+        frameCount: 8,
+        speed: 120,
+        delay: 480,
+        flip: false,
+        moving: true,
+        movingFrameCount: 3,
         moveStopDistance: 250,
       },
     },

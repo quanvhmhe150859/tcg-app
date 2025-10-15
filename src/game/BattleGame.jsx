@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { initPlayer, initEnemy } from "./initializers";
 import { useTickets } from "../components/context/TicketContext";
 import StatsPanel from "./components/StatsPanel";
@@ -13,6 +14,17 @@ import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
 
 const BattleGame = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const playerCharacter = location.state?.playerCharacter;
+  const enemyCharacter = "random";
+
+  useEffect(() => {
+    if (!playerCharacter) {
+      navigate("/characterselection");
+    }
+  }, [playerCharacter, navigate]);
+
   useEffect(() => {
     document.body.style.minWidth = "425px";
 
@@ -194,22 +206,22 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-7xl md:min-h-[770px] mx-auto bg-gray-100 rounded-lg bg-game">
+    <div className="p-4 max-w-7xl md:min-h-[770px] mx-auto rounded-lg bg-game">
       <Header level={level} />
 
       <div className="flex flex-col md:flex-row md:gap-4">
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
         <div className="flex-1">
-          <div className="flex justify-between items-center gap-4">
+          <div className="flex justify-between items-center gap-4 p-4 mb-4 bg-gray-900">
             <SpriteAnimation
-              name="alberon/holy_king"
+              name={playerCharacter}
               flip={true}
               ref={playerSpriteRef}
               distance={distance}
               health={player.currentHealth}
             />
             <SpriteAnimation
-              name="random"
+              name={enemyCharacter}
               flip={false}
               ref={enemySpriteRef}
               distance={distance}
@@ -237,9 +249,7 @@ const BattleGame = () => {
             toggleNormalStats={toggleNormalStats}
             toggleRareStats={toggleRareStats}
           />
-          <p className="text-center text-yellow-500">
-            Gold: {player.gold} 💰
-          </p>
+          <p className="text-center text-yellow-500">Gold: {player.gold} 💰</p>
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
