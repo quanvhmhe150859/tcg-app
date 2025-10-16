@@ -24,12 +24,18 @@ export const CHARACTER_STATS = {
     },
     holy_king: {
       armor: 12,
+      rareStats:{
+        barrier: 1,
+      }
     //   special: "Divine Light",
     },
   },
   esthea: {
     default: {
       armor: 6,
+      rareStats:{
+        shield: 50,
+      }
     //   special: "Swift Arrow",
     },
   },
@@ -50,7 +56,14 @@ export const CHARACTER_STATS = {
   },
   hansi: {
     default: {
-      armor: 6,
+      minAttack: 5,
+      maxAttack: 15,
+    //   special: "Shadow Blade",
+    },
+  },
+  ian: {
+    default: {
+      maxAttack: 35,
     //   special: "Shadow Blade",
     },
   },

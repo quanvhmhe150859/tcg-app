@@ -51,8 +51,8 @@ const receiveDamage = (entity, damage, entityName, damageType, currentTurnLogs) 
 
   let logMessage;
   switch (damageType) {
-    case "attack":
-      logMessage = `${entityName} takes ${finalDamage} (${damage}) damage!`;
+    case "attackCritical":
+      logMessage = `${entityName} takes ${finalDamage} (${damage}) damage! (Critical Hit)`;
       break;
     case "burn":
       logMessage = `${entityName} takes ${finalDamage} burn damage!`;
@@ -64,7 +64,7 @@ const receiveDamage = (entity, damage, entityName, damageType, currentTurnLogs) 
       logMessage = `${entityName} takes ${finalDamage} thorn damage!`;
       break;
     default:
-      logMessage = `${entityName} takes ${finalDamage} damage!`;
+      logMessage = `${entityName} takes ${finalDamage} (${damage}) damage!`;
   }
 
   addLog(logMessage, damageType, currentTurnLogs);
@@ -124,7 +124,7 @@ export const applyThorn = (
       defender.rareStats.thorn,
       attackerName,
       "thorn",
-      currentTurnLogs
+      currentTurnLogs,
     );
   }
   return true;
@@ -270,17 +270,10 @@ export const attackPhase = (
       defender,
       preArmorDamage,
       attackerName === "Player" ? "Enemy" : "Player",
-      "attack",
-      currentTurnLogs
+      isCritical ? "attackCritical" : "attack",
+      currentTurnLogs,
     )
   ) {
-    addLog(
-      `${attackerName} deals ${preArmorDamage} damage to ${
-        attackerName === "Player" ? "Enemy" : "Player"
-      }!${isCritical ? " (Critical Hit)" : ""}`,
-      isCritical ? "attackCritical" : "",
-      currentTurnLogs
-    );
     return false;
   }
 
@@ -315,7 +308,7 @@ export const applyBurn = (entity, entityName, currentTurnLogs) => {
       entity.effects.burnDot,
       entityName,
       "burn",
-      currentTurnLogs
+      currentTurnLogs,
     );
   }
   return true;
@@ -329,7 +322,7 @@ export const applyPoison = (entity, entityName, currentTurnLogs) => {
       damage,
       entityName,
       "poison",
-      currentTurnLogs
+      currentTurnLogs,
     );
     entity.effects.poisonDot += entity.effects.poisonBase;
     return result;

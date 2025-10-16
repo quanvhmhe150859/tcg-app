@@ -10,6 +10,10 @@ const rawConfigs = {
         flip: true,
         moving: false,
       },
+      front: {
+        frameCount: 5,
+        speed: 240,
+      },
       slash: {
         frameCount: 4,
         speed: 120,
@@ -32,6 +36,10 @@ const rawConfigs = {
         flip: true,
         moving: false,
         stopMovingAtFrame: 3,
+      },
+      front: {
+        frameCount: 5,
+        speed: 240,
       },
       slash: {
         frameCount: 8,
@@ -56,6 +64,10 @@ const rawConfigs = {
         moving: false,
         stopMovingAtFrame: 3,
       },
+      front: {
+        frameCount: 5,
+        speed: 240,
+      },
       slash: {
         frameCount: 5,
         speed: 120,
@@ -78,6 +90,10 @@ const rawConfigs = {
         flip: true,
         moving: false,
         stopMovingAtFrame: 3,
+      },
+      front: {
+        frameCount: 5,
+        speed: 240,
       },
       slash: {
         frameCount: 7,
@@ -102,6 +118,10 @@ const rawConfigs = {
         moving: false,
         stopMovingAtFrame: 3,
       },
+      front: {
+        frameCount: 5,
+        speed: 240,
+      },
       slash: {
         frameCount: 10,
         speed: 120,
@@ -124,6 +144,10 @@ const rawConfigs = {
         flip: true,
         moving: false,
         stopMovingAtFrame: 3,
+      },
+      front: {
+        frameCount: 6,
+        speed: 240,
       },
       slash: {
         frameCount: 4,
@@ -148,6 +172,10 @@ const rawConfigs = {
         moving: false,
         stopMovingAtFrame: 3,
       },
+      front: {
+        frameCount: 5,
+        speed: 240,
+      },
       slash: {
         frameCount: 7,
         speed: 120,
@@ -171,6 +199,10 @@ const rawConfigs = {
         moving: false,
         stopMovingAtFrame: 3,
       },
+      front: {
+        frameCount: 5,
+        speed: 180,
+      },
       slash: {
         frameCount: 8,
         speed: 120,
@@ -178,6 +210,32 @@ const rawConfigs = {
         flip: false,
         moving: true,
         movingFrameCount: 3,
+        moveStopDistance: 250,
+      },
+    },
+  },
+  "ian": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 4,
+        speed: 240,
+        delay: 0,
+        flip: true,
+        moving: false,
+      },
+      front: {
+        frameCount: 7,
+        speed: 240,
+      },
+      slash: {
+        frameCount: 4,
+        speed: 120,
+        delay: 480,
+        flip: true,
+        moving: false,
+        movingFrameCount: 5,
         moveStopDistance: 250,
       },
     },
@@ -205,6 +263,22 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
   ])
 );
 
+export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
+  Object.entries(rawConfigs).map(([key, config]) => [
+    key,
+    {
+      ...config,
+      layers: [
+        {
+          name: "front",
+          folder: `/sprites/${key}/front/`,
+          ...config.layers.front,
+        },
+      ],
+    },
+  ])
+);
+
 // const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
 // export const ANIMATION_CONFIGS = Object.fromEntries(
 //   Object.entries(rawConfigs).map(([key, config]) => [
@@ -216,6 +290,11 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
 //           name: "player",
 //           folder: `${BACKEND_URL}/sprites/${key}/player/`,
 //           ...config.layers.player,
+//         },
+//         {
+//             name: "front",
+//             folder: `${BACKEND_URL}/sprites/${key}/front/`,
+//             ...config.layers.front,
 //         },
 //         {
 //           name: "slash",

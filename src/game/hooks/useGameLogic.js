@@ -3,7 +3,7 @@ import {
   initEnemy,
   generateUpgradeOptions,
   generateRareUpgradeOptions,
-  resetEffects
+  resetEffects,
 } from "../initializers";
 import { playerTurn, enemyTurn } from "../gameLogic";
 import { addLog, checkGameOver, startTurn } from "../utils";
@@ -271,6 +271,12 @@ const useGameLogic = ({
           "upgrade",
           currentTurnLogs
         );
+      } else if (option.key === "currentHealth") {
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
+        addLog(`Player healed for +${value} HP!`, "upgrade", currentTurnLogs);
       } else if (option.key === "maxHealth") {
         newPlayer.maxHealth += value;
         newPlayer.currentHealth = Math.min(

@@ -25,10 +25,10 @@ const RandomCardsYugioh = lazy(() => import("./components/yugioh/RandomCardsYugi
 const ListCardsYugioh = lazy(() => import("./components/yugioh/ListCardsYugioh"));
 const OwnedYugiohCards = lazy(() => import("./components/yugioh/OwnedYugiohCards"));
 
+const CharacterSelection = lazy(() => import("./game/CharacterSelection"));
 const BattleGame = lazy(() => import("./game/BattleGame"));
 const Chatbot = lazy(() => import("./bot/Chatbot"));
 const ImageGenerator = lazy(() => import("./bot/Artbot"));
-const CharacterSelection = lazy(() => import("./game/constants/CharacterSelection"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
 
 function setFavicon(iconUrl) {

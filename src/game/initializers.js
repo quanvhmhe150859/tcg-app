@@ -198,9 +198,9 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "critChance",
       name: "Crit Chance",
-      basePrice: 13,
-      min: 3,
-      max: 7,
+      basePrice: 15,
+      min: 4,
+      max: 9,
       format: (val) => `+${val}%`,
     },
     {

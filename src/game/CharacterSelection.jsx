@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ANIMATION_CONFIGS } from "./animationConstants";
-import { CHARACTER_STATS } from "./characterStats";
-import "../../components/common/styles/CardItem.css";
+import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
+import { CHARACTER_STATS } from "./constants/characterStats";
+import "../components/common/styles/CardItem.css";
 
 const CharacterSelection = () => {
   const [hoveredCharacter, setHoveredCharacter] = useState(null);
@@ -12,22 +12,22 @@ const CharacterSelection = () => {
   const navigate = useNavigate();
 
   // 🔹 Lọc chỉ lấy nhân vật chính (loại bỏ biến thể) và sắp xếp theo thứ tự A → Z
-  const baseCharacters = Object.keys(ANIMATION_CONFIGS)
+  const baseCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS)
     .filter((key) => !key.includes("/"))
     .sort((a, b) => a.localeCompare(b));
 
   // 🔹 Lấy danh sách biến thể (bao gồm default)
   const getVariants = (baseKey) => [
     baseKey,
-    ...Object.keys(ANIMATION_CONFIGS).filter((k) =>
+    ...Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS).filter((k) =>
       k.startsWith(baseKey + "/")
     ),
   ];
 
   // 🔹 Lấy sprite frame
   const getSpriteUrl = (characterKey, frameIndex) => {
-    const config = ANIMATION_CONFIGS[characterKey];
-    const playerLayer = config.layers.find((layer) => layer.name === "player");
+    const config = ANIMATION_SELECT_CHARACTER_CONFIGS[characterKey];
+    const playerLayer = config.layers.find((layer) => layer.name === "front");
     const folderPath = playerLayer.folder.replace(/^\/sprites\//, "/sprites/");
     const paddedFrameIndex = frameIndex.toString().padStart(3, "0");
     return `${folderPath}frame${paddedFrameIndex}.png`;
@@ -61,9 +61,9 @@ const CharacterSelection = () => {
   // 🔹 Animation khi hover ở màn hình chọn chính
   useEffect(() => {
     if (hoveredCharacter) {
-      const config = ANIMATION_CONFIGS[hoveredCharacter];
+      const config = ANIMATION_SELECT_CHARACTER_CONFIGS[hoveredCharacter];
       const playerLayer = config.layers.find(
-        (layer) => layer.name === "player"
+        (layer) => layer.name === "front"
       );
       const { frameCount, speed } = playerLayer;
 
@@ -80,8 +80,8 @@ const CharacterSelection = () => {
   // 🔹 Animation loop cho tất cả nhân vật trong modal
   useEffect(() => {
     if (!selectedCharacter) return;
-    const baseConfig = ANIMATION_CONFIGS[selectedCharacter];
-    const baseLayer = baseConfig.layers.find((l) => l.name === "player");
+    const baseConfig = ANIMATION_SELECT_CHARACTER_CONFIGS[selectedCharacter];
+    const baseLayer = baseConfig.layers.find((l) => l.name === "front");
     const { frameCount, speed } = baseLayer;
 
     const interval = setInterval(() => {
@@ -99,7 +99,7 @@ const CharacterSelection = () => {
   // 🔹 Chọn ngẫu nhiên (random)
   const handleSelectRandom = () => {
     // Lấy tất cả các key nhân vật (bao gồm cả biến thể)
-    const allCharacters = Object.keys(ANIMATION_CONFIGS);
+    const allCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS);
     // Chọn ngẫu nhiên một nhân vật hoặc biến thể
     const randomCharacter = allCharacters[Math.floor(Math.random() * allCharacters.length)];
     navigate("/game", { state: { playerCharacter: randomCharacter } });
@@ -182,7 +182,7 @@ const CharacterSelection = () => {
                 return (
                   <div
                     key={variantKey}
-                    className="w-24 h-48 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
+                    className="w-36 h-48 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
                     onClick={() => handleSelectVariant(variantKey)}
                   >
                     <div
