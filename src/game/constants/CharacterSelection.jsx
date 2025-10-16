@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_CONFIGS } from "./animationConstants";
-import { CHARACTER_STATS } from "./characterStats";
-import "../../components/common/styles/CardItem.css";
 
 const CharacterSelection = () => {
   const [hoveredCharacter, setHoveredCharacter] = useState(null);
@@ -40,22 +38,6 @@ const CharacterSelection = () => {
     return namePart
       .replace(/_/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
-  // 🔹 Định dạng tên chỉ số đẹp (e.g., maxAttack -> Max Attack)
-  const formatStatName = (key) => {
-    return key
-      .replace(/([A-Z])/g, " $1") // Thêm khoảng trắng trước chữ in hoa
-      .replace(/^./, (str) => str.toUpperCase()) // Viết hoa chữ đầu
-      .trim(); // Xóa khoảng trắng thừa
-  };
-
-  // 🔹 Định dạng giá trị chỉ số (hiển thị % cho dodge, critChance, critDamage)
-  const formatStatValue = (statKey, value) => {
-    if (["dodge", "critChance", "critDamage"].includes(statKey)) {
-      return `+${(value * 100).toFixed(0)}%`;
-    }
-    return `+${value}`;
   };
 
   // 🔹 Animation khi hover ở màn hình chọn chính
@@ -98,11 +80,7 @@ const CharacterSelection = () => {
 
   // 🔹 Chọn ngẫu nhiên (random)
   const handleSelectRandom = () => {
-    // Lấy tất cả các key nhân vật (bao gồm cả biến thể)
-    const allCharacters = Object.keys(ANIMATION_CONFIGS);
-    // Chọn ngẫu nhiên một nhân vật hoặc biến thể
-    const randomCharacter = allCharacters[Math.floor(Math.random() * allCharacters.length)];
-    navigate("/game", { state: { playerCharacter: randomCharacter } });
+    navigate("/game", { state: { playerCharacter: "random" } });
   };
 
   return (
@@ -175,46 +153,29 @@ const CharacterSelection = () => {
             </h2>
 
             <div className="flex flex-wrap gap-4 justify-center">
-              {getVariants(selectedCharacter).map((variantKey) => {
-                const stats = CHARACTER_STATS[variantKey.split("/")[0]][
-                  variantKey.includes("/") ? variantKey.split("/")[1] : "default"
-                ];
-                return (
+              {getVariants(selectedCharacter).map((variantKey) => (
+                <div
+                  key={variantKey}
+                  className="w-24 h-32 rounded-md overflow-hidden text-center text-white 
+                  cursor-pointer transition bg-game-secondary"
+                  onClick={() => handleSelectVariant(variantKey)}
+                >
                   <div
-                    key={variantKey}
-                    className="w-24 h-48 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
-                    onClick={() => handleSelectVariant(variantKey)}
-                  >
-                    <div
-                      className="w-full h-24 bg-contain bg-center bg-no-repeat"
-                      style={{
-                        backgroundImage: `url(${getSpriteUrl(variantKey, modalFrame)})`,
-                      }}
-                    ></div>
-                    <span className="block text-sm font-bold capitalize">
-                      {variantKey === selectedCharacter
-                        ? "Default"
-                        : formatVariantName(variantKey)}
-                    </span>
-                    {/* Hiển thị chỉ số bonus động dựa trên characterStats.js */}
-                    <div className="text-xs mt-1 flex flex-col items-center justify-center">
-                      {Object.entries(stats).flatMap(([statKey, statValue]) =>
-                        statKey === "rareStats"
-                          ? Object.entries(statValue).map(([subKey, subValue]) => (
-                              <p className="text-green-500" key={subKey}>
-                                {formatStatName(subKey)}: {formatStatValue(subKey, subValue)}
-                              </p>
-                            ))
-                          : statKey !== "special" ? [ // Bỏ special khỏi hiển thị
-                              <p className="text-green-500" key={statKey}>
-                                {formatStatName(statKey)}: {formatStatValue(statKey, statValue)}
-                              </p>,
-                            ] : []
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                    className="w-full h-24 bg-contain bg-center bg-no-repeat"
+                    style={{
+                      backgroundImage: `url(${getSpriteUrl(
+                        variantKey,
+                        modalFrame
+                      )})`,
+                    }}
+                  ></div>
+                  <span className="block text-sm capitalize">
+                    {variantKey === selectedCharacter
+                      ? "Default"
+                      : formatVariantName(variantKey)}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

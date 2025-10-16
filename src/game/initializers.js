@@ -1,5 +1,3 @@
-import { CHARACTER_STATS } from "./constants/characterStats";
-
 export const resetEffects = (entity) => {
   return {
     burnDot: 0,
@@ -11,8 +9,8 @@ export const resetEffects = (entity) => {
   };
 };
 
-export const initPlayer = (characterKey) => {
-  const basePlayer = {
+export const initPlayer = () => {
+  const player = {
     level: 1,
     maxHealth: 1000,
     currentHealth: 1000,
@@ -36,69 +34,9 @@ export const initPlayer = (characterKey) => {
       barrier: 0,
     },
   };
-
-  if (!characterKey) {
-    return {
-      ...basePlayer,
-      effects: resetEffects(basePlayer),
-    };
-  }
-
-  // Extract character and variant (e.g., "alberon/holy_king" or "agathe")
-  const [baseCharacter, variant = "default"] = characterKey.split("/");
-
-  // Get character stats from CHARACTER_STATS
-  const characterStats = CHARACTER_STATS[baseCharacter]?.[variant];
-
-  if (!characterStats) {
-    return {
-      ...basePlayer,
-      effects: resetEffects(basePlayer),
-    };
-  }
-
-  // Add character-specific stats to base stats
-  const updatedPlayer = {
-    ...basePlayer,
-    maxHealth: basePlayer.maxHealth + (characterStats.maxHealth || 0),
-    regeneration: basePlayer.regeneration + (characterStats.regeneration || 0),
-    armor: basePlayer.armor + (characterStats.armor || 0),
-    minAttack: basePlayer.minAttack + (characterStats.minAttack || 0),
-    maxAttack: basePlayer.maxAttack + (characterStats.maxAttack || 0),
-    critChance: basePlayer.critChance + (characterStats.critChance || 0),
-    critDamage: basePlayer.critDamage + (characterStats.critDamage || 0),
-    lifeSteal: basePlayer.lifeSteal + (characterStats.lifeSteal || 0),
-    dodge: basePlayer.dodge + (characterStats.dodge || 0),
-    gold: basePlayer.gold + (characterStats.gold || 0),
-
-    special: characterStats.special || basePlayer.special,
-    rareStats: {
-      ...basePlayer.rareStats,
-      burn: basePlayer.rareStats.burn + (characterStats.rareStats?.burn || 0),
-      poison:
-        basePlayer.rareStats.poison + (characterStats.rareStats?.poison || 0),
-      thorn:
-        basePlayer.rareStats.thorn + (characterStats.rareStats?.thorn || 0),
-      stunChance:
-        basePlayer.rareStats.stunChance +
-        (characterStats.rareStats?.stunChance || 0),
-      counterattack:
-        basePlayer.rareStats.counterattack +
-        (characterStats.rareStats?.counterattack || 0),
-      swiftness:
-        basePlayer.rareStats.swiftness +
-        (characterStats.rareStats?.swiftness || 0),
-      shield:
-        basePlayer.rareStats.shield + (characterStats.rareStats?.shield || 0),
-      barrier:
-        basePlayer.rareStats.barrier + (characterStats.rareStats?.barrier || 0),
-    },
-  };
-
   return {
-    ...updatedPlayer,
-    currentHealth: updatedPlayer.maxHealth, // Ensure currentHealth matches updated maxHealth
-    effects: resetEffects(updatedPlayer),
+    ...player,
+    effects: resetEffects(player),
   };
 };
 
@@ -106,12 +44,12 @@ export const initEnemy = (level) => {
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = isBoss ? 2 : 1;
-  const health = Math.floor(12 * level * baseFactor * bossMultiplier);
+  const health = Math.floor(10 * level * baseFactor * bossMultiplier);
   const enemy = {
     maxHealth: health,
     currentHealth: health,
     minAttack: Math.floor(3 * level * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(5 * level * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(6 * level * baseFactor * bossMultiplier),
     critChance: 0.1 * baseFactor,
     critDamage: 2 * baseFactor,
     lifeSteal: 0.1 * baseFactor,
@@ -131,12 +69,8 @@ export const initEnemy = (level) => {
       stunChance: 0.002 * (level >= 20 ? level : 0) * baseFactor,
       counterattack: 0.01 * (level >= 20 ? level : 0) * baseFactor,
       swiftness: 0.005 * (level >= 20 ? level : 0) * baseFactor,
-      shield: Math.floor(
-        0.5 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
-      ),
-      barrier: Math.floor(
-        0.1 * (level >= 30 ? level : 0) * baseFactor * bossMultiplier
-      ),
+      shield: 0.5 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier,
+      barrier: 0.1 * (level >= 30 ? level : 0) * baseFactor * bossMultiplier,
     },
   };
   return {
