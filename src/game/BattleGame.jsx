@@ -10,7 +10,6 @@ import GameControls from "./components/GameControls";
 import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
-
 import SpriteAnimation from "./animations/SpriteAnimation";
 
 const BattleGame = () => {
@@ -35,7 +34,12 @@ const BattleGame = () => {
 
   const { earnTickets } = useTickets();
 
-  const [player, setPlayer] = useState(initPlayer());
+  // Initialize player with selected character stats
+  const [player, setPlayer] = useState(
+    playerCharacter === "random"
+      ? initPlayer()
+      : initPlayer(playerCharacter)
+  );
   const [enemy, setEnemy] = useState(initEnemy(1));
   const [turnLogs, setTurnLogs] = useState([]);
   const [gameOver, setGameOver] = useState(false);
