@@ -129,8 +129,8 @@ export const initEnemy = (level) => {
         0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       stunChance: 0.002 * (level >= 20 ? level : 0) * baseFactor,
-      counterattack: 0.01 * (level >= 20 ? level : 0) * baseFactor,
-      swiftness: 0.005 * (level >= 20 ? level : 0) * baseFactor,
+      counterattack: 0.008 * (level >= 20 ? level : 0) * baseFactor,
+      swiftness: 0.002 * (level >= 20 ? level : 0) * baseFactor,
       shield: Math.floor(
         0.5 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),

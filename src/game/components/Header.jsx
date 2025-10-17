@@ -14,7 +14,7 @@ const Header = ({ level }) => {
           className="cursor-pointer"
           title="Click for info"
         >
-          💡
+          🤔
         </h1>
 
         {openTips && (

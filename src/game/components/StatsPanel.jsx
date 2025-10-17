@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { statIcons } from "../constants/statIcons";
 
 const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
+  // 🔹 State to track hover status for health/barrier bar
+  const [isHealthBarHovered, setIsHealthBarHovered] = useState(false);
+
   // 🔹 Render stat
   const renderStat = (statName, value, isPercentage = false) => {
     const icon = statIcons[statName]?.icon || "";
@@ -25,19 +28,19 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
     shield = 0,
     barrier = 0
   ) => {
-    // Nếu có Barrier → hiển thị thanh màu xanh dương và thông tin Barrier
-    if (barrier > 0) {
+    // Nếu có Barrier và không hover → hiển thị thanh barrier màu xanh dương
+    if (barrier > 0 && !isHealthBarHovered) {
       return (
         <div className="w-full rounded h-4 flex overflow-hidden relative">
           <div className="bg-blue-500 h-full w-full"></div>
           <div className="absolute inset-0 flex items-center justify-center text-sm text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-            {statIcons["Barrier"]?.icon} ×{barrier}
+            {statIcons["Barrier"]?.icon} × {barrier}
           </div>
         </div>
       );
     }
 
-    // Nếu không có Barrier → tính phần Shield và Health
+    // Nếu không có Barrier hoặc đang hover → tính phần Shield và Health
     const effectiveHealth = currentHealth + shield;
     const totalCapacity = maxHealth + shield;
 
@@ -69,12 +72,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
 
         {/* Text overlay */}
         <div className="absolute inset-0 flex items-center justify-center text-sm text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-          {statIcons["Health"]?.icon} {currentHealth+shield} / {maxHealth}
-          {/* {shield > 0 && (
-            <span className="ml-2 text-gray-200">
-              {statIcons["Shield"]?.icon} {shield}
-            </span>
-          )} */}
+          {statIcons["Health"]?.icon} {currentHealth + shield} / {maxHealth}
         </div>
       </div>
     );
@@ -85,7 +83,11 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
       <h2 className="font-semibold">{name} Stats:</h2>
 
       {/* Health luôn hiện chữ đầy đủ */}
-      <div className="p-1 relative">
+      <div
+        className="p-1 relative"
+        onMouseEnter={() => setIsHealthBarHovered(true)}
+        onMouseLeave={() => setIsHealthBarHovered(false)}
+      >
         {renderHealthBar(
           entity.currentHealth,
           entity.maxHealth,

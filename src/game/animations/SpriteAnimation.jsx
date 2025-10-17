@@ -267,44 +267,64 @@ const SpriteAnimation = forwardRef(
         <div
           className="relative border border-gray-400 rounded-md"
           style={{
-            width: finalWidth,
-            height: finalHeight,
-            overflow: "visible",
+            width: finalWidth, // 128px
+            height: finalHeight, // 128px
+            position: "relative",
           }}
         >
-          {finalLayers.map((layer, i) => {
-            const index = indices[i];
-            const frameList = allFrames[i];
-            if (index === null || !frameList[index]) return null;
+          <div
+            className="absolute"
+            style={{
+              width: 400, // Div chứa img
+              height: 400,
+              overflow: "visible",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 5, // Đảm bảo div chứa img nằm trên div viền của component khác
+            }}
+          >
+            {finalLayers.map((layer, i) => {
+              const index = indices[i];
+              const frameList = allFrames[i];
+              if (index === null || !frameList[index]) return null;
 
-            const layerTranslateX = layer.moving
-              ? stopPositions[i] !== null
-                ? flip
-                  ? stopPositions[i]
-                  : -stopPositions[i]
-                : flip
-                ? translateX
-                : -translateX
-              : 0;
+              const layerTranslateX = layer.moving
+                ? stopPositions[i] !== null
+                  ? flip
+                    ? stopPositions[i]
+                    : -stopPositions[i]
+                  : flip
+                  ? translateX
+                  : -translateX
+                : 0;
 
-            return (
-              <img
-                key={layer.name || i}
-                src={frameList[index]}
-                alt={`${layer.name}-frame-${index}`}
-                className="absolute top-0 left-0"
-                style={{
-                  width: finalWidth,
-                  height: finalHeight,
-                  objectFit: "none",
-                  transform: (flip ? layer.flip : !layer.flip)
-                    ? `translateX(${layerTranslateX}px) scaleX(-1)`
-                    : `translateX(${layerTranslateX}px)`,
-                  zIndex: layer.name === "slash" ? 20 : 10,
-                }}
-              />
-            );
-          })}
+              return (
+                <img
+                  key={layer.name || i}
+                  src={frameList[index]}
+                  alt={`${layer.name}-frame-${index}`}
+                  className="absolute"
+                  style={{
+                    width: 400,
+                    height: 400,
+                    objectFit: "none",
+                    transform: (flip ? layer.flip : !layer.flip)
+                      ? `translateX(${layerTranslateX}px) scaleX(-1)`
+                      : `translateX(${layerTranslateX}px)`,
+                    zIndex: layer.name === "slash" ? 20 : 10, // img nằm trên div viền
+                    top: "50%",
+                    left: "50%",
+                    transform: `translate(-50%, -50%) ${
+                      (flip ? layer.flip : !layer.flip)
+                        ? `translateX(${layerTranslateX}px) scaleX(-1)`
+                        : `translateX(${layerTranslateX}px)`
+                    }`,
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     );

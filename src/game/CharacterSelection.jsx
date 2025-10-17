@@ -62,9 +62,7 @@ const CharacterSelection = () => {
   useEffect(() => {
     if (hoveredCharacter) {
       const config = ANIMATION_SELECT_CHARACTER_CONFIGS[hoveredCharacter];
-      const playerLayer = config.layers.find(
-        (layer) => layer.name === "front"
-      );
+      const playerLayer = config.layers.find((layer) => layer.name === "front");
       const { frameCount, speed } = playerLayer;
 
       const interval = setInterval(() => {
@@ -101,22 +99,21 @@ const CharacterSelection = () => {
     // Lấy tất cả các key nhân vật (bao gồm cả biến thể)
     const allCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS);
     // Chọn ngẫu nhiên một nhân vật hoặc biến thể
-    const randomCharacter = allCharacters[Math.floor(Math.random() * allCharacters.length)];
+    const randomCharacter =
+      allCharacters[Math.floor(Math.random() * allCharacters.length)];
     navigate("/game", { state: { playerCharacter: randomCharacter } });
   };
 
   return (
     <div className="inline-flex flex-col items-center p-8 rounded-lg bg-game">
-      <h1 className="text-4xl font-bold mb-8">
-        Select Your Character
-      </h1>
+      <h1 className="text-4xl font-bold mb-8">Select Your Character</h1>
 
       {/* 🔹 Grid danh sách nhân vật chính (thêm ô Random đầu tiên) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {/* Ô chọn ngẫu nhiên */}
         <div
           key="random"
-          className="relative w-32 h-48 bg-game-secondary rounded-lg overflow-hidden shadow-lg 
+          className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg 
           transform transition duration-300 hover:scale-105 cursor-pointer"
           onClick={handleSelectRandom}
         >
@@ -136,14 +133,17 @@ const CharacterSelection = () => {
         {baseCharacters.map((characterKey) => (
           <div
             key={characterKey}
-            className="relative w-32 h-48 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer"
+            className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer"
             onMouseEnter={() => setHoveredCharacter(characterKey)}
             onMouseLeave={() => setHoveredCharacter(null)}
             onClick={() => setSelectedCharacter(characterKey)}
           >
             <div
-              className="w-32 h-32 bg-contain bg-center bg-no-repeat"
+              className="relative w-32 h-32 overflow-visible"
               style={{
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center center",
+                backgroundSize: "auto",
                 backgroundImage: `url(${getSpriteUrl(
                   characterKey,
                   hoveredCharacter === characterKey ? currentFrame : 0
@@ -161,8 +161,14 @@ const CharacterSelection = () => {
 
       {/* 🔹 Modal hiển thị biến thể */}
       {selectedCharacter && (
-        <div className="modal-overlay" onClick={() => setSelectedCharacter(null)}>
-          <div className="rounded-lg p-6 w-96 relative bg-game" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedCharacter(null)}
+        >
+          <div
+            className="rounded-lg p-6 w-96 relative bg-game"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="absolute top-2 right-3 text-white text-2xl"
               onClick={() => setSelectedCharacter(null)}
@@ -176,19 +182,28 @@ const CharacterSelection = () => {
 
             <div className="flex flex-wrap gap-4 justify-center">
               {getVariants(selectedCharacter).map((variantKey) => {
-                const stats = CHARACTER_STATS[variantKey.split("/")[0]][
-                  variantKey.includes("/") ? variantKey.split("/")[1] : "default"
-                ];
+                const stats =
+                  CHARACTER_STATS[variantKey.split("/")[0]][
+                    variantKey.includes("/")
+                      ? variantKey.split("/")[1]
+                      : "default"
+                  ];
                 return (
                   <div
                     key={variantKey}
-                    className="w-36 h-48 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
+                    className="w-36 h-60 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
                     onClick={() => handleSelectVariant(variantKey)}
                   >
                     <div
-                      className="w-full h-24 bg-contain bg-center bg-no-repeat"
+                      className="relative w-full h-32 overflow-visible"
                       style={{
-                        backgroundImage: `url(${getSpriteUrl(variantKey, modalFrame)})`,
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center center",
+                        backgroundSize: "auto",
+                        backgroundImage: `url(${getSpriteUrl(
+                          variantKey,
+                          modalFrame
+                        )})`,
                       }}
                     ></div>
                     <span className="block text-sm font-bold capitalize">
@@ -200,16 +215,23 @@ const CharacterSelection = () => {
                     <div className="text-xs mt-1 flex flex-col items-center justify-center">
                       {Object.entries(stats).flatMap(([statKey, statValue]) =>
                         statKey === "rareStats"
-                          ? Object.entries(statValue).map(([subKey, subValue]) => (
-                              <p className="text-green-500" key={subKey}>
-                                {formatStatName(subKey)}: {formatStatValue(subKey, subValue)}
-                              </p>
-                            ))
-                          : statKey !== "special" ? [ // Bỏ special khỏi hiển thị
+                          ? Object.entries(statValue).map(
+                              ([subKey, subValue]) => (
+                                <p className="text-green-500" key={subKey}>
+                                  {formatStatName(subKey)}:{" "}
+                                  {formatStatValue(subKey, subValue)}
+                                </p>
+                              )
+                            )
+                          : statKey !== "special"
+                          ? [
+                              // Bỏ special khỏi hiển thị
                               <p className="text-green-500" key={statKey}>
-                                {formatStatName(statKey)}: {formatStatValue(statKey, statValue)}
+                                {formatStatName(statKey)}:{" "}
+                                {formatStatValue(statKey, statValue)}
                               </p>,
-                            ] : []
+                            ]
+                          : []
                       )}
                     </div>
                   </div>

@@ -133,6 +133,6 @@ export const statIcons = {
     type: "flat",
     stackable: false,
     maxValue: 999,
-    desc: "Negates incoming attacks. Each barrier negates one hit.",
+    desc: "Negates incoming attacks and is restored every battle.",
   },
 };
