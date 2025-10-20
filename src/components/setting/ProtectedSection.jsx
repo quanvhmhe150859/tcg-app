@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../utils/api";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 export default function ProtectedSection({ children }) {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export default function ProtectedSection({ children }) {
       sessionStorage.setItem("jwt", data.token);
       setUnlocked(true);
     } catch (err) {
-      alert(t("loginFailed"));
+      toast.error(t("loginFailed"));
     }
   };
 

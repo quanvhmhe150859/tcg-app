@@ -3,6 +3,7 @@ import * as signalR from "@microsoft/signalr";
 import { getOrFetchAndSet } from "../../utils/cache";
 import api from "../../utils/api";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 export const useImportPokemon = () => {
   const { t } = useTranslation();
@@ -51,7 +52,7 @@ export const useImportPokemon = () => {
 
     const token = sessionStorage.getItem("jwt");
     if (!token) {
-      alert(t("youAreNotLoggedIn"));
+      toast.error(t("youAreNotLoggedIn"));
       return;
     }
 

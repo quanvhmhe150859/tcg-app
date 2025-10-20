@@ -11,6 +11,7 @@ import SaveLoadData from "./SaveLoadData";
 import ProtectedSection from "./ProtectedSection";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 const AdminSettings = () => {
   const { t } = useTranslation();
@@ -61,7 +62,7 @@ const AdminSettings = () => {
       pokemonRarities.current?.save();
     }
 
-    alert(t("allSettingsSaved") + "!");
+    toast.success(t("allSettingsSaved") + "!");
   };
 
   return (

@@ -275,8 +275,8 @@ const SpriteAnimation = forwardRef(
           <div
             className="absolute"
             style={{
-              width: 400, // Div chứa img
-              height: 400,
+              width: 240, // Div chứa img
+              height: 240,
               overflow: "visible",
               top: "50%",
               left: "50%",
@@ -306,8 +306,6 @@ const SpriteAnimation = forwardRef(
                   alt={`${layer.name}-frame-${index}`}
                   className="absolute"
                   style={{
-                    width: 400,
-                    height: 400,
                     objectFit: "none",
                     transform: (flip ? layer.flip : !layer.flip)
                       ? `translateX(${layerTranslateX}px) scaleX(-1)`

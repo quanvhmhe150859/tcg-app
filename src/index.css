@@ -7,8 +7,8 @@
   --color-center: #dfc2f2;
   --color-dark: #a884bf;
 
-  --color-card-bg: #000;
-  --color-card-text: #fff;
+  --color-text-light: #000;
+  --color-text-dark: #fff;
 
   --color-bg-battle-game-light: #d1d5dc;
   --color-bg-battle-game-dark: #101828;
@@ -98,8 +98,8 @@ button:hover {
   --color-button-bg: var(--color-dark);
   --color-button-selected: var(--color-light);
 
-  --color-card-bg: #2c2c2c;
-  --color-card-text: #f5f5f5;
+  --color-text-light: #2c2c2c;
+  --color-text-dark: #f5f5f5;
 
   --color-input-range-duration: var(--color-violet-light);
   --color-input-range-volume: var(--color-indigo-light);
@@ -121,8 +121,8 @@ button:hover {
   --color-button-bg: var(--color-light);
   --color-button-selected: var(--color-dark);
 
-  --color-card-bg: #fff;
-  --color-card-text: #000;
+  --color-text-light: #fff;
+  --color-text-dark: #000;
 
   --color-input-range-duration: var(--color-violet-dark);
   --color-input-range-volume: var(--color-indigo-dark);
@@ -177,8 +177,8 @@ button:hover {
 }
 
 .bg-game {
-  background: var(--color-card-bg);
-  color: var(--color-card-text);
+  background: var(--color-text-light);
+  color: var(--color-text-dark);
 }
 
 .bg-game-animate{
@@ -186,9 +186,9 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
   margin-bottom: 1rem;
+  /* gap: 1rem;
+  padding: 1rem; */
 }
 
 .bg-game-secondary {

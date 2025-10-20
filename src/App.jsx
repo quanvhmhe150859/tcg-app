@@ -4,7 +4,9 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import HamburgerMenu from "./components/common/HamburgerMenu";
 import DarkModeToggle from "./components/common/DarkModeToggleButton";
@@ -17,19 +19,33 @@ import "./i18n";
 import { useOrientation } from "./components/context/OrientationContext";
 
 // ⚡ Lazy load tất cả các trang
-const RandomCardsPokemon = lazy(() => import("./components/pokemon/RandomCardsPokemon"));
-const ListCardsPokemon = lazy(() => import("./components/pokemon/ListCardsPokemon"));
-const OwnedPokemonCards = lazy(() => import("./components/pokemon/OwnedPokemonCards"));
+const RandomCardsPokemon = lazy(() =>
+  import("./components/pokemon/RandomCardsPokemon")
+);
+const ListCardsPokemon = lazy(() =>
+  import("./components/pokemon/ListCardsPokemon")
+);
+const OwnedPokemonCards = lazy(() =>
+  import("./components/pokemon/OwnedPokemonCards")
+);
 
-const RandomCardsYugioh = lazy(() => import("./components/yugioh/RandomCardsYugioh"));
-const ListCardsYugioh = lazy(() => import("./components/yugioh/ListCardsYugioh"));
-const OwnedYugiohCards = lazy(() => import("./components/yugioh/OwnedYugiohCards"));
+const RandomCardsYugioh = lazy(() =>
+  import("./components/yugioh/RandomCardsYugioh")
+);
+const ListCardsYugioh = lazy(() =>
+  import("./components/yugioh/ListCardsYugioh")
+);
+const OwnedYugiohCards = lazy(() =>
+  import("./components/yugioh/OwnedYugiohCards")
+);
 
 const CharacterSelection = lazy(() => import("./game/CharacterSelection"));
 const BattleGame = lazy(() => import("./game/BattleGame"));
 const Chatbot = lazy(() => import("./bot/Chatbot"));
 const ImageGenerator = lazy(() => import("./bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
+
+const NotFound = lazy(() => import("./components/common/NotFound"));
 
 function setFavicon(iconUrl) {
   const link =
@@ -77,11 +93,14 @@ function App() {
     <Router>
       <div className="app">
         <FaviconUpdater />
-        <HamburgerMenu />
-        <ScrollToTopButton />
 
-        {/* Các nút nổi */}
+        <Toaster position="top-center" reverseOrder={false} />
+
         <>
+          <HamburgerMenu />
+          <ScrollToTopButton />
+
+          {/* Các nút nổi */}
           {buttons.map((btn, i) => {
             const style =
               orientation === "vertical"
@@ -96,19 +115,32 @@ function App() {
         </>
 
         {/* ⚙️ Suspense hiển thị khi đang load trang */}
-        <Suspense fallback={<div className="text-center text-white mt-8">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-center text-white mt-8">Loading...</div>
+          }
+        >
           <Routes>
             <Route path="/" element={<AdminSettings />} />
+
             <Route path="/pokemon" element={<RandomCardsPokemon />} />
             <Route path="/pokemonls" element={<ListCardsPokemon />} />
             <Route path="/pokemonowned" element={<OwnedPokemonCards />} />
             <Route path="/yugioh" element={<RandomCardsYugioh />} />
             <Route path="/yugiohls" element={<ListCardsYugioh />} />
             <Route path="/yugiohowned" element={<OwnedYugiohCards />} />
-            <Route path="/characterselection" element={<CharacterSelection />} />
+
+            <Route
+              path="/characterselection"
+              element={<CharacterSelection />}
+            />
             <Route path="/game" element={<BattleGame />} />
+
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/imagegenerator" element={<ImageGenerator />} />
+
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </Suspense>
       </div>

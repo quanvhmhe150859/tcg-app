@@ -242,45 +242,6 @@ const rawConfigs = {
   },
 };
 
-// export const ANIMATION_CONFIGS = Object.fromEntries(
-//   Object.entries(rawConfigs).map(([key, config]) => [
-//     key,
-//     {
-//       ...config,
-//       layers: [
-//         {
-//           name: "player",
-//           folder: `/sprites/${key}/player/`,
-//           ...config.layers.player,
-//         },
-//         {
-//           name: "slash",
-//           folder: `/sprites/${key}/slash/`,
-//           ...config.layers.slash,
-//         },
-//       ],
-//     },
-//   ])
-// );
-
-// export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
-//   Object.entries(rawConfigs).map(([key, config]) => [
-//     key,
-//     {
-//       ...config,
-//       layers: [
-//         {
-//           name: "front",
-//           folder: `/sprites/${key}/front/`,
-//           ...config.layers.front,
-//         },
-//       ],
-//     },
-//   ])
-// );
-
-const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
-
 export const ANIMATION_CONFIGS = Object.fromEntries(
   Object.entries(rawConfigs).map(([key, config]) => [
     key,
@@ -289,12 +250,12 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
       layers: [
         {
           name: "player",
-          folder: `${BACKEND_URL}/sprites/${key}/player/`,
+          folder: `/sprites/${key}/player/`,
           ...config.layers.player,
         },
         {
           name: "slash",
-          folder: `${BACKEND_URL}/sprites/${key}/slash/`,
+          folder: `/sprites/${key}/slash/`,
           ...config.layers.slash,
         },
       ],
@@ -310,10 +271,49 @@ export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
       layers: [
         {
           name: "front",
-          folder: `${BACKEND_URL}/sprites/${key}/front/`,
+          folder: `/sprites/${key}/front/`,
           ...config.layers.front,
         },
       ],
     },
   ])
 );
+
+// const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
+
+// export const ANIMATION_CONFIGS = Object.fromEntries(
+//   Object.entries(rawConfigs).map(([key, config]) => [
+//     key,
+//     {
+//       ...config,
+//       layers: [
+//         {
+//           name: "player",
+//           folder: `${BACKEND_URL}/sprites/${key}/player/`,
+//           ...config.layers.player,
+//         },
+//         {
+//           name: "slash",
+//           folder: `${BACKEND_URL}/sprites/${key}/slash/`,
+//           ...config.layers.slash,
+//         },
+//       ],
+//     },
+//   ])
+// );
+
+// export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
+//   Object.entries(rawConfigs).map(([key, config]) => [
+//     key,
+//     {
+//       ...config,
+//       layers: [
+//         {
+//           name: "front",
+//           folder: `${BACKEND_URL}/sprites/${key}/front/`,
+//           ...config.layers.front,
+//         },
+//       ],
+//     },
+//   ])
+// );

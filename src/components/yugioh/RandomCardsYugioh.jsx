@@ -17,6 +17,7 @@ import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
 import { useTickets } from "../context/TicketContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 const RandomCardsYugioh = () => {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ const RandomCardsYugioh = () => {
         parsedRaw !== null &&
         Object.keys(parsedRaw).length === 0)
     ) {
-      alert("Chưa thiết lập Allowed Rarities Yugioh Weights!");
+      toast.error("Chưa thiết lập Allowed Rarities Yugioh Weights!");
       navigate("/", { state: { defaultTab: "yugioh" } });
     }
   }, [navigate]);

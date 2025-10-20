@@ -3,6 +3,7 @@ import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 import { getTickets, setTickets } from "../../utils/ticketStorage";
 import { useTickets } from "../context/TicketContext";
+import { toast } from "react-hot-toast";
 
 export default function CardSaveLoad() {
   const { t } = useTranslation();
@@ -72,10 +73,10 @@ export default function CardSaveLoad() {
 
         setCards(normalizedCards);
 
-        alert(t("loadSuccessfully") + "!");
+        toast.success(t("loadSuccessfully") + "!");
       } catch (err) {
         console.error("Lỗi load file:", err);
-        alert(t("invalidFileFormat") + "!");
+        toast.error(t("invalidFileFormat") + "!");
       }
     };
     reader.readAsText(file);

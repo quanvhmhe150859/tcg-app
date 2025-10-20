@@ -1,3 +1,5 @@
+import { toast } from "react-hot-toast";
+
 export function spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t) {
   if (spinMode === null) {
     localStorage.setItem("spinMode", "free");
@@ -6,7 +8,7 @@ export function spendTicketsIfNeeded(count, spinMode, tickets, updateTickets, t)
   if (spinMode !== "ticket") return true; // free mode -> luôn ok
 
   if (tickets < count) {
-    alert(t("notEnoughTicketsToRoll")+"!");
+    toast.error(t("notEnoughTicketsToRoll")+"!");
     return false;
   }
 
