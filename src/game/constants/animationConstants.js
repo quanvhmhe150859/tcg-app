@@ -293,11 +293,6 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
           ...config.layers.player,
         },
         {
-            name: "front",
-            folder: `${BACKEND_URL}/sprites/${key}/front/`,
-            ...config.layers.front,
-        },
-        {
           name: "slash",
           folder: `${BACKEND_URL}/sprites/${key}/slash/`,
           ...config.layers.slash,
