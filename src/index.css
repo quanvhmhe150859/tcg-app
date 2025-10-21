@@ -46,8 +46,8 @@
 body {
   font-family: sans-serif;
   margin: 0;
-  padding: 2rem;
   transition: background 0.3s, color 0.3s;
+  /* padding: 2rem; */
 }
 
 button {

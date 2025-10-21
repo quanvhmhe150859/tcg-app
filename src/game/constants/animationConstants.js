@@ -240,6 +240,86 @@ const rawConfigs = {
       },
     },
   },
+  "bombie": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 3,
+        speed: 120,
+        delay: 0,
+        flip: true,
+        moving: false,
+        stopMovingAtFrame: 3,
+      },
+      front: {
+        frameCount: 9,
+        speed: 240,
+      },
+      slash: {
+        frameCount: 9,
+        speed: 120,
+        delay: 180,
+        flip: false,
+        moving: true,
+        movingFrameCount: 1,
+        moveStopDistance: 250,
+      },
+    },
+  },
+  "jol": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 3,
+        speed: 240,
+        delay: 0,
+        flip: true,
+        moving: false,
+      },
+      front: {
+        frameCount: 6,
+        speed: 240,
+      },
+      slash: {
+        frameCount: 5,
+        speed: 120,
+        delay: 480,
+        flip: false,
+        moving: false,
+        movingFrameCount: 5,
+        moveStopDistance: 250,
+      },
+    },
+  },
+  "kanak": {
+    width: 128,
+    height: 128,
+    layers: {
+      player: {
+        frameCount: 3,
+        speed: 240,
+        delay: 0,
+        flip: true,
+        moving: false,
+        stopMovingAtFrame: 3,
+      },
+      front: {
+        frameCount: 6,
+        speed: 240,
+      },
+      slash: {
+        frameCount: 9,
+        speed: 120,
+        delay: 180,
+        flip: false,
+        moving: true,
+        movingFrameCount: 1,
+        moveStopDistance: 250,
+      },
+    },
+  },
 };
 
 export const ANIMATION_CONFIGS = Object.fromEntries(

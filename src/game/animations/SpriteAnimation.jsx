@@ -262,7 +262,10 @@ const SpriteAnimation = forwardRef(
       <div
         ref={containerRef}
         className="flex flex-col items-center gap-3"
-        style={{ opacity, transition: `opacity ${fadeDuration}ms ease` }}
+        style={{
+          opacity,
+          transition: `opacity ${fadeDuration}ms ease`,
+        }}
       >
         <div
           className="relative border border-gray-400 rounded-md"
@@ -272,19 +275,21 @@ const SpriteAnimation = forwardRef(
             position: "relative",
           }}
         >
+          {/* Container cho các layer không phải slash */}
           <div
             className="absolute"
             style={{
-              width: 240, // Div chứa img
+              width: 240,
               height: 240,
               overflow: "visible",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              zIndex: 5, // Đảm bảo div chứa img nằm trên div viền của component khác
+              zIndex: 10, // z-index thấp cho non-slash layers
             }}
           >
             {finalLayers.map((layer, i) => {
+              if (layer.name === "slash") return null; // Bỏ qua layer slash
               const index = indices[i];
               const frameList = allFrames[i];
               if (index === null || !frameList[index]) return null;
@@ -307,10 +312,6 @@ const SpriteAnimation = forwardRef(
                   className="absolute"
                   style={{
                     objectFit: "none",
-                    transform: (flip ? layer.flip : !layer.flip)
-                      ? `translateX(${layerTranslateX}px) scaleX(-1)`
-                      : `translateX(${layerTranslateX}px)`,
-                    zIndex: layer.name === "slash" ? 20 : 10, // img nằm trên div viền
                     top: "50%",
                     left: "50%",
                     transform: `translate(-50%, -50%) ${
@@ -318,6 +319,57 @@ const SpriteAnimation = forwardRef(
                         ? `translateX(${layerTranslateX}px) scaleX(-1)`
                         : `translateX(${layerTranslateX}px)`
                     }`,
+                    zIndex: 10, // z-index cho non-slash layers
+                  }}
+                />
+              );
+            })}
+          </div>
+          {/* Container riêng cho layer slash */}
+          <div
+            className="absolute"
+            style={{
+              width: 240,
+              height: 240,
+              overflow: "visible",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 200, // z-index cao cho slash layer
+            }}
+          >
+            {finalLayers.map((layer, i) => {
+              if (layer.name !== "slash") return null; // Chỉ render layer slash
+              const index = indices[i];
+              const frameList = allFrames[i];
+              if (index === null || !frameList[index]) return null;
+
+              const layerTranslateX = layer.moving
+                ? stopPositions[i] !== null
+                  ? flip
+                    ? stopPositions[i]
+                    : -stopPositions[i]
+                  : flip
+                  ? translateX
+                  : -translateX
+                : 0;
+
+              return (
+                <img
+                  key={layer.name || i}
+                  src={frameList[index]}
+                  alt={`${layer.name}-frame-${index}`}
+                  className="absolute"
+                  style={{
+                    objectFit: "none",
+                    top: "50%",
+                    left: "50%",
+                    transform: `translate(-50%, -50%) ${
+                      (flip ? layer.flip : !layer.flip)
+                        ? `translateX(${layerTranslateX}px) scaleX(-1)`
+                        : `translateX(${layerTranslateX}px)`
+                    }`,
+                    zIndex: 200, // z-index cao cho slash
                   }}
                 />
               );

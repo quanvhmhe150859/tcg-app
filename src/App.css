@@ -1,9 +1,13 @@
 #root {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  /* padding: 2rem; */
   /* justify-content: center; */
+}
+
+.app{
+  padding: 4rem;
 }
 
 .logo {

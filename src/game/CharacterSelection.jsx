@@ -50,12 +50,27 @@ const CharacterSelection = () => {
       .trim(); // Xóa khoảng trắng thừa
   };
 
-  // 🔹 Định dạng giá trị chỉ số (hiển thị % cho dodge, critChance, critDamage)
+  // 🔹 Định dạng giá trị chỉ số (hiển thị % cho dodge, critChance, critDamage, màu xanh lá cho > 0, màu đỏ cho < 0)
   const formatStatValue = (statKey, value) => {
-    if (["dodge", "critChance", "critDamage"].includes(statKey)) {
-      return `+${(value * 100).toFixed(0)}%`;
+    const isPercentage = [
+      "critChance",
+      "critDamage",
+      "lifeSteal",
+      "dodge",
+      "counterattack",
+      "stunChance",
+      "swiftness",
+    ].includes(statKey);
+    const formattedValue = isPercentage
+      ? `${(value * 100).toFixed(0)}%`
+      : `${Math.abs(value)}`;
+    if (value > 0) {
+      return { text: `+ ${formattedValue}`, className: "text-green-500" };
+    } else if (value < 0) {
+      return { text: `- ${formattedValue}`, className: "text-red-500" };
+    } else {
+      return { text: formattedValue, className: "text-white" };
     }
-    return `+${value}`;
   };
 
   // 🔹 Animation khi hover ở màn hình chọn chính
@@ -191,7 +206,7 @@ const CharacterSelection = () => {
                 return (
                   <div
                     key={variantKey}
-                    className="w-36 h-60 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
+                    className="w-36 pb-4 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
                     onClick={() => handleSelectVariant(variantKey)}
                   >
                     <div
@@ -216,19 +231,28 @@ const CharacterSelection = () => {
                       {Object.entries(stats).flatMap(([statKey, statValue]) =>
                         statKey === "rareStats"
                           ? Object.entries(statValue).map(
-                              ([subKey, subValue]) => (
-                                <p className="text-green-500" key={subKey}>
-                                  {formatStatName(subKey)}:{" "}
-                                  {formatStatValue(subKey, subValue)}
-                                </p>
-                              )
+                              ([subKey, subValue]) => {
+                                const { text, className } = formatStatValue(
+                                  subKey,
+                                  subValue
+                                );
+                                return (
+                                  <p className={className} key={subKey}>
+                                    {formatStatName(subKey)}: {text}
+                                  </p>
+                                );
+                              }
                             )
                           : statKey !== "special"
                           ? [
-                              // Bỏ special khỏi hiển thị
-                              <p className="text-green-500" key={statKey}>
+                              <p
+                                className={
+                                  formatStatValue(statKey, statValue).className
+                                }
+                                key={statKey}
+                              >
                                 {formatStatName(statKey)}:{" "}
-                                {formatStatValue(statKey, statValue)}
+                                {formatStatValue(statKey, statValue).text}
                               </p>,
                             ]
                           : []
