@@ -1,12 +1,14 @@
 import { Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import HamburgerMenu from "../components/common/HamburgerMenu";
-import DarkModeToggle from "../components/common/DarkModeToggleButton";
-import LanguageSwitcher from "../components/common/LanguageSwitcherButton";
-import MusicToggleButton from "../components/common/MusicToggleButton";
-import TicketCount from "../components/common/TicketCount";
-import ScrollToTopButton from "../components/common/ScrollToTopButton";
-import { useOrientation } from "../components/context/OrientationContext";
+import HamburgerMenu from "../components/ui/HamburgerMenu";
+import DarkModeToggle from "../components/ui/DarkModeToggleButton";
+import LanguageSwitcher from "../components/ui/LanguageSwitcherButton";
+import MusicToggleButton from "../components/ui/MusicToggleButton";
+import TicketCount from "../components/ui/TicketCount";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
+import { useOrientation } from "../context/OrientationContext";
+import Header from "./Header";
+import Footer from "./Footer";
 
 export default function MainLayout() {
   const { orientation } = useOrientation();
@@ -24,6 +26,9 @@ export default function MainLayout() {
       <HamburgerMenu />
       <ScrollToTopButton />
 
+      {/* Header */}
+      <Header />
+
       {/* Các nút nổi */}
       {buttons.map((btn, i) => {
         const style =
@@ -39,6 +44,9 @@ export default function MainLayout() {
 
       {/* Nội dung từng trang */}
       <Outlet />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

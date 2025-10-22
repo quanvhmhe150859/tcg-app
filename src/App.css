@@ -7,15 +7,11 @@
 }
 
 .app{
-  padding: 3rem;
+  padding: 1rem;
 }
 
 .card {
   padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
 
 .floating-button {

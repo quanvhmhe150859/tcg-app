@@ -33,7 +33,7 @@ const Homepage = () => {
       backgroundVideo: "/bg/game-video.mp4",
     },
     {
-      label: t("gacha"),
+      label: "Gacha",
       path: "#",
       backgroundImage: "url(/bg/gacha-bg.png)",
       backgroundVideo: "/bg/gacha-video.mp4",
@@ -42,13 +42,13 @@ const Homepage = () => {
 
   const gachaSubButtons = [
     {
-      label: "Pokemon",
+      label: "Pokémon",
       path: "/pokemon",
       backgroundImage: "url(/bg/pokemon-bg.png)",
       backgroundVideo: "/bg/pokemon-video.mp4",
     },
     {
-      label: "Yu-Gi-Oh",
+      label: "Yu-Gi-Oh!",
       path: "/yugioh",
       backgroundImage: "url(/bg/yugioh-bg.png)",
       backgroundVideo: "/bg/yugioh-video.mp4",
@@ -62,7 +62,7 @@ const Homepage = () => {
         alt="TCG Logo"
         className="h-auto w-auto max-h-24 md:max-h-32 lg:max-h-40 object-contain drop-shadow-[0_0_3px_black]"
       />
-      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
         {buttonStyles.map((button, index) => (
           <div
             key={button.label}
@@ -72,7 +72,7 @@ const Homepage = () => {
             }
           >
             {button.label === "Gacha" && isGachaClicked ? (
-              <div className="flex flex-col space-y-2 h-[70vh] w-[240px] sm:w-[20vw]">
+              <div className="flex flex-row space-x-2 sm:flex-col sm:space-x-0 sm:space-y-2 h-[24vh] sm:h-[70vh] sm:w-[20vw]">
                 {gachaSubButtons.map((subButton) => (
                   <Link
                     key={subButton.label}
@@ -95,7 +95,7 @@ const Homepage = () => {
                         muted
                       />
                     )}
-                    <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]">
+                    <span className="relative z-10 drop-shadow-[0_0_3px_black] text-xl">
                       {subButton.label}
                     </span>
                   </Link>
@@ -104,7 +104,7 @@ const Homepage = () => {
             ) : (
               <Link
                 to={button.path}
-                className={`h-[50vh] w-[240px] sm:h-[70vh] sm:w-[20vw] text-white rounded-lg transition-all duration-300 transform hover:scale-105 text-2xl font-semibold flex items-center justify-center relative overflow-hidden ${
+                className={`h-[24vh] sm:h-[70vh] sm:w-[24vw] text-white rounded-lg transition-all duration-300 transform hover:scale-105 text-2xl font-semibold flex items-center justify-center relative overflow-hidden ${
                   visibleButtons[index] ? "animate-fadeIn" : "opacity-0"
                 }`}
                 style={{
@@ -124,7 +124,7 @@ const Homepage = () => {
                     muted
                   />
                 )}
-                <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]">
+                <span className="relative z-10 drop-shadow-[0_0_3px_black] text-3xl">
                   {button.label}
                 </span>
               </Link>

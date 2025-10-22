@@ -1,4 +1,4 @@
-import { useOrientation } from "../context/OrientationContext";
+import { useOrientation } from "../../context/OrientationContext";
 
 export default function ControlButtons() {
   const { orientation, setOrientation } = useOrientation();

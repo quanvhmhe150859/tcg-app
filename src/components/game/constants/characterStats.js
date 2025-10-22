@@ -1,4 +1,3 @@
-// characterStats.js
 export const CHARACTER_STATS = {
   agathe: {
     default: {

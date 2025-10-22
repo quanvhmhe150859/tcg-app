@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getTickets, setTickets, addTickets } from "../../utils/ticketStorage";
+import { getTickets, setTickets, addTickets } from "../utils/ticketStorage";
 
 const TicketContext = createContext();
 

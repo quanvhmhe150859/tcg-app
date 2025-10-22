@@ -19,13 +19,13 @@ const OwnedPokemonCards = lazy(() => import("./components/pokemon/OwnedPokemonCa
 const RandomCardsYugioh = lazy(() => import("./components/yugioh/RandomCardsYugioh"));
 const ListCardsYugioh = lazy(() => import("./components/yugioh/ListCardsYugioh"));
 const OwnedYugiohCards = lazy(() => import("./components/yugioh/OwnedYugiohCards"));
-const CharacterSelection = lazy(() => import("./game/CharacterSelection"));
-const BattleGame = lazy(() => import("./game/BattleGame"));
-const Chatbot = lazy(() => import("./bot/Chatbot"));
-const ImageGenerator = lazy(() => import("./bot/Artbot"));
+const CharacterSelection = lazy(() => import("./components/game/CharacterSelection"));
+const BattleGame = lazy(() => import("./components/game/BattleGame"));
+const Chatbot = lazy(() => import("./components/bot/Chatbot"));
+const ImageGenerator = lazy(() => import("./components/bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
-const Homepage = lazy(() => import("./components/common/Homepage"));
-const NotFound = lazy(() => import("./components/common/NotFound"));
+const Homepage = lazy(() => import("./components/pages/Homepage"));
+const NotFound = lazy(() => import("./components/pages/NotFound"));
 
 // === FaviconUpdater giữ nguyên ===
 function setFavicon(iconUrl) {

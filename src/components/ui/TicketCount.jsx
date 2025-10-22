@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTickets } from "../context/TicketContext";
+import { useTickets } from "../../context/TicketContext";
 import { useTranslation } from "react-i18next";
 
 export default function TicketButton() {

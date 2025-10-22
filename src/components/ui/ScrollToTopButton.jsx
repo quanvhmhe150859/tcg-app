@@ -22,7 +22,7 @@ const ScrollToTopButton = () => {
   if (!visible) return null;
 
   return (
-    <button className="floating-button" style={{ position: "fixed", bottom: "15px", right: "15px" }} onClick={scrollToTop} title={t("scrollToTop")}>
+    <button className="floating-button z-999" style={{ position: "fixed", bottom: "15px", right: "15px" }} onClick={scrollToTop} title={t("scrollToTop")}>
       🔝
     </button>
   );

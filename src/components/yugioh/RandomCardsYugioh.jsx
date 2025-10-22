@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CardItemYugioh from "./CardItemYugioh";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../common/styles/RandomCards.module.css";
+import styles from "../styles/RandomCards.module.css";
 import RollButtonGroup from "../common/RollButtonGroup";
 import { Tooltip } from "react-tooltip";
 import {

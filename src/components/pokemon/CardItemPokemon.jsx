@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
-import "../common/styles/CardItem.css";
+import "../styles/CardItem.css";
 import "./rarityEffects.css";
 import { getRarityStyle } from "../../utils/getRarityStyle";
 import CardItemPokemonModal from "./CardItemPokemonModal";

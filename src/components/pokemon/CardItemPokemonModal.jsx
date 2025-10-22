@@ -1,5 +1,5 @@
 import React from "react";
-import "../common/styles/CardItem.css";
+import "../styles/CardItem.css";
 
 const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;

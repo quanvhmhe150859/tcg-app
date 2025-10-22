@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
 import { CHARACTER_STATS } from "./constants/characterStats";
-import "../components/common/styles/CardItem.css";
+import "../styles/CardItem.css";
 
 const CharacterSelection = () => {
   useEffect(() => {

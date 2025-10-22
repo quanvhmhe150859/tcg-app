@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import api from "../../utils/api";
 import CardItemYugioh from "./CardItemYugioh";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../common/styles/RandomCards.module.css";
+import styles from "../styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 import Pagination from "../common/Pagination";
 

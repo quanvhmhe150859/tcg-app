@@ -81,6 +81,12 @@ const AdminSettings = () => {
           {t("general")}
         </button>
         <button
+          className={tab === "music" ? "selected-tab" : ""}
+          onClick={() => setTab("music")}
+        >
+          BGM
+        </button>
+        <button
           className={tab === "pokemon" ? "selected-tab" : ""}
           onClick={() => setTab("pokemon")}
         >
@@ -93,10 +99,10 @@ const AdminSettings = () => {
           Yu-Gi-Oh!
         </button>
         <button
-          className={tab === "music" ? "selected-tab" : ""}
-          onClick={() => setTab("music")}
+          className={tab === "update" ? "selected-tab" : ""}
+          onClick={() => setTab("update")}
         >
-          BGM
+          {t("update")}
         </button>
       </div>
 
@@ -112,14 +118,6 @@ const AdminSettings = () => {
         <div className="section">
           <SaveLoadData />
         </div>
-
-        <ProtectedSection>
-          <div className="section">
-            <h3>{t("importData")}</h3>
-            <ImportDataPokemon />
-            <ImportDataYugioh />
-          </div>
-        </ProtectedSection>
       </div>
 
       {/* Pokémon Tab */}
@@ -139,6 +137,17 @@ const AdminSettings = () => {
         <div className="section">
           <BgmPlayer />
         </div>
+      </div>
+
+      {/* Update Tab */}
+      <div className={`tab-content ${tab === "update" ? "open" : "closed"}`}>
+        <ProtectedSection>
+          <div className="section">
+            <h3>{t("importData")}</h3>
+            <ImportDataPokemon />
+            <ImportDataYugioh />
+          </div>
+        </ProtectedSection>
       </div>
 
       {(tab === "pokemon" || tab === "yugioh") && (

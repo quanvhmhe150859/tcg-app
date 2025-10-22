@@ -1,4 +1,4 @@
-import { useBgm } from "../context/BgmContext";
+import { useBgm } from "../../context/BgmContext";
 import { useTranslation } from "react-i18next";
 
 export default function MusicToggleButton() {

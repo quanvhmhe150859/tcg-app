@@ -57,19 +57,17 @@ const HamburgerMenu = () => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="hamburger-menu"
           >
-            {/* <h1 className="text-2xl font-bold mt-12"> Menu</h1> */}
-            <Link
-              className="text-2xl font-bold mt-12"
-              to="/"
-              onClick={() => setOpen(false)}
-            >
-              🏠 {t("homepage")}
-            </Link>
+            <h1 className="text-2xl font-bold mt-12">📂 Menu</h1>
             <div className="hamburger-menu-content">
               <ul>
                 <li>
+                  <Link to="/" onClick={() => setOpen(false)}>
+                    🏠 {t("homepage")}
+                  </Link>
+                </li>
+                <li>
                   <Link to="/settings" onClick={() => setOpen(false)}>
-                    ⚙️ {t("settings")}
+                    ⚙️ <span>{t("settings")}</span>
                   </Link>
                 </li>
                 <li>

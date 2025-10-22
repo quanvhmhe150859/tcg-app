@@ -2,6 +2,7 @@
   "homepage": "Home",
   "settings": "Settings",
   "general": "General",
+  "update": "Update",
   "backgroundMusic": "Background Music",
   "selectSongs": "Select Songs",
   "playMode": "Play Mode",

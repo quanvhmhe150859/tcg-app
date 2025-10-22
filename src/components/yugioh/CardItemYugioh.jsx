@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RarityDot from "./RarityDot";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import CardItemYugiohModal from "./CardItemYugiohModal";
-import "../common/styles/CardItem.css";
+import "../styles/CardItem.css";
 import { motion } from "framer-motion";
 
 const CardItemYugioh = ({ card, index, isFlipped = true, type, onCardFlip }) => {
