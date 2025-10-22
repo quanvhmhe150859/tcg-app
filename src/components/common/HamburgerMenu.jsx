@@ -57,20 +57,24 @@ const HamburgerMenu = () => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="hamburger-menu"
           >
-            <h1 className="text-2xl font-bold mt-12">🏠 Menu</h1>
+            {/* <h1 className="text-2xl font-bold mt-12"> Menu</h1> */}
+            <Link
+              className="text-2xl font-bold mt-12"
+              to="/"
+              onClick={() => setOpen(false)}
+            >
+              🏠 {t("homepage")}
+            </Link>
             <div className="hamburger-menu-content">
               <ul>
                 <li>
-                  <Link to="/" onClick={() => setOpen(false)}>
+                  <Link to="/settings" onClick={() => setOpen(false)}>
                     ⚙️ {t("settings")}
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/characterselection"
-                    onClick={() => setOpen(false)}
-                  >
-                    🧩 {t("game")} 
+                  <Link to="/characterselection" onClick={() => setOpen(false)}>
+                    🧩 {t("game")}
                     <img
                       src="/icons/new_icon.gif"
                       alt="new"
@@ -249,11 +253,8 @@ const HamburgerMenu = () => {
                   </AnimatePresence>
                 </li>
                 <li>
-                  <Link
-                    to="/test"
-                    onClick={() => setOpen(false)}
-                  >
-                    🧪 {t("Test")} 
+                  <Link to="/test" onClick={() => setOpen(false)}>
+                    🧪 {t("Test")}
                   </Link>
                 </li>
               </ul>

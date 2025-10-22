@@ -5,6 +5,14 @@ import { CHARACTER_STATS } from "./constants/characterStats";
 import "../components/common/styles/CardItem.css";
 
 const CharacterSelection = () => {
+  useEffect(() => {
+    document.body.style.minWidth = "425px";
+
+    return () => {
+      document.body.style.minWidth = ""; // reset khi rời trang
+    };
+  }, []);
+
   const [hoveredCharacter, setHoveredCharacter] = useState(null);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [selectedCharacter, setSelectedCharacter] = useState(null);

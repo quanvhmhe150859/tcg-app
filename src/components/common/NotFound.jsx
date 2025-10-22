@@ -11,7 +11,7 @@ export default function NotFound() {
     const ctx = canvas.getContext("2d");
     let animationFrameId;
 
-    // Thiết lập canvas
+    // Thiết lập kích thước canvas chiếm toàn màn hình
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -101,18 +101,18 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-screen bg-gray-900 text-white text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-900 text-white text-center">
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
         style={{ zIndex: 0 }}
       />
-      <div className="relative z-10">
+      <div className="relative z-10 max-w-md p-8">
         <h1 className="text-6xl font-bold text-red-400 mb-4">404</h1>
         <p className="text-lg mb-6">Trang bạn đang truy cập không tồn tại hoặc đã bị xóa.</p>
         <button
           onClick={() => navigate("/")}
-          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition"
+          className="button-blue"
         >
           Quay lại trang chủ
         </button>

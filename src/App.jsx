@@ -24,6 +24,7 @@ const BattleGame = lazy(() => import("./game/BattleGame"));
 const Chatbot = lazy(() => import("./bot/Chatbot"));
 const ImageGenerator = lazy(() => import("./bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
+const Homepage = lazy(() => import("./components/common/Homepage"));
 const NotFound = lazy(() => import("./components/common/NotFound"));
 
 // === FaviconUpdater giữ nguyên ===
@@ -63,11 +64,12 @@ export default function App() {
   return (
     <Router>
       <FaviconUpdater />
-      <Suspense fallback={<div className="text-center text-white mt-8">Loading...</div>}>
+      <Suspense fallback={<div className="text-center text-white mt-8">Thinking...</div>}>
         <Routes>
           {/* 🧭 Layout chính */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<AdminSettings />} />
+            <Route path="/" element={<Homepage />} />
+            <Route path="/settings" element={<AdminSettings />} />
             <Route path="/pokemon" element={<RandomCardsPokemon />} />
             <Route path="/pokemonls" element={<ListCardsPokemon />} />
             <Route path="/pokemonowned" element={<OwnedPokemonCards />} />
