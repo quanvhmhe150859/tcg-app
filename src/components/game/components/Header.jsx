@@ -11,7 +11,7 @@ const Header = ({ level }) => {
       <div className="flex-1 text-left">
         <h1
           onClick={() => setOpenTips(true)}
-          className="cursor-pointer relative z-30"
+          className="cursor-pointer relative z-300"
           title="Click for info"
         >
           🤔

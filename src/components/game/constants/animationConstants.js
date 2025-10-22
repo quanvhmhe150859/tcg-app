@@ -299,7 +299,7 @@ const rawConfigs = {
     layers: {
       player: {
         frameCount: 3,
-        speed: 240,
+        speed: 120,
         delay: 0,
         flip: true,
         moving: false,
