@@ -32,8 +32,8 @@
   transition: background 0.3s, color 0.3s;
   /* border: 1px solid #aaa; */
 
-  background: var(--color-card-bg);
-  color: var(--color-card-text);
+  background: var(--color-text-light);
+  color: var(--color-text-dark);
 }
 
 .card-image {
