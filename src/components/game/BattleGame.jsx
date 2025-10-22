@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { initPlayer, initEnemy } from "./initializers";
-import { useTickets } from "../components/context/TicketContext";
+import { useTickets } from "../../context/TicketContext";
 import StatsPanel from "./components/StatsPanel";
 import BattleLog from "./components/BattleLog";
 import UpgradePanel from "./components/UpgradePanel";

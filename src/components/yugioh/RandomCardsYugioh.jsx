@@ -14,7 +14,7 @@ import {
 import SelectBox from "../common/SelectBox";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
 import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
-import { useTickets } from "../context/TicketContext";
+import { useTickets } from "../../context/TicketContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";

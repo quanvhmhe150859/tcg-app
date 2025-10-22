@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 import { getTickets, setTickets } from "../../utils/ticketStorage";
-import { useTickets } from "../context/TicketContext";
+import { useTickets } from "../../context/TicketContext";
 import { toast } from "react-hot-toast";
 
 export default function CardSaveLoad() {

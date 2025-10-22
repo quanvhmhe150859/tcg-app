@@ -7,7 +7,7 @@ import RollButtonGroup from "../common/RollButtonGroup";
 import { getPokemonCards } from "./pokemonApiHelpers";
 import { addCardsToLocalStorage } from "../../utils/storageUtils";
 import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
-import { useTickets } from "../context/TicketContext";
+import { useTickets } from "../../context/TicketContext";
 import SelectBox from "../common/SelectBox";
 import { useTranslation } from "react-i18next";
 

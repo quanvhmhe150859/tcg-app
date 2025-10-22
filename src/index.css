@@ -140,10 +140,6 @@ button:hover {
   font-weight: bold;
 }
 
-.roll-tab {
-  cursor: pointer;
-}
-
 .spinner {
   width: 16px;
   height: 16px;

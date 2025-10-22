@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useBgm } from "../context/BgmContext";
+import { useBgm } from "../../context/BgmContext";
 import { Tooltip } from "react-tooltip";
 import { useTranslation } from "react-i18next";
 
