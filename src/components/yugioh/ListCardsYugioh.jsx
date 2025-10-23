@@ -108,7 +108,7 @@ export default function ListCardsYugioh() {
         toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
         try {
           // Fallback to demoYugioh.json
-          const response = await fetch("/public/demo/demo-yugioh.json");
+          const response = await fetch("/demo/demo-yugioh.json");
           const fallbackData = await response.json();
 
           // Filter and sort fallback data to match current filters

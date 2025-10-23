@@ -94,7 +94,7 @@ export default function ListCardsPokemon() {
         toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
         try {
           // Fallback to demoPokemon.json
-          const response = await fetch("/public/demo/demo-pokemon.json");
+          const response = await fetch("/demo/demo-pokemon.json");
           const fallbackData = await response.json();
 
           // Filter and sort fallback data to match current filters
