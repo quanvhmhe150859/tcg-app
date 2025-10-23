@@ -18,7 +18,7 @@ const Header = ({ level }) => {
         </h1>
 
         {openTips && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-300">
             <div className="bg-game-secondary rounded-lg shadow-lg p-6 max-w-lg w-full relative">
               <button
                 onClick={() => setOpenTips(false)}

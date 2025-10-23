@@ -174,9 +174,9 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "armor",
       name: "Armor",
-      basePrice: 4,
-      min: 5,
-      max: 8,
+      basePrice: 6,
+      min: 4,
+      max: 6,
       format: (val) => `+${val}`,
     },
     {
@@ -238,7 +238,7 @@ export const generateUpgradeOptions = (player) => {
       stat.min + Math.random() * (stat.max - stat.min + 1)
     );
     const price = Math.floor(
-      stat.basePrice * value * (player.level / 2) + Math.random() * 100
+      stat.basePrice * value * Math.floor((player.level / 2) * 1.05) + Math.random() * 100
     );
 
     return {

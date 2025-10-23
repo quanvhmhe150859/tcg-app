@@ -6,11 +6,17 @@ const limitHealth = (entity) => {
 };
 
 // Hàm nhận sát thương chung
-const receiveDamage = (entity, damage, entityName, damageType, currentTurnLogs) => {
+const receiveDamage = (
+  entity,
+  damage,
+  entityName,
+  damageType,
+  currentTurnLogs
+) => {
   let finalDamage = damage;
 
   // Áp dụng giáp cho sát thương attack
-  if (damageType === "attack") {
+  if (damageType.includes("attack")) {
     finalDamage = applyArmor(entity, damage);
   }
 
@@ -124,7 +130,7 @@ export const applyThorn = (
       defender.rareStats.thorn,
       attackerName,
       "thorn",
-      currentTurnLogs,
+      currentTurnLogs
     );
   }
   return true;
@@ -271,7 +277,7 @@ export const attackPhase = (
       preArmorDamage,
       attackerName === "Player" ? "Enemy" : "Player",
       isCritical ? "attackCritical" : "attack",
-      currentTurnLogs,
+      currentTurnLogs
     )
   ) {
     return false;
@@ -308,7 +314,7 @@ export const applyBurn = (entity, entityName, currentTurnLogs) => {
       entity.effects.burnDot,
       entityName,
       "burn",
-      currentTurnLogs,
+      currentTurnLogs
     );
   }
   return true;
@@ -322,7 +328,7 @@ export const applyPoison = (entity, entityName, currentTurnLogs) => {
       damage,
       entityName,
       "poison",
-      currentTurnLogs,
+      currentTurnLogs
     );
     entity.effects.poisonDot += entity.effects.poisonBase;
     return result;

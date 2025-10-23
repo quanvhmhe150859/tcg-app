@@ -98,7 +98,7 @@ const useGameLogic = ({
    * Increases the reroll price and resets bought options.
    */
   const increaseRerollPrice = () => {
-    setRerollPrice((prev) => Math.floor(prev * 1.5));
+    setRerollPrice((prev) => Math.floor(prev * 1.6));
     setBoughtOptions([]);
   };
 
