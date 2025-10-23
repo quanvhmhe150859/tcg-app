@@ -223,14 +223,15 @@ const RandomCardsYugioh = () => {
         setFlippedStates(Array(result.length).fill(false)); // Khởi tạo trạng thái úp cho tất cả lá bài
       }
 
-      addCardsToLocalStorage(result, "yugioh", spinMode);
+      addCardsToLocalStorage(result, "yugioh", spinMode, noResultWarning);
     } catch (err) {
-      console.error("Lỗi khi roll:", err);
+      setNoResultWarning(true);
+      toast.success(t("showingDemoCardInstead"));
+      toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
       // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
       const response = await fetch("/demo/demoYugioh.json");
       const demoData = await response.json();
       let result = demoData.slice(0, baseCount);
-      setNoResultWarning(true);
       refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       setCards(result);
       setFlippedStates(Array(result.length).fill(false));
@@ -316,11 +317,11 @@ const RandomCardsYugioh = () => {
         </div>
       )}
 
-      {!isRolling && noResultWarning && (
+      {/* {!isRolling && noResultWarning && (
         <p className={styles.warningMessage}>
-          ⚠️ {t("noCardsMatchTheCurrentSelection")}. Demo: 
+          ⚠️ {t("noMatchingCardFoundOrAnErrorOccurred")}.
         </p>
-      )}
+      )} */}
 
       {!isRolling && cards.length > 0 && (
         <p className={styles.totalPrice}>

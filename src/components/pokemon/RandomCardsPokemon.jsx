@@ -10,6 +10,7 @@ import { spendTicketsIfNeeded, refundTickets } from "../../utils/ticketUtils";
 import { useTickets } from "../../context/TicketContext";
 import SelectBox from "../common/SelectBox";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 const RandomCardsPokemon = () => {
   const { t } = useTranslation();
@@ -102,13 +103,17 @@ const RandomCardsPokemon = () => {
         rarity: selectedRarity,
         superType: selectedSuperType,
       });
+      let isDemo = false;
 
       if (!result || result.length === 0) {
+        isDemo = true;
+        setNoResultWarning(true);
+        toast.success(t("showingDemoCardInstead"));
+        toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
         // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
         const response = await fetch("/demo/demoPokemon.json");
         const demoData = await response.json();
         result = demoData.slice(0, baseCount);
-        setNoResultWarning(true);
         refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       }
 
@@ -116,7 +121,7 @@ const RandomCardsPokemon = () => {
       setCards(result);
       setFlippedStates(Array(result.length).fill(false)); // Khởi tạo trạng thái úp
 
-      addCardsToLocalStorage(result, "pokemon", spinMode);
+      addCardsToLocalStorage(result, "pokemon", spinMode, isDemo);
     } catch (err) {
       setNoResultWarning(true);
       refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
@@ -217,9 +222,9 @@ const RandomCardsPokemon = () => {
         </div>
       )}
 
-      {!isRolling && noResultWarning && (
-        <p className="m-4">⚠️ {t("noCardsMatchTheCurrentSelection")}. Demo: </p>
-      )}
+      {/* {!isRolling && noResultWarning && (
+        <p className="m-4">⚠️ {t("noMatchingCardFoundOrAnErrorOccurred")}. </p>
+      )} */}
 
       <div className={styles.cardList}>
         {noResultWarning && (

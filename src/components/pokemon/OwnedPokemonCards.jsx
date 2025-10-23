@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
 import Pagination from "../common/Pagination";
+import { toast } from "react-hot-toast";
 
 const OwnedPokemonCards = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const OwnedPokemonCards = () => {
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState("id"); // Default sort by id
   const [sortOrder, setSortOrder] = useState("asc"); // Default ascending order
+  const [noResultWarning, setNoResultWarning] = useState(false);
 
   // Cache lưu kết quả các trang đã gọi
   const cacheRef = useRef({});
@@ -30,10 +32,11 @@ const OwnedPokemonCards = () => {
   }, []);
 
   const fetchCards = async () => {
-    if (allOwned.length === 0) {
-      setCards([]);
-      return;
-    }
+    //UNCOMMENT WHEN READY
+    // if (allOwned.length === 0) {
+    //   setCards([]);
+    //   return;
+    // }
 
     // Sort allOwned theo sortBy + sortOrder
     const sortedCards = [...allOwned].sort((a, b) => {
@@ -92,18 +95,48 @@ const OwnedPokemonCards = () => {
       cacheRef.current[cacheKey] = sortedRes;
       setCards(sortedRes);
     } catch (err) {
-      console.error("Failed to fetch owned pokemon cards", err);
+      setNoResultWarning(true);
+      toast.success(t("showingDemoCardInstead"));
+      toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
+      try {
+        // Fallback to demoPokemon.json
+        const response = await fetch("/public/demo/demoPokemon.json");
+        const fallbackData = await response.json();
+
+        // Sort fallback data theo sortBy + sortOrder
+        const sortedFallback = [...fallbackData].sort((a, b) => {
+          if (sortBy === "id") {
+            return sortOrder === "asc"
+              ? a.id.localeCompare(b.id)
+              : b.id.localeCompare(a.id);
+          } else {
+            return sortOrder === "asc"
+              ? a.quantity - b.quantity
+              : b.quantity - a.quantity;
+          }
+        });
+
+        cacheRef.current[cacheKey] = sortedFallback;
+        setCards(sortedFallback);
+      } catch (fallbackErr) {
+        console.error(
+          "Failed to fetch fallback data from demoPokemon.json",
+          fallbackErr
+        );
+        setCards([]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  //UNCOMMENT WHEN READY
   useEffect(() => {
-    if (allOwned.length > 0) {
-      fetchCards();
-    } else {
-      setCards([]);
-    }
+    // if (allOwned.length > 0) {
+    fetchCards();
+    // } else {
+    //   setCards([]);
+    // }
   }, [page, allOwned, sortBy, sortOrder]);
 
   return (
@@ -185,6 +218,12 @@ const OwnedPokemonCards = () => {
               />
 
               <div className={styles.cardList}>
+                {noResultWarning && (
+                  <div
+                    className="absolute inset-0 bg-[url('/demo/sample-watermark.png')] opacity-10 bg-repeat bg-[length:100px_100px] pointer-events-none w-full h-full z-10"
+                    style={{ backgroundSize: "100px 100px" }}
+                  ></div>
+                )}
                 <AnimatePresence>
                   {cards.filter(Boolean).map((card, index) => (
                     <motion.div
@@ -194,7 +233,11 @@ const OwnedPokemonCards = () => {
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <CardItemPokemon card={card} index={index} />
+                      <CardItemPokemon
+                        card={card}
+                        index={index}
+                        isApiFailed={noResultWarning}
+                      />
                     </motion.div>
                   ))}
                 </AnimatePresence>

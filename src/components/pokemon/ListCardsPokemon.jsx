@@ -7,6 +7,7 @@ import CardItemPokemon from "./CardItemPokemon";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 export default function ListCardsPokemon() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export default function ListCardsPokemon() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [noResultWarning, setNoResultWarning] = useState(false);
 
   // Bộ lọc mới
   const [superType, setSuperType] = useState(null);
@@ -87,8 +89,65 @@ export default function ListCardsPokemon() {
         setCards(data.data);
         setTotalPages(data.totalPages);
       } catch (err) {
-        console.error("Failed to fetch cards", err);
-        setCards([]);
+        setNoResultWarning(true);
+        toast.success(t("showingDemoCardInstead"));
+        toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
+        try {
+          // Fallback to demoPokemon.json
+          const response = await fetch("/public/demo/demoPokemon.json");
+          const fallbackData = await response.json();
+
+          // Filter and sort fallback data to match current filters
+          const filteredData = fallbackData
+            .filter((card) => {
+              const matchesSearch = debouncedSearch
+                ? card.name
+                    ?.toLowerCase()
+                    .includes(debouncedSearch.toLowerCase())
+                : true;
+              const matchesSuperType = superType?.value
+                ? card.supertype === superType.value
+                : true;
+              const matchesRarity = rarity?.value
+                ? card.rarity === rarity.value
+                : true;
+              const matchesType = type?.value
+                ? card.types?.includes(type.value)
+                : true;
+              const matchesDexNumber = debouncedDexNumber
+                ? card.nationalPokedexNumbers?.includes(
+                    Number(debouncedDexNumber)
+                  )
+                : true;
+              return (
+                matchesSearch &&
+                matchesSuperType &&
+                matchesRarity &&
+                matchesType &&
+                matchesDexNumber
+              );
+            })
+            .sort((a, b) => {
+              if (orderBy === "asc") {
+                return a.id.localeCompare(b.id);
+              } else {
+                return b.id.localeCompare(a.id);
+              }
+            });
+
+          // Simulate pagination
+          const start = (page - 1) * 20; // Assuming pageSize is 20
+          const paginatedData = filteredData.slice(start, start + 20);
+          setCards(paginatedData);
+          setTotalPages(Math.ceil(filteredData.length / 20));
+        } catch (fallbackErr) {
+          console.error(
+            "Failed to fetch fallback data from demoPokemon.json",
+            fallbackErr
+          );
+          setCards([]);
+          setTotalPages(1);
+        }
       } finally {
         setLoading(false);
       }
@@ -163,6 +222,12 @@ export default function ListCardsPokemon() {
         ) : (
           <>
             <div className={styles.cardList}>
+              {noResultWarning && (
+                <div
+                  className="absolute inset-0 bg-[url('/demo/sample-watermark.png')] opacity-10 bg-repeat bg-[length:100px_100px] pointer-events-none w-full h-full z-10"
+                  style={{ backgroundSize: "100px 100px" }}
+                ></div>
+              )}
               <AnimatePresence>
                 {cards.filter(Boolean).map((card, index) => (
                   <motion.div
@@ -172,7 +237,11 @@ export default function ListCardsPokemon() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <CardItemPokemon card={card} index={index} />
+                    <CardItemPokemon
+                      card={card}
+                      index={index}
+                      isApiFailed={noResultWarning}
+                    />
                   </motion.div>
                 ))}
               </AnimatePresence>

@@ -7,6 +7,7 @@ import CardItemYugioh from "./CardItemYugioh";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/RandomCards.module.css";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 export default function ListCardsYugioh() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export default function ListCardsYugioh() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [noResultWarning, setNoResultWarning] = useState(false);
 
   // Bộ lọc
   const [atkMin, setAtkMin] = useState("");
@@ -101,8 +103,82 @@ export default function ListCardsYugioh() {
         setCards(data.data);
         setTotalPages(data.totalPages);
       } catch (err) {
-        console.error("Failed to fetch cards", err);
-        setCards([]);
+        setNoResultWarning(true);
+        toast.success(t("showingDemoCardInstead"));
+        toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
+        try {
+          // Fallback to demoYugioh.json
+          const response = await fetch("/public/demo/demoYugioh.json");
+          const fallbackData = await response.json();
+
+          // Filter and sort fallback data to match current filters
+          const filteredData = fallbackData
+            .filter((card) => {
+              const matchesSearch = debouncedSearch
+                ? card.name
+                    ?.toLowerCase()
+                    .includes(debouncedSearch.toLowerCase())
+                : true;
+              const matchesType = type?.value ? card.type === type.value : true;
+              const matchesArchetype = archetype?.value
+                ? card.archetype === archetype.value
+                : true;
+              const matchesAttribute = attribute?.value
+                ? card.attribute === attribute.value
+                : true;
+              const matchesAtkMin = atkMin ? card.atk >= Number(atkMin) : true;
+              const matchesAtkMax = atkMax ? card.atk <= Number(atkMax) : true;
+              const matchesDefMin = defMin ? card.def >= Number(defMin) : true;
+              const matchesDefMax = defMax ? card.def <= Number(defMax) : true;
+              const matchesLevelMin = levelMin
+                ? card.level >= Number(levelMin)
+                : true;
+              const matchesLevelMax = levelMax
+                ? card.level <= Number(levelMax)
+                : true;
+              return (
+                matchesSearch &&
+                matchesType &&
+                matchesArchetype &&
+                matchesAttribute &&
+                matchesAtkMin &&
+                matchesAtkMax &&
+                matchesDefMin &&
+                matchesDefMax &&
+                matchesLevelMin &&
+                matchesLevelMax
+              );
+            })
+            .sort((a, b) => {
+              if (orderField === "name") {
+                return orderBy === "asc"
+                  ? a.name.localeCompare(b.name)
+                  : b.name.localeCompare(a.name);
+              } else if (orderField === "atk") {
+                return orderBy === "asc" ? a.atk - b.atk : b.atk - a.atk;
+              } else if (orderField === "def") {
+                return orderBy === "asc" ? a.def - b.def : b.def - a.def;
+              } else if (orderField === "level") {
+                return orderBy === "asc"
+                  ? a.level - b.level
+                  : b.level - a.level;
+              }
+              return 0;
+            });
+
+          // Simulate pagination
+          const start = (page - 1) * 20; // Assuming pageSize is 20
+          const paginatedData = filteredData.slice(start, start + 20);
+          setCards(paginatedData);
+          setTotalPages(Math.ceil(filteredData.length / 20));
+        } catch (fallbackErr) {
+          console.error(
+            "Failed to fetch fallback data from demoYugioh.json",
+            fallbackErr
+          );
+          setCards([]);
+          setTotalPages(1);
+        }
       } finally {
         setLoading(false);
       }
@@ -129,14 +205,6 @@ export default function ListCardsYugioh() {
       setShowSidebar(window.innerWidth >= 1024);
     }
   }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   return (
     <div className="flex gap-4 p-4 justify-center">
@@ -196,6 +264,12 @@ export default function ListCardsYugioh() {
         ) : (
           <>
             <div className={styles.cardList}>
+              {noResultWarning && (
+                <div
+                  className="absolute inset-0 bg-[url('/demo/sample-watermark.png')] opacity-10 bg-repeat bg-[length:100px_100px] pointer-events-none w-full h-full z-10"
+                  style={{ backgroundSize: "100px 100px" }}
+                ></div>
+              )}
               <AnimatePresence>
                 {cards.filter(Boolean).map((card, index) => (
                   <motion.div
@@ -205,7 +279,11 @@ export default function ListCardsYugioh() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <CardItemYugioh card={card} index={index} />
+                    <CardItemYugioh
+                      card={card}
+                      index={index}
+                      isApiFailed={noResultWarning}
+                    />
                   </motion.div>
                 ))}
               </AnimatePresence>
