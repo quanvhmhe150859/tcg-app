@@ -111,7 +111,7 @@ const RandomCardsPokemon = () => {
         toast.success(t("showingDemoCardInstead"));
         toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
         // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
-        const response = await fetch("/demo/demoPokemon.json");
+        const response = await fetch("/demo/demo-pokemon.json");
         const demoData = await response.json();
         result = demoData.slice(0, baseCount);
         refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);

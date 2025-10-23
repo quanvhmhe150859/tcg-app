@@ -98,7 +98,7 @@ const OwnedYugiohCards = () => {
       toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
       try {
         // Fallback to demoYugioh.json
-        const response = await fetch("/public/demo/demoYugioh.json");
+        const response = await fetch("/public/demo/demo-yugioh.json");
         const fallbackData = await response.json();
 
         // Sort fallback data theo sortBy + sortOrder

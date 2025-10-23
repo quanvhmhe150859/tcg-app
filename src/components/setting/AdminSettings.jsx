@@ -37,11 +37,12 @@ const AdminSettings = () => {
   useEffect(() => {
     if (location.state?.defaultTab && tab === location.state.defaultTab) {
       const timer = setTimeout(() => {
-        window.scrollTo({
-          top: document.body.scrollHeight - 200,
-          behavior: "smooth",
-        });
-      }, 500); // chờ render 0.5s
+        const el = document.getElementById("target-section");
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.scrollY - 10; // 👈 trừ 10px
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 500); // chờ 0.5s cho component render xong
       return () => clearTimeout(timer);
     }
   }, [tab, location.state]);
@@ -151,7 +152,9 @@ const AdminSettings = () => {
       </div>
 
       {(tab === "pokemon" || tab === "yugioh") && (
-        <button className="" onClick={handleSave}>{t("save")}</button>
+        <button className="" onClick={handleSave}>
+          {t("save")}
+        </button>
       )}
     </div>
   );

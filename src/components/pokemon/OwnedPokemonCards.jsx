@@ -100,7 +100,7 @@ const OwnedPokemonCards = () => {
       toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
       try {
         // Fallback to demoPokemon.json
-        const response = await fetch("/public/demo/demoPokemon.json");
+        const response = await fetch("/public/demo/demo-pokemon.json");
         const fallbackData = await response.json();
 
         // Sort fallback data theo sortBy + sortOrder

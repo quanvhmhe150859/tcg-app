@@ -110,7 +110,7 @@ const AllowedRaritiesYugiohWeight = forwardRef((props, ref) => {
   const total = Object.values(weights).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="section">
+    <div id="target-section" className="section">
       <Tooltip id="tooltip" />
 
       <h3 className="text-lg font-bold">{i18n.language == "en" ? "Rarities Banners" : "Banner Rarities"} {t("allowed")}</h3>

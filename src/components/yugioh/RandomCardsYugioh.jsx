@@ -90,7 +90,7 @@ const RandomCardsYugioh = () => {
         Object.keys(parsedRaw).length === 0)
     ) {
       toast.error("Chưa thiết lập Allowed Rarities Yugioh Weights!");
-      navigate("/", { state: { defaultTab: "yugioh" } });
+      navigate("/settings", { state: { defaultTab: "yugioh" } });
     }
   }, [navigate]);
 
@@ -228,8 +228,8 @@ const RandomCardsYugioh = () => {
       setNoResultWarning(true);
       toast.success(t("showingDemoCardInstead"));
       toast.error(t("noMatchingCardFoundOrAnErrorOccurred"));
-      // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
-      const response = await fetch("/demo/demoYugioh.json");
+      // Nếu API trả về rỗng, lấy dữ liệu từ file demoYugioh.json
+      const response = await fetch("/demo/demo-yugioh.json");
       const demoData = await response.json();
       let result = demoData.slice(0, baseCount);
       refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
