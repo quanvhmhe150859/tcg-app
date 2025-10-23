@@ -166,7 +166,7 @@ const OwnedPokemonCards = () => {
         </div>
       </div>
 
-      {loading && <p>{t("loading")}</p>}
+      {loading && <p>{t("loadingCards")}</p>}
 
       {!loading && (
         <>

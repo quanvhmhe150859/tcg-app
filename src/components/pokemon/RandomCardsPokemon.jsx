@@ -96,7 +96,7 @@ const RandomCardsPokemon = () => {
     setNoResultWarning(false);
 
     try {
-      const result = await getPokemonCards({
+      let result = await getPokemonCards({
         count: baseCount,
         type: selectedType,
         rarity: selectedRarity,
@@ -104,6 +104,10 @@ const RandomCardsPokemon = () => {
       });
 
       if (!result || result.length === 0) {
+        // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
+        const response = await fetch("/demo/demoPokemon.json");
+        const demoData = await response.json();
+        result = demoData.slice(0, baseCount);
         setNoResultWarning(true);
         refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       }
@@ -214,10 +218,16 @@ const RandomCardsPokemon = () => {
       )}
 
       {!isRolling && noResultWarning && (
-        <p className="m-4">⚠️ {t("noCardsMatchTheCurrentSelection")}.</p>
+        <p className="m-4">⚠️ {t("noCardsMatchTheCurrentSelection")}. Demo: </p>
       )}
 
       <div className={styles.cardList}>
+        {noResultWarning && (
+          <div
+            className="absolute inset-0 bg-[url('/demo/sample-watermark.png')] opacity-10 bg-repeat bg-[length:100px_100px] pointer-events-none w-full h-full z-10"
+            style={{ backgroundSize: "100px 100px" }}
+          ></div>
+        )}
         <AnimatePresence>
           {cards.filter(Boolean).map((card, index) => (
             <motion.div
@@ -232,6 +242,7 @@ const RandomCardsPokemon = () => {
                 index={index}
                 isFlipped={flippedStates[index] || false}
                 onCardFlip={() => handleCardFlip(index)}
+                isApiFailed={noResultWarning}
               />
             </motion.div>
           ))}

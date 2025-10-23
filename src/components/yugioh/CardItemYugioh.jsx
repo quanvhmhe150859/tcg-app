@@ -5,7 +5,7 @@ import CardItemYugiohModal from "./CardItemYugiohModal";
 import "../styles/CardItem.css";
 import { motion } from "framer-motion";
 
-const CardItemYugioh = ({ card, index, isFlipped = true, type, onCardFlip }) => {
+const CardItemYugioh = ({ card, index, isFlipped = true, type, onCardFlip, isApiFailed }) => {
   const [showModal, setShowModal] = useState(false);
   const cardId = card.cardId || card.card_id || "unknown";
   const smallImageUrl = `${
@@ -33,7 +33,7 @@ const CardItemYugioh = ({ card, index, isFlipped = true, type, onCardFlip }) => 
     >
       <div className={`image-container yugioh-card`} onClick={handleCardClick}>
         <motion.img
-          src={isFlipped ? smallImageUrl : backCardUrl}
+          src={isFlipped ? isApiFailed ? card.imageUrlsmall : smallImageUrl : backCardUrl}
           alt={isFlipped ? card.name : "Card Back"}
           className={`card-image`}
           style={{ width: "184px", height: "268.44px" }}
@@ -106,6 +106,7 @@ const CardItemYugioh = ({ card, index, isFlipped = true, type, onCardFlip }) => 
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         card={card}
+        isApiFailed={isApiFailed}
       />
     </motion.div>
   );

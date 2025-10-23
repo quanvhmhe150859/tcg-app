@@ -1,4 +1,4 @@
-export const getRarityStyle = (rarity) => {
+export const getRarityStylePokemon = (rarity) => {
   const baseStyle = {
     padding: "2px 6px",
     borderRadius: "999px",

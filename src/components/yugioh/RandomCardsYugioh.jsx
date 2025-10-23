@@ -217,7 +217,6 @@ const RandomCardsYugioh = () => {
 
       if (!result || result.length === 0) {
         setNoResultWarning(true);
-        setCards([]);
         refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
       } else {
         setCards(result);
@@ -227,9 +226,14 @@ const RandomCardsYugioh = () => {
       addCardsToLocalStorage(result, "yugioh", spinMode);
     } catch (err) {
       console.error("Lỗi khi roll:", err);
+      // Nếu API trả về rỗng, lấy dữ liệu từ file demoPokemon.json
+      const response = await fetch("/demo/demoYugioh.json");
+      const demoData = await response.json();
+      let result = demoData.slice(0, baseCount);
       setNoResultWarning(true);
-      setCards([]);
       refundTickets(ticketCost, spinMode, updatedTickets, updateTickets);
+      setCards(result);
+      setFlippedStates(Array(result.length).fill(false));
     } finally {
       setIsRolling(false);
     }
@@ -282,22 +286,24 @@ const RandomCardsYugioh = () => {
           )}
         </div>
 
-          <RollButtonGroup
-            handleRoll={handleRoll}
-            isRolling={isRolling}
-            spinMode={spinMode}
-            ticketOptions={[calcTicketCost(1), calcTicketCost(10)]}
-          />
+        <RollButtonGroup
+          handleRoll={handleRoll}
+          isRolling={isRolling}
+          spinMode={spinMode}
+          ticketOptions={[calcTicketCost(1), calcTicketCost(10)]}
+        />
         <div className="flex justify-center mt-2">
-          {!isRolling && cards.length > 0 && !flippedStates.every((state) => state) && (
-            <button
-              onClick={handleFlipAll}
-              disabled={flippedStates.every((state) => state)} // Vô hiệu hóa nếu tất cả đã lật
-              className="toggle-button"
-            >
-              {t("openAllCards")}
-            </button>
-          )}
+          {!isRolling &&
+            cards.length > 0 &&
+            !flippedStates.every((state) => state) && (
+              <button
+                onClick={handleFlipAll}
+                disabled={flippedStates.every((state) => state)} // Vô hiệu hóa nếu tất cả đã lật
+                className="toggle-button"
+              >
+                {t("openAllCards")}
+              </button>
+            )}
         </div>
       </div>
 
@@ -312,7 +318,7 @@ const RandomCardsYugioh = () => {
 
       {!isRolling && noResultWarning && (
         <p className={styles.warningMessage}>
-          ⚠️ {t("noCardsMatchTheCurrentSelection")}.
+          ⚠️ {t("noCardsMatchTheCurrentSelection")}. Demo: 
         </p>
       )}
 
@@ -323,6 +329,12 @@ const RandomCardsYugioh = () => {
       )}
 
       <div className={styles.cardList}>
+        {noResultWarning && (
+          <div
+            className="absolute inset-0 bg-[url('/demo/sample-watermark.png')] opacity-10 bg-repeat bg-[length:100px_100px] pointer-events-none w-full h-full z-10"
+            style={{ backgroundSize: "100px 100px" }}
+          ></div>
+        )}
         <AnimatePresence>
           {cards.filter(Boolean).map((card, index) => (
             <motion.div
@@ -338,6 +350,7 @@ const RandomCardsYugioh = () => {
                 isFlipped={flippedStates[index] || false}
                 type="gacha"
                 onCardFlip={() => handleCardFlip(card.price || 0, index)} // ← Chỉ cập nhật totalPrice
+                isApiFailed={noResultWarning}
               />
             </motion.div>
           ))}

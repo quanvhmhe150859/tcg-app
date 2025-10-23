@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/CardItem.css";
 
-const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
+const CardItemPokemonModal = ({ isOpen, onClose, card, isApiFailed }) => {
   if (!isOpen) return null;
 
   const hiresUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${card.id}_hires.png`;
@@ -9,7 +9,7 @@ const CardItemPokemonModal = ({ isOpen, onClose, card }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <img className="hires-image pokemon" src={hiresUrl} alt={card.name} />
+        <img className="hires-image pokemon" src={isApiFailed ? card.cardImage.largeUrl : hiresUrl} alt={card.name} />
         <button className="close-button" onClick={onClose}>
           ✖
         </button>

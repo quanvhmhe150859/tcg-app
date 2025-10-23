@@ -1,0 +1,122 @@
+[
+  {
+    "cardId": 52945066,
+    "name": "Marincess Wave",
+    "archetype": "Marincess",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/52945066.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/52945066.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/52945066.jpg",
+    "price": 0.9,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Legendary Duelists: Duels From the Deep"
+  },
+  {
+    "cardId": 53129443,
+    "name": "Dark Hole",
+    "archetype": "Hole",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/53129443.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/53129443.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/53129443.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Starter Deck: Codebreaker"
+  },
+  {
+    "cardId": 58820853,
+    "name": "Blackwing - Shura the Blue Flame",
+    "archetype": "Blackwing",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/58820853.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/58820853.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/58820853.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Raging Battle"
+  },
+  {
+    "cardId": 61204971,
+    "name": "Elemental HERO Thunder Giant",
+    "archetype": "Elemental HERO",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/61204971.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/61204971.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/61204971.jpg",
+    "price": 0,
+    "rarity": "Normal Parallel Rare",
+    "setRarityCode": "",
+    "setName": "Mattel Action Figure promotional cards: Series 1"
+  },
+  {
+    "cardId": 90664857,
+    "name": "Virtual World Shell - Jaja",
+    "archetype": "Virtual World",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/90664857.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/90664857.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/90664857.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Phantom Rage"
+  },
+  {
+    "cardId": 84550200,
+    "name": "Sonic Jammer",
+    "archetype": null,
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/84550200.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/84550200.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/84550200.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Dark Revelation Volume 2"
+  },
+  {
+    "cardId": 11987744,
+    "name": "Nin-Ken Dog",
+    "archetype": "Ninja",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/11987744.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/11987744.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/11987744.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Dark Crisis"
+  },
+  {
+    "cardId": 78984772,
+    "name": "Twin-Headed Fire Dragon",
+    "archetype": null,
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/78984772.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/78984772.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/78984772.jpg",
+    "price": 3.13,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Pharaoh's Servant"
+  },
+  {
+    "cardId": 97534104,
+    "name": "Mystic Potato",
+    "archetype": "Attribute Summoner",
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/97534104.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/97534104.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/97534104.jpg",
+    "price": 0,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "2025 Mega-Pack Tin"
+  },
+  {
+    "cardId": 17052477,
+    "name": "Guarded Treasure",
+    "archetype": null,
+    "imageUrl": "https://images.ygoprodeck.com/images/cards/17052477.jpg",
+    "imageUrlsmall": "https://images.ygoprodeck.com/images/cards_small/17052477.jpg",
+    "imageUrlcropped": "https://images.ygoprodeck.com/images/cards_cropped/17052477.jpg",
+    "price": 2.24,
+    "rarity": "Common",
+    "setRarityCode": "(C)",
+    "setName": "Dragons of Legend: The Complete Series"
+  }
+]

@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/CardItem.css";
 
-const CardItemYugiohModal = ({ isOpen, onClose, card }) => {
+const CardItemYugiohModal = ({ isOpen, onClose, card, isApiFailed }) => {
   if (!isOpen) return null;
 
   const bigImageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/yugioh/${card.cardId}.jpg`;
@@ -9,7 +9,7 @@ const CardItemYugiohModal = ({ isOpen, onClose, card }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <img src={bigImageUrl} alt={card.name} className="hires-image yugioh" />
+        <img src={isApiFailed ? card.imageUrl : bigImageUrl} alt={card.name} className="hires-image yugioh" />
         <button className="close-button" onClick={onClose}>
           ✖
         </button>

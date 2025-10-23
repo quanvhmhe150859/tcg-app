@@ -1,0 +1,290 @@
+[
+  {
+    "id": "xyp-XY114",
+    "name": "Darkrai",
+    "supertype": "Pokémon",
+    "rarity": "Promo",
+    "level": null,
+    "hp": "110",
+    "artist": "kawayoo",
+    "flavorText": "It can lull people to sleep and make them dream. It is active during nights of the new moon.",
+    "evolvesFrom": null,
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "xyp-XY114",
+      "smallUrl": "https://images.pokemontcg.io/xyp/XY114.png",
+      "largeUrl": "https://images.pokemontcg.io/xyp/XY114_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 16156,
+        "cardId": "xyp-XY114",
+        "type": "Darkness"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "sv8pt5-125",
+    "name": "Professor's Research",
+    "supertype": "Trainer",
+    "rarity": "Common",
+    "level": null,
+    "hp": null,
+    "artist": null,
+    "flavorText": null,
+    "evolvesFrom": null,
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "sv8pt5-125",
+      "smallUrl": "https://images.pokemontcg.io/sv8pt5/125.png",
+      "largeUrl": "https://images.pokemontcg.io/sv8pt5/125_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "sv1-49",
+    "name": "Clauncher",
+    "supertype": "Pokémon",
+    "rarity": "Common",
+    "level": null,
+    "hp": "70",
+    "artist": "miki kudo",
+    "flavorText": "Clauncher's claws will regrow if they fall off. The meat inside the claws is edible, but it has a distinct flavor that doesn't appeal to all tastes.",
+    "evolvesFrom": null,
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "sv1-49",
+      "smallUrl": "https://images.pokemontcg.io/sv1/49.png",
+      "largeUrl": "https://images.pokemontcg.io/sv1/49_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 9095,
+        "cardId": "sv1-49",
+        "type": "Water"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "pl3-68",
+    "name": "Masquerain",
+    "supertype": "Pokémon",
+    "rarity": "Uncommon",
+    "level": "36",
+    "hp": "80",
+    "artist": "Masakazu Fukuda",
+    "flavorText": "Its antennae have eye patterns on them. Its four wings enable it to hover and fly in any direction.",
+    "evolvesFrom": "Surskit",
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "pl3-68",
+      "smallUrl": "https://images.pokemontcg.io/pl3/68.png",
+      "largeUrl": "https://images.pokemontcg.io/pl3/68_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 6268,
+        "cardId": "pl3-68",
+        "type": "Grass"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "pl3-73",
+    "name": "Ninjask",
+    "supertype": "Pokémon",
+    "rarity": "Uncommon",
+    "level": "38",
+    "hp": "80",
+    "artist": "Kouki Saitou",
+    "flavorText": "Because it moves so quickly, it sometimes becomes unseeable. It congregates around tree sap.",
+    "evolvesFrom": "Nincada",
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "pl3-73",
+      "smallUrl": "https://images.pokemontcg.io/pl3/73.png",
+      "largeUrl": "https://images.pokemontcg.io/pl3/73_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 6273,
+        "cardId": "pl3-73",
+        "type": "Grass"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "sm10-182",
+    "name": "Pokégear 3.0",
+    "supertype": "Trainer",
+    "rarity": "Uncommon",
+    "level": null,
+    "hp": null,
+    "artist": "Studio Bora Inc.",
+    "flavorText": null,
+    "evolvesFrom": null,
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "sm10-182",
+      "smallUrl": "https://images.pokemontcg.io/sm10/182.png",
+      "largeUrl": "https://images.pokemontcg.io/sm10/182_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "zsv10pt5-154",
+    "name": "Rufflet",
+    "supertype": "Pokémon",
+    "rarity": "Illustration Rare",
+    "level": null,
+    "hp": "70",
+    "artist": "Miki Tanaka",
+    "flavorText": "They crush berries with their talons. They bravely stand up to any opponent, no matter how strong it is.",
+    "evolvesFrom": null,
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "zsv10pt5-154",
+      "smallUrl": "https://images.pokemontcg.io/zsv10pt5/154.png",
+      "largeUrl": "https://images.pokemontcg.io/zsv10pt5/154_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 16549,
+        "cardId": "zsv10pt5-154",
+        "type": "Colorless"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "base2-35",
+    "name": "Exeggutor",
+    "supertype": "Pokémon",
+    "rarity": "Uncommon",
+    "level": "35",
+    "hp": "80",
+    "artist": "Kagemaru Himeno",
+    "flavorText": "Legend has it that on rare occasions, one of its heads will drop off and continue on as an Exeggcute.",
+    "evolvesFrom": "Exeggcute",
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "base2-35",
+      "smallUrl": "https://images.pokemontcg.io/base2/35.png",
+      "largeUrl": "https://images.pokemontcg.io/base2/35_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 104,
+        "cardId": "base2-35",
+        "type": "Grass"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "ecard1-78",
+    "name": "Gloom",
+    "supertype": "Pokémon",
+    "rarity": "Uncommon",
+    "level": null,
+    "hp": "70",
+    "artist": "Yuichi Sawayama",
+    "flavorText": null,
+    "evolvesFrom": "Oddish",
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "ecard1-78",
+      "smallUrl": "https://images.pokemontcg.io/ecard1/78.png",
+      "largeUrl": "https://images.pokemontcg.io/ecard1/78_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 2850,
+        "cardId": "ecard1-78",
+        "type": "Grass"
+      }
+    ],
+    "cardWeaknesses": []
+  },
+  {
+    "id": "sv10-56",
+    "name": "Gorebyss",
+    "supertype": "Pokémon",
+    "rarity": "Rare",
+    "level": null,
+    "hp": "90",
+    "artist": null,
+    "flavorText": null,
+    "evolvesFrom": "Clamperl",
+    "cardAbilities": [],
+    "cardAttacks": [],
+    "cardDexNumbers": [],
+    "cardImage": {
+      "cardId": "sv10-56",
+      "smallUrl": "https://images.pokemontcg.io/sv10/56.png",
+      "largeUrl": "https://images.pokemontcg.io/sv10/56_hires.png"
+    },
+    "cardLegalities": [],
+    "cardRetreatCosts": [],
+    "cardSubtypes": [],
+    "cardTypes": [
+      {
+        "id": 9311,
+        "cardId": "sv10-56",
+        "type": "Water"
+      }
+    ],
+    "cardWeaknesses": []
+  }
+]

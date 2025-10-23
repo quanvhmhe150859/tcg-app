@@ -24,6 +24,7 @@ export default function ListCardsPokemon() {
   const [rarity, setRarity] = useState(null);
   const [type, setType] = useState(null);
   const [dexNumber, setDexNumber] = useState("");
+  const [debouncedDexNumber, setDebouncedDexNumber] = useState("");
   const [orderBy, setOrderBy] = useState("asc");
 
   // react-select options
@@ -59,6 +60,18 @@ export default function ListCardsPokemon() {
   }, [search]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDexNumber(dexNumber);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [dexNumber]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [superType, rarity, type]);
+
+  useEffect(() => {
     const getCards = async () => {
       setLoading(true);
       try {
@@ -68,7 +81,7 @@ export default function ListCardsPokemon() {
           superType: superType?.value,
           rarity: rarity?.value,
           type: type?.value,
-          dexNumber,
+          dexNumber: debouncedDexNumber,
           orderBy,
         });
         setCards(data.data);
@@ -82,7 +95,15 @@ export default function ListCardsPokemon() {
     };
 
     getCards();
-  }, [debouncedSearch, page, superType, rarity, type, dexNumber, orderBy]);
+  }, [
+    debouncedSearch,
+    debouncedDexNumber,
+    page,
+    superType,
+    rarity,
+    type,
+    orderBy,
+  ]);
 
   return (
     <div className="flex gap-4 p-4 justify-center">

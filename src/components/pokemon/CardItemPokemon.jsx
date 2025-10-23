@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
 import "../styles/CardItem.css";
 import "./rarityEffects.css";
-import { getRarityStyle } from "../../utils/getRarityStyle";
+import { getRarityStylePokemon } from "../../utils/getRarityStylePokemon";
 import CardItemPokemonModal from "./CardItemPokemonModal";
 
-const CardItemPokemon = ({ card, index, isFlipped = true, onCardFlip }) => {
+const CardItemPokemon = ({ card, index, isFlipped = true, onCardFlip, isApiFailed }) => {
   const [showModal, setShowModal] = useState(false);
   const smallUrl = `${import.meta.env.VITE_API_BASE_URL}/api/images/pokemon/${
     card.id
   }.png`;
   const backCardUrl = "/default-pokemon.png";
-  const rarityStyle = getRarityStyle(card.rarity);
+  const rarityStyle = getRarityStylePokemon(card.rarity);
   const rarityClass = rarityStyle.className || "";
 
   const handleCardClick = () => {
@@ -32,7 +32,7 @@ const CardItemPokemon = ({ card, index, isFlipped = true, onCardFlip }) => {
     >
       <div className={`image-container ${rarityClass}`} onClick={handleCardClick}>
         <motion.img
-          src={isFlipped ? smallUrl : backCardUrl}
+          src={isFlipped ? (isApiFailed ? card.cardImage.smallUrl : smallUrl) : backCardUrl}
           alt={isFlipped ? card.name : "Card Back"}
           className="card-image pokemon"
           initial={{ rotateY: isFlipped ? 180 : 0 }}
@@ -77,6 +77,7 @@ const CardItemPokemon = ({ card, index, isFlipped = true, onCardFlip }) => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         card={card}
+        isApiFailed={isApiFailed}
       />
     </motion.div>
   );

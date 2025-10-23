@@ -65,7 +65,6 @@ export default function Sidebar({
         className="border p-2 rounded w-full mb-3"
         value={dexNumber}
         onChange={(e) => setDexNumber(e.target.value)}
-        disabled={loading}
       />
 
       {/* Name */}
@@ -75,7 +74,6 @@ export default function Sidebar({
         className="border p-2 rounded w-full mb-3"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        disabled={loading}
       />
 
       {/* SuperType */}
