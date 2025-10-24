@@ -11,6 +11,7 @@ import "./i18n";
 
 import MainLayout from "./layouts/MainLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
+import SpriteSheetUploaderAndPlayer from "../test/SpriteSheetUploaderAndPlayer";
 
 // Lazy load các trang
 const RandomCardsPokemon = lazy(() => import("./components/pokemon/RandomCardsPokemon"));
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="/game" element={<BattleGame />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/imagegenerator" element={<ImageGenerator />} />
+            <Route path="/test" element={<SpriteSheetUploaderAndPlayer />} />
           </Route>
 
           {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}
