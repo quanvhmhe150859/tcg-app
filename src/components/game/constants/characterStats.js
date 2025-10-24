@@ -1,9 +1,32 @@
 export const CHARACTER_STATS = {
   agathe: {
     default: {
-      maxAttack: 10,
       armor: 8,
+      maxAttack: 10,
       //   special: "Fire Strike",
+    },
+    heretic_punisher_captain: {
+      armor: 2,
+      maxAttack: 20,
+      //   special: "Flaming Barrage",
+    },
+    undead: {
+      maxHealth: -200,
+      armor: -5,
+      maxAttack: 10,
+      lifeSteal: 0.15,
+      //   special: "Dark Cleave",
+    },
+    pristine_winter: {
+      armor: 15,
+      maxAttack: 5,
+      //   special: "Frostbite Edge",
+    },
+    knight: {
+      armor: 8,
+      maxAttack: 10,
+      dodge: 0.05,
+      //   special: "Shield Bash",
     },
   },
   bardrey: {
@@ -37,6 +60,14 @@ export const CHARACTER_STATS = {
         shield: 50,
       },
       //   special: "Swift Arrow",
+    },
+    poison_apple: {
+      armor: 2,
+      dodge: 0.1,
+      rareStats: {
+        poison: 2,
+      },
+      //   special: "Toxic Slam",
     },
   },
   gidnil: {

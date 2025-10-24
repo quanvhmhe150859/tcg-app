@@ -42,10 +42,10 @@ function calculateTickets(level) {
   } else if (level < 30) {
     return Math.floor(level * 1.2);
   } else if (level < 40) {
-    return Math.floor(level * 1.5);
+    return Math.floor(level * 1.7);
   } else if (level < 50) {
-    return Math.floor(level * 1.8);
+    return Math.floor(level * 2.0);
   } else {
-    return Math.floor(level * 2.1);
+    return Math.floor(level * 2.5);
   }
 }
