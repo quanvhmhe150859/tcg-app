@@ -28,4 +28,4 @@ dist-ssr
 *.crt
 
 # Ignore sprite images
-public/sprites/
+# public/sprites/

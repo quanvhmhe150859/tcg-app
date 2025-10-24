@@ -84,7 +84,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
 
       {/* Health luôn hiện chữ đầy đủ */}
       <div
-        className="p-1 relative"
+        className="p-1 relative z-300"
         onMouseEnter={() => setIsHealthBarHovered(true)}
         onMouseLeave={() => setIsHealthBarHovered(false)}
       >

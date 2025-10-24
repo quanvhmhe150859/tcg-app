@@ -7,6 +7,7 @@ import {
 } from "../initializers";
 import { playerTurn, enemyTurn } from "../gameLogic";
 import { addLog, checkGameOver, startTurn } from "../utils";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Custom hook to manage game logic for BattleGame component.
@@ -157,6 +158,16 @@ const useGameLogic = ({
         newPlayer.maxAttack += value;
         addLog(
           `Player purchased Max Attack by +${value} due to Min Attack exceeding Max Attack for ${option.price} gold!`,
+          "purchase",
+          currentTurnLogs
+        );
+      } else if (option.key === "currentHealth") {
+        newPlayer.currentHealth = Math.min(
+          newPlayer.currentHealth + value,
+          newPlayer.maxHealth
+        );
+        addLog(
+          `Player purchased ${option.name} by +${value} for ${option.price} gold!`,
           "purchase",
           currentTurnLogs
         );
@@ -412,22 +423,26 @@ const useGameLogic = ({
   /**
    * Resets the game to initial state.
    */
+  const navigate = useNavigate();
+
   const resetGame = () => {
-    setPlayer(initPlayer());
-    setEnemy(initEnemy(1));
-    setTurnLogs([]);
-    setGameOver(false);
-    setTurnCount(1);
-    setGlobalTurnCount(1);
-    setLogId(1);
-    setLevel(1);
-    setIsAuto(false);
-    setShowUpgradeOptions(false);
-    setUpgradeOptions([]);
-    setIsRareUpgrade(false);
-    setShowShop(false);
-    setShopOptions([]);
-    resetShopState();
+    navigate("/characterselection");
+
+    // setPlayer(initPlayer());
+    // setEnemy(initEnemy(1));
+    // setTurnLogs([]);
+    // setGameOver(false);
+    // setTurnCount(1);
+    // setGlobalTurnCount(1);
+    // setLogId(1);
+    // setLevel(1);
+    // setIsAuto(false);
+    // setShowUpgradeOptions(false);
+    // setUpgradeOptions([]);
+    // setIsRareUpgrade(false);
+    // setShowShop(false);
+    // setShopOptions([]);
+    // resetShopState();
   };
 
   return {
