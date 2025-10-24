@@ -103,40 +103,39 @@ export const initPlayer = (characterKey) => {
 };
 
 export const initEnemy = (level) => {
-  const scale = Math.pow(level, 1.1);
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
-  const bossMultiplier = (isBoss ? 1 : 0) + (level === 30 ? 2 : 1);
-  const health = Math.floor(10 * scale * baseFactor * bossMultiplier);
+  const bossMultiplier = isBoss ? 2 : 1;
+  const health = Math.floor(12 * level * baseFactor * bossMultiplier);
   const enemy = {
     maxHealth: health,
     currentHealth: health,
-    regeneration: Math.floor(0.1 * scale * baseFactor * bossMultiplier),
-    armor: Math.floor(0.4 * scale * baseFactor * bossMultiplier),
-    minAttack: Math.floor(0.7 * scale * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(2 * scale * baseFactor * bossMultiplier),
-    critChance: 0.005 * scale * baseFactor,
-    critDamage: 1 + 0.05 * scale * baseFactor,
-    lifeSteal: 0.003 * scale * baseFactor,
-    dodge: 0.001 * scale * baseFactor,
+    minAttack: Math.floor(3 * level * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(5 * level * baseFactor * bossMultiplier),
+    critChance: 0.1 * baseFactor,
+    critDamage: 2 * baseFactor,
+    lifeSteal: 0.1 * baseFactor,
+    regeneration: Math.floor(0.1 * level * baseFactor * bossMultiplier),
+    dodge: 0.01 * baseFactor,
+    armor: Math.floor(1 * level * baseFactor * bossMultiplier),
     rareStats: {
       burn: Math.floor(
-        0.08 * (level >= 10 ? scale : 0) * baseFactor * bossMultiplier
+        0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       poison: Math.floor(
-        0.05 * (level >= 10 ? scale : 0) * baseFactor * bossMultiplier
+        0.05 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       thorn: Math.floor(
-        0.08 * (level >= 10 ? scale : 0) * baseFactor * bossMultiplier
+        0.1 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
-      stunChance: 0.002 * (level >= 20 ? scale : 0) * baseFactor,
-      counterattack: 0.002 * (level >= 20 ? scale : 0) * baseFactor,
-      swiftness: 0.0015 * (level >= 20 ? scale : 0) * baseFactor,
+      stunChance: 0.002 * (level >= 20 ? level : 0) * baseFactor,
+      counterattack: 0.008 * (level >= 20 ? level : 0) * baseFactor,
+      swiftness: 0.002 * (level >= 20 ? level : 0) * baseFactor,
       shield: Math.floor(
-        0.9 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
+        0.5 * (level >= 20 ? level : 0) * baseFactor * bossMultiplier
       ),
       barrier: Math.floor(
-        0.08 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
+        0.1 * (level >= 30 ? level : 0) * baseFactor * bossMultiplier
       ),
     },
   };
@@ -151,7 +150,7 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "maxHealth",
       name: "Max Health",
-      basePrice: 0.1,
+      basePrice: 0.05,
       min: 100,
       max: 300,
       format: (val) => `+${val}`,
@@ -159,7 +158,7 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "currentHealth",
       name: "Current Health",
-      basePrice: 0.1,
+      basePrice: 0.05,
       min: 200,
       max: 500,
       format: (val) => `+${val}`,
@@ -167,63 +166,63 @@ export const generateUpgradeOptions = (player) => {
     {
       key: "regeneration",
       name: "Regeneration",
-      basePrice: 10,
-      min: player.level - 6 <= 0 ? 1 : (player.level - 6) / 2,
-      max: (player.level + 0) / 2,
+      basePrice: 6,
+      min: player.level - 3 <= 0 ? 1 : (player.level - 3) / 2,
+      max: (player.level + 3) / 2,
       format: (val) => `+${val}`,
     },
     {
       key: "armor",
       name: "Armor",
-      basePrice: 10,
-      min: 3,
-      max: 5,
+      basePrice: 6,
+      min: 4,
+      max: 6,
       format: (val) => `+${val}`,
     },
     {
       key: "minAttack",
       name: "Min Attack",
-      basePrice: 10,
-      min: 5,
+      basePrice: 8,
+      min: 4,
       max: 7,
       format: (val) => `+${val}`,
     },
     {
       key: "maxAttack",
       name: "Max Attack",
-      basePrice: 12,
-      min: 6,
-      max: 11,
+      basePrice: 10,
+      min: 5,
+      max: 9,
       format: (val) => `+${val}`,
     },
     {
       key: "critChance",
       name: "Crit Chance",
-      basePrice: 20,
-      min: 5,
-      max: 7,
+      basePrice: 15,
+      min: 4,
+      max: 9,
       format: (val) => `+${val}%`,
     },
     {
       key: "critDamage",
       name: "Crit Damage",
-      basePrice: 1,
-      min: 20,
-      max: 30,
+      basePrice: 0.5,
+      min: 10,
+      max: 50,
       format: (val) => `+${val}%`,
     },
     {
       key: "lifeSteal",
       name: "Life Steal",
-      basePrice: 20,
-      min: 2,
-      max: 4,
+      basePrice: 18,
+      min: 3,
+      max: 5,
       format: (val) => `+${val}%`,
     },
     {
       key: "dodge",
       name: "Dodge",
-      basePrice: 20,
+      basePrice: 16,
       min: 3,
       max: 5,
       format: (val) => `+${val}%`,
@@ -239,8 +238,7 @@ export const generateUpgradeOptions = (player) => {
       stat.min + Math.random() * (stat.max - stat.min + 1)
     );
     const price = Math.floor(
-      stat.basePrice * value * Math.floor((player.level / 2) * 1.05) +
-        Math.random() * 100
+      stat.basePrice * value * Math.floor((player.level / 2) * 1.05) + Math.random() * 100
     );
 
     return {
@@ -301,8 +299,8 @@ export const generateRareUpgradeOptions = (player) => {
     {
       key: "barrier",
       name: "Barrier",
-      min: 2,
-      max: 4,
+      min: 1,
+      max: 3,
       format: (val) => `+${val}`,
     },
   ];

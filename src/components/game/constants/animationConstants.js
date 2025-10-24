@@ -1,5 +1,5 @@
 const rawConfigs = {
-  "agathe/default": {
+  "agathe": {
     width: 128,
     height: 128,
     layers: {
@@ -25,111 +25,7 @@ const rawConfigs = {
       },
     },
   },
-  "agathe/heretic_punisher_captain": {
-    width: 128,
-    height: 128,
-    layers: {
-      player: {
-        frameCount: 3,
-        speed: 240,
-        delay: 0,
-        flip: true,
-        moving: false,
-      },
-      front: {
-        frameCount: 5,
-        speed: 240,
-      },
-      slash: {
-        frameCount: 4,
-        speed: 120,
-        delay: 480,
-        flip: true,
-        moving: false,
-        movingFrameCount: 5,
-        moveStopDistance: 250,
-      },
-    },
-  },
-  "agathe/undead": {
-    width: 128,
-    height: 128,
-    layers: {
-      player: {
-        frameCount: 3,
-        speed: 240,
-        delay: 0,
-        flip: true,
-        moving: false,
-      },
-      front: {
-        frameCount: 5,
-        speed: 240,
-      },
-      slash: {
-        frameCount: 4,
-        speed: 120,
-        delay: 480,
-        flip: true,
-        moving: false,
-        movingFrameCount: 5,
-        moveStopDistance: 250,
-      },
-    },
-  },
-  "agathe/pristine_winter": {
-    width: 128,
-    height: 128,
-    layers: {
-      player: {
-        frameCount: 3,
-        speed: 240,
-        delay: 0,
-        flip: true,
-        moving: false,
-      },
-      front: {
-        frameCount: 5,
-        speed: 240,
-      },
-      slash: {
-        frameCount: 4,
-        speed: 120,
-        delay: 480,
-        flip: true,
-        moving: false,
-        movingFrameCount: 5,
-        moveStopDistance: 250,
-      },
-    },
-  },
-  "agathe/knight": {
-    width: 128,
-    height: 128,
-    layers: {
-      player: {
-        frameCount: 3,
-        speed: 240,
-        delay: 0,
-        flip: true,
-        moving: false,
-      },
-      front: {
-        frameCount: 5,
-        speed: 240,
-      },
-      slash: {
-        frameCount: 4,
-        speed: 120,
-        delay: 480,
-        flip: true,
-        moving: false,
-        movingFrameCount: 5,
-        moveStopDistance: 250,
-      },
-    },
-  },
-  "bardrey/default": {
+  "bardrey": {
     width: 128,
     height: 128,
     layers: {
@@ -156,7 +52,7 @@ const rawConfigs = {
       },
     },
   },
-  "alberon/default": {
+  "alberon": {
     width: 128,
     height: 128,
     layers: {
@@ -210,7 +106,7 @@ const rawConfigs = {
       },
     },
   },
-  "esthea/default": {
+  "esthea": {
     width: 128,
     height: 128,
     layers: {
@@ -237,34 +133,7 @@ const rawConfigs = {
       },
     },
   },
-  "esthea/poison_apple": {
-    width: 128,
-    height: 128,
-    layers: {
-      player: {
-        frameCount: 3,
-        speed: 240,
-        delay: 0,
-        flip: true,
-        moving: false,
-        stopMovingAtFrame: 3,
-      },
-      front: {
-        frameCount: 5,
-        speed: 240,
-      },
-      slash: {
-        frameCount: 7,
-        speed: 120,
-        delay: 180,
-        flip: false,
-        moving: true,
-        movingFrameCount: 1,
-        moveStopDistance: 250,
-      },
-    },
-  },
-  "gidnil/default": {
+  "gidnil": {
     width: 128,
     height: 128,
     layers: {
@@ -291,7 +160,7 @@ const rawConfigs = {
       },
     },
   },
-  "haerang/default": {
+  "haerang": {
     width: 128,
     height: 128,
     layers: {
@@ -318,7 +187,7 @@ const rawConfigs = {
       },
     },
   },
-  "hansi/default": {
+  "hansi": {
     width: 128,
     height: 128,
     layers: {
@@ -345,7 +214,7 @@ const rawConfigs = {
       },
     },
   },
-  "ian/default": {
+  "ian": {
     width: 128,
     height: 128,
     layers: {
@@ -371,7 +240,7 @@ const rawConfigs = {
       },
     },
   },
-  "bombie/default": {
+  "bombie": {
     width: 128,
     height: 128,
     layers: {
@@ -398,7 +267,7 @@ const rawConfigs = {
       },
     },
   },
-  "jol/default": {
+  "jol": {
     width: 128,
     height: 128,
     layers: {
@@ -424,7 +293,7 @@ const rawConfigs = {
       },
     },
   },
-  "kanak/default": {
+  "kanak": {
     width: 128,
     height: 128,
     layers: {
@@ -453,45 +322,6 @@ const rawConfigs = {
   },
 };
 
-export const ANIMATION_CONFIGS = Object.fromEntries(
-  Object.entries(rawConfigs).map(([key, config]) => [
-    key,
-    {
-      ...config,
-      layers: [
-        {
-          name: "player",
-          folder: `/sprites/${key}/player/`,
-          ...config.layers.player,
-        },
-        {
-          name: "slash",
-          folder: `/sprites/${key}/slash/`,
-          ...config.layers.slash,
-        },
-      ],
-    },
-  ])
-);
-
-export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
-  Object.entries(rawConfigs).map(([key, config]) => [
-    key,
-    {
-      ...config,
-      layers: [
-        {
-          name: "front",
-          folder: `/sprites/${key}/front/`,
-          ...config.layers.front,
-        },
-      ],
-    },
-  ])
-);
-
-// const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
-
 // export const ANIMATION_CONFIGS = Object.fromEntries(
 //   Object.entries(rawConfigs).map(([key, config]) => [
 //     key,
@@ -500,12 +330,12 @@ export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
 //       layers: [
 //         {
 //           name: "player",
-//           folder: `${BACKEND_URL}/sprites/${key}/player/`,
+//           folder: `/sprites/${key}/player/`,
 //           ...config.layers.player,
 //         },
 //         {
 //           name: "slash",
-//           folder: `${BACKEND_URL}/sprites/${key}/slash/`,
+//           folder: `/sprites/${key}/slash/`,
 //           ...config.layers.slash,
 //         },
 //       ],
@@ -521,10 +351,49 @@ export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
 //       layers: [
 //         {
 //           name: "front",
-//           folder: `${BACKEND_URL}/sprites/${key}/front/`,
+//           folder: `/sprites/${key}/front/`,
 //           ...config.layers.front,
 //         },
 //       ],
 //     },
 //   ])
 // );
+
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
+
+export const ANIMATION_CONFIGS = Object.fromEntries(
+  Object.entries(rawConfigs).map(([key, config]) => [
+    key,
+    {
+      ...config,
+      layers: [
+        {
+          name: "player",
+          folder: `${BACKEND_URL}/sprites/${key}/player/`,
+          ...config.layers.player,
+        },
+        {
+          name: "slash",
+          folder: `${BACKEND_URL}/sprites/${key}/slash/`,
+          ...config.layers.slash,
+        },
+      ],
+    },
+  ])
+);
+
+export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
+  Object.entries(rawConfigs).map(([key, config]) => [
+    key,
+    {
+      ...config,
+      layers: [
+        {
+          name: "front",
+          folder: `${BACKEND_URL}/sprites/${key}/front/`,
+          ...config.layers.front,
+        },
+      ],
+    },
+  ])
+);

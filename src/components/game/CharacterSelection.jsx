@@ -19,18 +19,18 @@ const CharacterSelection = () => {
   const [modalFrame, setModalFrame] = useState(0);
   const navigate = useNavigate();
 
-  // Lọc chỉ lấy nhân vật default (có dạng "character/default")
-  const defaultCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS)
-    .filter((key) => key.endsWith("/default"))
+  // 🔹 Lọc chỉ lấy nhân vật chính (loại bỏ biến thể) và sắp xếp theo thứ tự A → Z
+  const baseCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS)
+    .filter((key) => !key.includes("/"))
     .sort((a, b) => a.localeCompare(b));
 
-  // Lấy danh sách biến thể (bao gồm default) cho nhân vật
-  const getVariants = (baseKey) => {
-    const baseName = baseKey.split("/")[0];
-    return Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS).filter(
-      (k) => k === baseName + "/default" || k.startsWith(baseName + "/")
-    );
-  };
+  // 🔹 Lấy danh sách biến thể (bao gồm default)
+  const getVariants = (baseKey) => [
+    baseKey,
+    ...Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS).filter((k) =>
+      k.startsWith(baseKey + "/")
+    ),
+  ];
 
   // 🔹 Lấy sprite frame
   const getSpriteUrl = (characterKey, frameIndex) => {
@@ -58,7 +58,7 @@ const CharacterSelection = () => {
       .trim(); // Xóa khoảng trắng thừa
   };
 
-  // 🔹 Định dạng giá trị chỉ số (hiển thị màu xanh lá cho > 0, màu đỏ cho < 0)
+  // 🔹 Định dạng giá trị chỉ số (hiển thị % cho dodge, critChance, critDamage, màu xanh lá cho > 0, màu đỏ cho < 0)
   const formatStatValue = (statKey, value) => {
     const isPercentage = [
       "critChance",
@@ -152,37 +152,34 @@ const CharacterSelection = () => {
           </div>
         </div>
 
-        {/* Danh sách nhân vật default */}
-        {defaultCharacters.map((characterKey) => {
-          const baseName = characterKey.split("/")[0];
-          return (
+        {/* Danh sách nhân vật bình thường */}
+        {baseCharacters.map((characterKey) => (
+          <div
+            key={characterKey}
+            className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer"
+            onMouseEnter={() => setHoveredCharacter(characterKey)}
+            onMouseLeave={() => setHoveredCharacter(null)}
+            onClick={() => setSelectedCharacter(characterKey)}
+          >
             <div
-              key={characterKey}
-              className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer"
-              onMouseEnter={() => setHoveredCharacter(characterKey)}
-              onMouseLeave={() => setHoveredCharacter(null)}
-              onClick={() => setSelectedCharacter(characterKey)}
-            >
-              <div
-                className="relative w-32 h-32 overflow-visible"
-                style={{
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center center",
-                  backgroundSize: "auto",
-                  backgroundImage: `url(${getSpriteUrl(
-                    characterKey,
-                    hoveredCharacter === characterKey ? currentFrame : 0
-                  )})`,
-                }}
-              />
-              <div className="absolute bottom-0 w-full bg-black bg-opacity-70 text-center py-2">
-                <span className="text-white text-lg font-semibold capitalize">
-                  {baseName}
-                </span>
-              </div>
+              className="relative w-32 h-32 overflow-visible"
+              style={{
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center center",
+                backgroundSize: "auto",
+                backgroundImage: `url(${getSpriteUrl(
+                  characterKey,
+                  hoveredCharacter === characterKey ? currentFrame : 0
+                )})`,
+              }}
+            />
+            <div className="absolute bottom-0 w-full bg-black bg-opacity-70 text-center py-2">
+              <span className="text-white text-lg font-semibold capitalize">
+                {characterKey}
+              </span>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* 🔹 Modal hiển thị biến thể */}
@@ -192,7 +189,7 @@ const CharacterSelection = () => {
           onClick={() => setSelectedCharacter(null)}
         >
           <div
-            className="rounded-lg p-6 w-full relative bg-game mr-4 ml-4"
+            className="rounded-lg p-6 w-96 relative bg-game"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -203,7 +200,7 @@ const CharacterSelection = () => {
             </button>
 
             <h2 className="text-2xl font-bold mb-4 capitalize text-center">
-              {selectedCharacter.split("/")[0]} Variants
+              {selectedCharacter} Variants
             </h2>
 
             <div className="flex flex-wrap gap-4 justify-center">
@@ -232,7 +229,7 @@ const CharacterSelection = () => {
                         )})`,
                       }}
                     ></div>
-                    <span className="block text-sm font-bold capitalize h-12">
+                    <span className="block text-sm font-bold capitalize">
                       {variantKey === selectedCharacter
                         ? "Default"
                         : formatVariantName(variantKey)}
