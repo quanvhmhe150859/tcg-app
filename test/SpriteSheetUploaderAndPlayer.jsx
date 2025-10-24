@@ -7,41 +7,50 @@ import React, {
 } from "react";
 
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
-  const [spriteSheetUrl, setSpriteSheetUrl] = useState(null); // URL của sprite sheet
-  const [frameCount, setFrameCount] = useState(5); // Số frame
-  const [frameWidth, setFrameWidth] = useState(128); // Chiều rộng frame
-  const [frameHeight, setFrameHeight] = useState(128); // Chiều cao frame
-  const [horizontalSpacing, setHorizontalSpacing] = useState(0); // Khoảng cách ngang giữa các frame
-  const [verticalSpacing, setVerticalSpacing] = useState(0); // Khoảng cách dọc giữa các frame
-  const [leftOffset, setLeftOffset] = useState(0); // Offset bên trái
-  const [topOffset, setTopOffset] = useState(0); // Offset bên trên
-  const [columns, setColumns] = useState(5); // Số frame trên một hàng
-  const [speed, setSpeed] = useState(120); // Tốc độ animation (ms/frame)
-  const [delay, setDelay] = useState(0); // Delay trước khi bắt đầu
-  const [flip, setFlip] = useState(false); // Flip sprite
-  const [isPlaying, setIsPlaying] = useState(false); // Trạng thái chơi
-  const [isLooping, setIsLooping] = useState(false); // Trạng thái loop
-  const [index, setIndex] = useState(0); // Frame hiện tại
-  const [loaded, setLoaded] = useState(false); // Sprite sheet đã load
-  const [isDragging, setIsDragging] = useState(false); // Trạng thái kéo
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Vị trí chuột khi bắt đầu kéo
+  const [spriteSheetUrl, setSpriteSheetUrl] = useState(null);
+  const [frameCount, setFrameCount] = useState(5);
+  const [frameWidth, setFrameWidth] = useState(128);
+  const [frameHeight, setFrameHeight] = useState(128);
+  const [horizontalSpacing, setHorizontalSpacing] = useState(0);
+  const [verticalSpacing, setVerticalSpacing] = useState(0);
+  const [leftOffset, setLeftOffset] = useState(0);
+  const [topOffset, setTopOffset] = useState(0);
+  const [columns, setColumns] = useState(5);
+  const [speed, setSpeed] = useState(120);
+  const [delay, setDelay] = useState(0);
+  const [flip, setFlip] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLooping, setIsLooping] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isScaledDown, setIsScaledDown] = useState(true);
+  const [originalDimensions, setOriginalDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
   const frameReq = useRef(null);
   const startTime = useRef(null);
   const containerRef = useRef(null);
+  const originalImageRef = useRef(null);
 
-  // Preload sprite sheet
+  // Preload sprite sheet and get original dimensions
   useEffect(() => {
     if (spriteSheetUrl) {
       const img = new Image();
       img.src = spriteSheetUrl;
-      img.onload = () => setLoaded(true);
+      img.onload = () => {
+        setLoaded(true);
+        setOriginalDimensions({ width: img.width, height: img.height });
+      };
       img.onerror = () => console.warn("Failed to load sprite sheet");
-      return () => URL.revokeObjectURL(spriteSheetUrl); // Giải phóng URL khi unmount
+      return () => URL.revokeObjectURL(spriteSheetUrl);
     }
   }, [spriteSheetUrl]);
 
-  // Xử lý upload file
+  // Handle file upload
   const handleUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "image/png") {
@@ -49,12 +58,18 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
       setSpriteSheetUrl(url);
       setLoaded(false);
       setIndex(0);
+      setIsScaledDown(true);
     } else {
-      alert("Vui lòng upload file PNG!");
+      alert("Please upload a PNG file!");
     }
   };
 
-  // Tính total duration
+  // Toggle scale
+  const handleToggleScale = () => {
+    setIsScaledDown((prev) => !prev);
+  };
+
+  // Calculate total duration
   const totalDuration = frameCount * speed + delay;
 
   // Animation loop
@@ -110,7 +125,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     }
   };
 
-  // Xử lý kéo để chỉnh offset
+  // Handle drag for offset
   const handleMouseDown = (e) => {
     if (!loaded) return;
     setIsDragging(true);
@@ -147,13 +162,36 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     getElement: () => containerRef.current,
   }));
 
-  // Tính background position cho frame hiện tại, có tính khoảng cách
-  const backgroundPositionX = -(index % columns) * (frameWidth + horizontalSpacing) + leftOffset;
-  const backgroundPositionY = -Math.floor(index / columns) * (frameHeight + verticalSpacing) + topOffset;
+  // Calculate background position for current frame
+  const backgroundPositionX =
+    -(index % columns) * (frameWidth + horizontalSpacing) + leftOffset;
+  const backgroundPositionY =
+    -Math.floor(index / columns) * (frameHeight + verticalSpacing) + topOffset;
+
+  // Calculate display dimensions
+  const displayWidth = isScaledDown
+    ? originalDimensions.width * 0.25
+    : originalDimensions.width;
+  const displayHeight = isScaledDown
+    ? originalDimensions.height * 0.25
+    : originalDimensions.height;
+
+  // Calculate highlight frame position (scaled to match display)
+  const highlightScale = isScaledDown ? 0.25 : 1;
+  const highlightX =
+    (index % columns) * (frameWidth + horizontalSpacing) * highlightScale -
+    leftOffset * highlightScale;
+  const highlightY =
+    Math.floor(index / columns) *
+      (frameHeight + verticalSpacing) *
+      highlightScale -
+    topOffset * highlightScale;
 
   return (
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
-      <h2 className="text-lg font-bold mb-4">Upload Sprite Sheet và Chạy Animation</h2>
+      <h2 className="text-lg font-bold mb-4">
+        Upload Sprite Sheet and Play Animation
+      </h2>
 
       {/* Upload section */}
       <div className="mb-4">
@@ -166,14 +204,16 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
         />
       </div>
 
-      {/* Cấu hình thông số */}
+      {/* Configuration parameters */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label>Frame Count:</label>
           <input
             type="number"
             value={frameCount}
-            onChange={(e) => setFrameCount(Math.max(1, parseInt(e.target.value)))}
+            onChange={(e) =>
+              setFrameCount(Math.max(1, parseInt(e.target.value)))
+            }
             className="border p-1 w-full"
           />
         </div>
@@ -182,7 +222,9 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           <input
             type="number"
             value={frameWidth}
-            onChange={(e) => setFrameWidth(Math.max(1, parseInt(e.target.value)))}
+            onChange={(e) =>
+              setFrameWidth(Math.max(1, parseInt(e.target.value)))
+            }
             className="border p-1 w-full"
           />
         </div>
@@ -191,7 +233,9 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           <input
             type="number"
             value={frameHeight}
-            onChange={(e) => setFrameHeight(Math.max(1, parseInt(e.target.value)))}
+            onChange={(e) =>
+              setFrameHeight(Math.max(1, parseInt(e.target.value)))
+            }
             className="border p-1 w-full"
           />
         </div>
@@ -200,7 +244,9 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           <input
             type="number"
             value={horizontalSpacing}
-            onChange={(e) => setHorizontalSpacing(Math.max(0, parseInt(e.target.value)))}
+            onChange={(e) =>
+              setHorizontalSpacing(Math.max(0, parseInt(e.target.value)))
+            }
             className="border p-1 w-full"
           />
         </div>
@@ -209,7 +255,9 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           <input
             type="number"
             value={verticalSpacing}
-            onChange={(e) => setVerticalSpacing(Math.max(0, parseInt(e.target.value)))}
+            onChange={(e) =>
+              setVerticalSpacing(Math.max(0, parseInt(e.target.value)))
+            }
             className="border p-1 w-full"
           />
         </div>
@@ -315,9 +363,47 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             }}
           />
         ) : (
-          <p className="text-center">Upload sprite sheet để hiển thị</p>
+          <p className="text-center">Upload sprite sheet to display</p>
         )}
       </div>
+
+      {/* Original image display */}
+      {loaded && spriteSheetUrl && (
+        <div className="mb-4 relative">
+          <h3 className="text-md font-semibold mb-2">Original Sprite Sheet</h3>
+          {/* <button
+            onClick={handleToggleScale}
+            className="mb-2 bg-purple-500 text-white p-2 rounded"
+          >
+            {isScaledDown ? "Restore Original Size" : "Scale Down 25%"}
+          </button> */}
+          <div className="relative inline-block">
+            <img
+              ref={originalImageRef}
+              src={spriteSheetUrl}
+              alt="Original sprite sheet"
+              style={{
+                width: displayWidth,
+                height: displayHeight,
+                transition: "all 0.3s ease",
+                maxWidth: "none",
+              }}
+            />
+            {/* Highlight frame */}
+            <div
+              className="absolute border-2 border-red-500"
+              style={{
+                width: frameWidth * highlightScale,
+                height: frameHeight * highlightScale,
+                left: highlightX,
+                top: highlightY,
+                pointerEvents: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 });
