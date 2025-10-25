@@ -72,16 +72,16 @@ export default function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/settings" element={<AdminSettings />} />
             <Route path="/pokemon" element={<RandomCardsPokemon />} />
-            <Route path="/pokemonls" element={<ListCardsPokemon />} />
-            <Route path="/pokemonowned" element={<OwnedPokemonCards />} />
+            <Route path="/pokemon-ls" element={<ListCardsPokemon />} />
+            <Route path="/pokemon-owned" element={<OwnedPokemonCards />} />
             <Route path="/yugioh" element={<RandomCardsYugioh />} />
-            <Route path="/yugiohls" element={<ListCardsYugioh />} />
-            <Route path="/yugiohowned" element={<OwnedYugiohCards />} />
-            <Route path="/characterselection" element={<CharacterSelection />} />
+            <Route path="/yugioh-ls" element={<ListCardsYugioh />} />
+            <Route path="/yugioh-owned" element={<OwnedYugiohCards />} />
+            <Route path="/character-selection" element={<CharacterSelection />} />
             <Route path="/game" element={<BattleGame />} />
             <Route path="/chatbot" element={<Chatbot />} />
-            <Route path="/imagegenerator" element={<ImageGenerator />} />
-            <Route path="/test" element={<SpriteSheetUploaderAndPlayer />} />
+            <Route path="/image-generator" element={<ImageGenerator />} />
+            <Route path="/sprite-sheet" element={<SpriteSheetUploaderAndPlayer />} />
           </Route>
 
           {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}

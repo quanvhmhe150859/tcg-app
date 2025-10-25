@@ -7,6 +7,14 @@ import React, {
 } from "react";
 
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
+  useEffect(() => {
+    document.body.style.minWidth = "640px";
+
+    return () => {
+      document.body.style.minWidth = ""; // reset khi rời trang
+    };
+  }, []);
+
   const [spriteSheetUrl, setSpriteSheetUrl] = useState(null);
   const [frameCount, setFrameCount] = useState(5);
   const [frameWidth, setFrameWidth] = useState(128);
@@ -204,8 +212,9 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
         />
       </div>
 
-      {/* Configuration parameters */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      {/* Configuration parameters and controls */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        {/* Cột 1: Các input */}
         <div>
           <label>Frame Count:</label>
           <input
@@ -216,9 +225,14 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             }
             className="border p-1 w-full"
           />
-        </div>
-        <div>
-          <label>Frame Width (px):</label>
+          <label className="block mt-2">Left Offset (px):</label>
+          <input
+            type="number"
+            value={leftOffset}
+            onChange={(e) => setLeftOffset(parseInt(e.target.value) || 0)}
+            className="border p-1 w-full"
+          />
+          <label className="block mt-2">Frame Width (px):</label>
           <input
             type="number"
             value={frameWidth}
@@ -227,20 +241,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             }
             className="border p-1 w-full"
           />
-        </div>
-        <div>
-          <label>Frame Height (px):</label>
-          <input
-            type="number"
-            value={frameHeight}
-            onChange={(e) =>
-              setFrameHeight(Math.max(1, parseInt(e.target.value)))
-            }
-            className="border p-1 w-full"
-          />
-        </div>
-        <div>
-          <label>Horizontal Spacing (px):</label>
+          <label className="block mt-2">Horizontal Spacing (px):</label>
           <input
             type="number"
             value={horizontalSpacing}
@@ -249,36 +250,16 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             }
             className="border p-1 w-full"
           />
-        </div>
-        <div>
-          <label>Vertical Spacing (px):</label>
+          <label className="block mt-2">Speed (ms/frame):</label>
           <input
             type="number"
-            value={verticalSpacing}
-            onChange={(e) =>
-              setVerticalSpacing(Math.max(0, parseInt(e.target.value)))
-            }
+            value={speed}
+            onChange={(e) => setSpeed(Math.max(1, parseInt(e.target.value)))}
             className="border p-1 w-full"
           />
         </div>
-        <div>
-          <label>Left Offset (px):</label>
-          <input
-            type="number"
-            value={leftOffset}
-            onChange={(e) => setLeftOffset(parseInt(e.target.value) || 0)}
-            className="border p-1 w-full"
-          />
-        </div>
-        <div>
-          <label>Top Offset (px):</label>
-          <input
-            type="number"
-            value={topOffset}
-            onChange={(e) => setTopOffset(parseInt(e.target.value) || 0)}
-            className="border p-1 w-full"
-          />
-        </div>
+
+        {/* Cột 2: Các input còn lại */}
         <div>
           <label>Columns:</label>
           <input
@@ -287,18 +268,32 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             onChange={(e) => setColumns(Math.max(1, parseInt(e.target.value)))}
             className="border p-1 w-full"
           />
-        </div>
-        <div>
-          <label>Speed (ms/frame):</label>
+          <label className="block mt-2">Top Offset (px):</label>
           <input
             type="number"
-            value={speed}
-            onChange={(e) => setSpeed(Math.max(1, parseInt(e.target.value)))}
+            value={topOffset}
+            onChange={(e) => setTopOffset(parseInt(e.target.value) || 0)}
             className="border p-1 w-full"
           />
-        </div>
-        <div>
-          <label>Delay (ms):</label>
+          <label className="block mt-2">Frame Height (px):</label>
+          <input
+            type="number"
+            value={frameHeight}
+            onChange={(e) =>
+              setFrameHeight(Math.max(1, parseInt(e.target.value)))
+            }
+            className="border p-1 w-full"
+          />
+          <label className="block mt-2">Vertical Spacing (px):</label>
+          <input
+            type="number"
+            value={verticalSpacing}
+            onChange={(e) =>
+              setVerticalSpacing(Math.max(0, parseInt(e.target.value)))
+            }
+            className="border p-1 w-full"
+          />
+          <label className="block mt-2">Delay (ms):</label>
           <input
             type="number"
             value={delay}
@@ -306,8 +301,10 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             className="border p-1 w-full"
           />
         </div>
-        <div className="col-span-2">
-          <label>
+
+        {/* Cột 3: Checkbox, Buttons, Animation */}
+        <div className="flex flex-col items-center">
+          <label className="mb-2">
             <input
               type="checkbox"
               checked={flip}
@@ -315,56 +312,54 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             />
             Flip Sprite (scaleX(-1))
           </label>
-        </div>
-      </div>
-
-      {/* Buttons control */}
-      <div className="flex gap-4 mb-4">
-        <button
-          onClick={handlePlayOnce}
-          disabled={!loaded}
-          className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400"
-        >
-          Play Once
-        </button>
-        <button
-          onClick={handleToggleLoop}
-          disabled={!loaded}
-          className="bg-green-500 text-white p-2 rounded disabled:bg-gray-400"
-        >
-          {isLooping ? "Stop Loop" : "Loop"}
-        </button>
-      </div>
-
-      {/* Display animation */}
-      <div
-        ref={containerRef}
-        className="relative border border-gray-400 rounded-md mx-auto mb-4"
-        style={{
-          width: frameWidth,
-          height: frameHeight,
-          position: "relative",
-          cursor: loaded ? "move" : "default",
-        }}
-        onMouseDown={handleMouseDown}
-      >
-        {loaded && spriteSheetUrl ? (
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={handlePlayOnce}
+              disabled={!loaded}
+              className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400"
+            >
+              Once
+            </button>
+            <button
+              onClick={handleToggleLoop}
+              disabled={!loaded}
+              className="bg-green-500 text-white p-2 rounded disabled:bg-gray-400"
+            >
+              {isLooping ? "Stop" : "Loop"}
+            </button>
+          </div>
           <div
-            className="absolute"
+            ref={containerRef}
+            className="relative border border-gray-400 rounded-md"
             style={{
               width: frameWidth,
               height: frameHeight,
-              backgroundImage: `url(${spriteSheetUrl})`,
-              backgroundPosition: `${backgroundPositionX}px ${backgroundPositionY}px`,
-              backgroundRepeat: "no-repeat",
-              top: "50%",
-              left: "50%",
-              transform: `translate(-50%, -50%) ${flip ? "scaleX(-1)" : ""}`,
+              position: "relative",
+              cursor: loaded ? "move" : "default",
             }}
-          />
-        ) : (
-          <p className="text-center">Upload sprite sheet to display</p>
-        )}
+            onMouseDown={handleMouseDown}
+          >
+            {loaded && spriteSheetUrl ? (
+              <div
+                className="absolute"
+                style={{
+                  width: frameWidth,
+                  height: frameHeight,
+                  backgroundImage: `url(${spriteSheetUrl})`,
+                  backgroundPosition: `${backgroundPositionX}px ${backgroundPositionY}px`,
+                  backgroundRepeat: "no-repeat",
+                  top: "50%",
+                  left: "50%",
+                  transform: `translate(-50%, -50%) ${
+                    flip ? "scaleX(-1)" : ""
+                  }`,
+                }}
+              />
+            ) : (
+              <p className="text-center">Upload sprite sheet to display</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Original image display */}
@@ -389,7 +384,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
                 maxWidth: "none",
               }}
             />
-            {/* Highlight frame */}
             <div
               className="absolute border-2 border-red-500"
               style={{

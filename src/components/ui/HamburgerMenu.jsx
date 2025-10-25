@@ -14,6 +14,7 @@ const HamburgerMenu = () => {
     list: false,
     collection: false,
     ai: false,
+    test: false,
   });
 
   const toggleExpand = (section) => {
@@ -57,7 +58,7 @@ const HamburgerMenu = () => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="hamburger-menu"
           >
-            <h1 className="text-2xl font-bold mt-12">📂 Menu</h1>
+            <h1 className="text-2xl font-bold mt-12 mb-4">📂 Menu</h1>
             <div className="hamburger-menu-content">
               <ul>
                 <li>
@@ -71,7 +72,7 @@ const HamburgerMenu = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/characterselection" onClick={() => setOpen(false)}>
+                  <Link to="/character-selection" onClick={() => setOpen(false)}>
                     🧩 {t("game")}
                     <img
                       src="/icons/new_icon.gif"
@@ -146,7 +147,7 @@ const HamburgerMenu = () => {
                       >
                         <li>
                           <Link
-                            to="/pokemonowned"
+                            to="/pokemon-owned"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -155,7 +156,7 @@ const HamburgerMenu = () => {
                         </li>
                         <li>
                           <Link
-                            to="/yugiohowned"
+                            to="/yugioh-owned"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -188,7 +189,7 @@ const HamburgerMenu = () => {
                       >
                         <li>
                           <Link
-                            to="/pokemonls"
+                            to="/pokemon-ls"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -197,7 +198,7 @@ const HamburgerMenu = () => {
                         </li>
                         <li>
                           <Link
-                            to="/yugiohls"
+                            to="/yugioh-ls"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -239,7 +240,7 @@ const HamburgerMenu = () => {
                         </li>
                         <li>
                           <Link
-                            to="/imagegenerator"
+                            to="/image-generator"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
@@ -251,9 +252,46 @@ const HamburgerMenu = () => {
                   </AnimatePresence>
                 </li>
                 <li>
-                  <Link to="/test" onClick={() => setOpen(false)}>
-                    🧪 {t("Test")}
+                  <Link
+                    to=""
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleExpand("test");
+                    }}
+                    className="flex items-center"
+                  >
+                    🧪 <span>Test</span> {expanded.test ? "▼" : "▶"}
                   </Link>
+                  <AnimatePresence>
+                    {expanded.test && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="submenu"
+                      >
+                        <li>
+                          <Link
+                            to="/sprite-sheet"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            😤 Sprites Sheet
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/test"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            🐞 Testing
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
               </ul>
             </div>
