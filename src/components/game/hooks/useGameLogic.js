@@ -9,16 +9,92 @@ import { playerTurn, enemyTurn } from "../gameLogic";
 import { addLog, checkGameOver, startTurn } from "../utils";
 import { useNavigate } from "react-router-dom";
 
+// Các thuộc tính cần hiển thị dưới dạng phần trăm
+const PERCENTAGE_KEYS = [
+  "critChance",
+  "critDamage",
+  "lifeSteal",
+  "dodge",
+  "stunChance",
+  "counterattack",
+  "swiftness",
+];
+
 /**
- * Custom hook to manage game logic for BattleGame component.
- * @param {Object} params - State and setter functions grouped by context
- * @param {Object} params.playerState - Player state and setter
- * @param {Object} params.enemyState - Enemy state and setter
- * @param {Object} params.gameState - Game-related states and setters
- * @param {Object} params.shopState - Shop-related states and setters
- * @param {Function} params.earnTickets - Function to earn tickets from TicketContext
- * @returns {Object} Game logic functions
+ * Định dạng giá trị cho log (thêm % nếu là thuộc tính phần trăm)
+ * @param {string} key - Key của thuộc tính
+ * @param {number} value - Giá trị cần định dạng
+ * @returns {string} Giá trị đã định dạng
  */
+const formatValueForLog = (key, value) => {
+  return PERCENTAGE_KEYS.includes(key) ? `${value}%` : value;
+};
+
+/**
+ * Xử lý cập nhật player state và tạo log khi mua hoặc nâng cấp
+ * @param {Object} prevPlayer - Trạng thái player trước đó
+ * @param {Object} option - Tùy chọn nâng cấp/mua
+ * @param {Array} currentTurnLogs - Logs của turn hiện tại
+ * @param {string} logType - Loại log (purchase/upgrade)
+ * @param {boolean} isPurchase - Có phải hành động mua hàng không
+ * @returns {Object} Player state mới
+ */
+const updatePlayerAndLog = (prevPlayer, option, currentTurnLogs, logType, isPurchase = false) => {
+  const newPlayer = { ...prevPlayer, rareStats: { ...prevPlayer.rareStats } };
+  const value = PERCENTAGE_KEYS.includes(option.key) || option.key === "critDamage"
+    ? option.value / 100
+    : option.value;
+
+  if (option.key === "minAttack" && newPlayer.minAttack + value > newPlayer.maxAttack) {
+    newPlayer.maxAttack += value;
+    addLog(
+      `Player ${isPurchase ? 'purchased' : 'upgraded'} Max Attack by +${value} due to Min Attack exceeding Max Attack${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      logType,
+      currentTurnLogs
+    );
+  } else if (option.key === "currentHealth") {
+    newPlayer.currentHealth = Math.min(
+      newPlayer.currentHealth + value,
+      newPlayer.maxHealth
+    );
+    addLog(
+      `Player ${isPurchase ? 'purchased' : 'healed'} for +${value} HP${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      logType,
+      currentTurnLogs
+    );
+  } else if (option.key === "maxHealth") {
+    newPlayer.maxHealth += value;
+    newPlayer.currentHealth = Math.min(
+      newPlayer.currentHealth + value,
+      newPlayer.maxHealth
+    );
+    addLog(
+      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      logType,
+      currentTurnLogs
+    );
+  } else if (option.key in newPlayer.rareStats) {
+    newPlayer.rareStats[option.key] += value;
+    addLog(
+      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      logType,
+      currentTurnLogs
+    );
+  } else {
+    newPlayer[option.key] += value;
+    addLog(
+      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      logType,
+      currentTurnLogs
+    );
+  }
+
+  if (isPurchase) {
+    newPlayer.gold -= option.price;
+  }
+  return newPlayer;
+};
+
 const useGameLogic = ({
   playerState,
   enemyState,
@@ -78,10 +154,7 @@ const useGameLogic = ({
             logs: currentTurnLogs,
           },
         ];
-        if (newTurnLogs.length > 20) {
-          return newTurnLogs.slice(1);
-        }
-        return newTurnLogs;
+        return newTurnLogs.length > 20 ? newTurnLogs.slice(1) : newTurnLogs;
       });
       return newLogId;
     });
@@ -103,13 +176,6 @@ const useGameLogic = ({
     setBoughtOptions([]);
   };
 
-  /**
-   * Ends the current turn, updates player/enemy, and checks for game over or level up.
-   * @param {Object} newPlayer - Updated player state
-   * @param {Object} newEnemy - Updated enemy state
-   * @param {Array} currentTurnLogs - Logs for the current turn
-   * @param {Object} gameStatus - Game status (isOver, levelUp)
-   */
   const endTurn = (newPlayer, newEnemy, currentTurnLogs, gameStatus) => {
     setPlayer(newPlayer);
     setEnemy(newEnemy);
@@ -129,95 +195,11 @@ const useGameLogic = ({
     }
   };
 
-  /**
-   * Handles purchasing an item from the shop.
-   * @param {Object} option - The upgrade option to purchase
-   * @param {number} index - Index of the option in shopOptions
-   */
   const handlePurchase = (option, index) => {
     if (player.gold < option.price || boughtOptions.includes(index)) return;
     setPlayer((prev) => {
-      const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
       const currentTurnLogs = [];
-      const value = [
-        "critChance",
-        "lifeSteal",
-        "dodge",
-        "stunChance",
-        "counterattack",
-        "swiftness",
-      ].includes(option.key)
-        ? option.value / 100
-        : ["critDamage"].includes(option.key)
-        ? option.value / 100
-        : option.value;
-      if (
-        option.key === "minAttack" &&
-        newPlayer.minAttack + value > newPlayer.maxAttack
-      ) {
-        newPlayer.maxAttack += value;
-        addLog(
-          `Player purchased Max Attack by +${value} due to Min Attack exceeding Max Attack for ${option.price} gold!`,
-          "purchase",
-          currentTurnLogs
-        );
-      } else if (option.key === "currentHealth") {
-        newPlayer.currentHealth = Math.min(
-          newPlayer.currentHealth + value,
-          newPlayer.maxHealth
-        );
-        addLog(
-          `Player purchased ${option.name} by +${value} for ${option.price} gold!`,
-          "purchase",
-          currentTurnLogs
-        );
-      } else if (option.key === "maxHealth") {
-        newPlayer.maxHealth += value;
-        newPlayer.currentHealth = Math.min(
-          newPlayer.currentHealth + value,
-          newPlayer.maxHealth
-        );
-        addLog(
-          `Player purchased ${option.name} by +${value} for ${option.price} gold!`,
-          "purchase",
-          currentTurnLogs
-        );
-      } else if (option.key in newPlayer.rareStats) {
-        newPlayer.rareStats[option.key] += value;
-        addLog(
-          [
-            "critChance",
-            "critDamage",
-            "lifeSteal",
-            "dodge",
-            "stunChance",
-            "counterattack",
-            "swiftness",
-          ].includes(option.key)
-            ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
-            : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
-          "purchase",
-          currentTurnLogs
-        );
-      } else {
-        newPlayer[option.key] += value;
-        addLog(
-          [
-            "critChance",
-            "critDamage",
-            "lifeSteal",
-            "dodge",
-            "stunChance",
-            "counterattack",
-            "swiftness",
-          ].includes(option.key)
-            ? `Player purchased ${option.name} by +${option.value}% for ${option.price} gold!`
-            : `Player purchased ${option.name} by +${option.value} for ${option.price} gold!`,
-          "purchase",
-          currentTurnLogs
-        );
-      }
-      newPlayer.gold -= option.price;
+      const newPlayer = updatePlayerAndLog(prev, option, currentTurnLogs, "purchase", true);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
@@ -252,88 +234,10 @@ const useGameLogic = ({
     resetShopState();
   };
 
-  /**
-   * Handles upgrading a player stat or ability.
-   * @param {Object} option - The upgrade option to apply
-   */
   const handleUpgrade = (option) => {
     setPlayer((prev) => {
-      const newPlayer = { ...prev, rareStats: { ...prev.rareStats } };
       const currentTurnLogs = [];
-      const value = [
-        "critChance",
-        "lifeSteal",
-        "dodge",
-        "stunChance",
-        "counterattack",
-        "swiftness",
-      ].includes(option.key)
-        ? option.value / 100
-        : ["critDamage"].includes(option.key)
-        ? option.value / 100
-        : option.value;
-      if (
-        option.key === "minAttack" &&
-        newPlayer.minAttack + value > newPlayer.maxAttack
-      ) {
-        newPlayer.maxAttack += value;
-        addLog(
-          `Player upgraded Max Attack by +${value} due to Min Attack exceeding Max Attack!`,
-          "upgrade",
-          currentTurnLogs
-        );
-      } else if (option.key === "currentHealth") {
-        newPlayer.currentHealth = Math.min(
-          newPlayer.currentHealth + value,
-          newPlayer.maxHealth
-        );
-        addLog(`Player healed for +${value} HP!`, "upgrade", currentTurnLogs);
-      } else if (option.key === "maxHealth") {
-        newPlayer.maxHealth += value;
-        newPlayer.currentHealth = Math.min(
-          newPlayer.currentHealth + value,
-          newPlayer.maxHealth
-        );
-        addLog(
-          `Player upgraded ${option.name} by +${option.value}!`,
-          "upgrade",
-          currentTurnLogs
-        );
-      } else if (option.key in newPlayer.rareStats) {
-        newPlayer.rareStats[option.key] += value;
-        addLog(
-          [
-            "critChance",
-            "critDamage",
-            "lifeSteal",
-            "dodge",
-            "stunChance",
-            "counterattack",
-            "swiftness",
-          ].includes(option.key)
-            ? `Player upgraded ${option.name} by +${option.value}%!`
-            : `Player upgraded ${option.name} by +${option.value}!`,
-          "upgrade",
-          currentTurnLogs
-        );
-      } else {
-        newPlayer[option.key] += value;
-        addLog(
-          [
-            "critChance",
-            "critDamage",
-            "lifeSteal",
-            "dodge",
-            "stunChance",
-            "counterattack",
-            "swiftness",
-          ].includes(option.key)
-            ? `Player upgraded ${option.name} by +${option.value}%!`
-            : `Player upgraded ${option.name} by +${option.value}!`,
-          "upgrade",
-          currentTurnLogs
-        );
-      }
+      const newPlayer = updatePlayerAndLog(prev, option, currentTurnLogs, "upgrade");
       newPlayer.effects = resetEffects(newPlayer);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
@@ -411,22 +315,14 @@ const useGameLogic = ({
     }
   };
 
-  /**
-   * Toggles auto-attack mode.
-   */
   const toggleAuto = () => {
-    // if (!showUpgradeOptions && !showShop) {
     setIsAuto((prev) => !prev);
-    // }
   };
 
-  /**
-   * Resets the game to initial state.
-   */
   const navigate = useNavigate();
 
   const resetGame = () => {
-    navigate("/characterselection");
+    navigate("/character-selection");
 
     // setPlayer(initPlayer());
     // setEnemy(initEnemy(1));

@@ -106,8 +106,8 @@ export const initEnemy = (level) => {
   const scale = Math.pow(level, 1.1);
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
-  const bossMultiplier = (isBoss ? 1 : 0) + (level === 30 ? 2 : 1);
-  const health = Math.floor(10 * scale * baseFactor * bossMultiplier);
+  const bossMultiplier = (isBoss ? 1 : 0) + (level > 30 ? 2 : 1);
+  const health = Math.floor(9 * scale * baseFactor * bossMultiplier);
   const enemy = {
     maxHealth: health,
     currentHealth: health,
@@ -136,7 +136,7 @@ export const initEnemy = (level) => {
         0.9 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
       barrier: Math.floor(
-        0.08 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
+        0.06 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
     },
   };

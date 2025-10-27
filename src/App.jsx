@@ -11,7 +11,7 @@ import "./i18n";
 
 import MainLayout from "./layouts/MainLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
-import SpriteSheetUploaderAndPlayer from "../test/SpriteSheetUploaderAndPlayer";
+import SpriteSheetUploaderAndPlayer from "./components/game/animations/SpriteSheetUploaderAndPlayer";
 
 // Lazy load các trang
 const RandomCardsPokemon = lazy(() => import("./components/pokemon/RandomCardsPokemon"));

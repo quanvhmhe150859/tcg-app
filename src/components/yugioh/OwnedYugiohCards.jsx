@@ -32,11 +32,10 @@ const OwnedYugiohCards = () => {
   }, []);
 
   const fetchCards = async () => {
-    //UNCOMMENT WHEN READY
-    // if (allOwned.length === 0) {
-    //   setCards([]);
-    //   return;
-    // }
+    if (allOwned.length === 0) {
+      setCards([]);
+      return;
+    }
 
     // Sort allOwned theo sortBy + sortOrder
     const sortedCards = [...allOwned].sort((a, b) => {
@@ -128,13 +127,12 @@ const OwnedYugiohCards = () => {
     }
   };
 
-  //UNCOMMENT WHEN READY
   useEffect(() => {
-    // if (allOwned.length > 0) {
+    if (allOwned.length > 0) {
     fetchCards();
-    // } else {
-    //   setCards([]);
-    // }
+    } else {
+      setCards([]);
+    }
   }, [page, allOwned, sortBy, sortOrder]);
 
   return (
