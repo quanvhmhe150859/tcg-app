@@ -39,16 +39,30 @@ const formatValueForLog = (key, value) => {
  * @param {boolean} isPurchase - Có phải hành động mua hàng không
  * @returns {Object} Player state mới
  */
-const updatePlayerAndLog = (prevPlayer, option, currentTurnLogs, logType, isPurchase = false) => {
+const updatePlayerAndLog = (
+  prevPlayer,
+  option,
+  currentTurnLogs,
+  logType,
+  isPurchase = false
+) => {
   const newPlayer = { ...prevPlayer, rareStats: { ...prevPlayer.rareStats } };
-  const value = PERCENTAGE_KEYS.includes(option.key) || option.key === "critDamage"
-    ? option.value / 100
-    : option.value;
+  const value =
+    PERCENTAGE_KEYS.includes(option.key) || option.key === "critDamage"
+      ? option.value / 100
+      : option.value;
 
-  if (option.key === "minAttack" && newPlayer.minAttack + value > newPlayer.maxAttack) {
+  if (
+    option.key === "minAttack" &&
+    newPlayer.minAttack + value > newPlayer.maxAttack
+  ) {
     newPlayer.maxAttack += value;
     addLog(
-      `Player ${isPurchase ? 'purchased' : 'upgraded'} Max Attack by +${value} due to Min Attack exceeding Max Attack${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      `Player ${
+        isPurchase ? "purchased" : "upgraded"
+      } Max Attack by +${value} due to Min Attack exceeding Max Attack${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
       logType,
       currentTurnLogs
     );
@@ -58,7 +72,9 @@ const updatePlayerAndLog = (prevPlayer, option, currentTurnLogs, logType, isPurc
       newPlayer.maxHealth
     );
     addLog(
-      `Player ${isPurchase ? 'purchased' : 'healed'} for +${value} HP${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      `Player ${isPurchase ? "purchased" : "healed"} for +${value} HP${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
       logType,
       currentTurnLogs
     );
@@ -69,21 +85,33 @@ const updatePlayerAndLog = (prevPlayer, option, currentTurnLogs, logType, isPurc
       newPlayer.maxHealth
     );
     addLog(
-      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      `Player ${isPurchase ? "purchased" : "upgraded"} ${
+        option.name
+      } by +${formatValueForLog(option.key, option.value)}${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
       logType,
       currentTurnLogs
     );
   } else if (option.key in newPlayer.rareStats) {
     newPlayer.rareStats[option.key] += value;
     addLog(
-      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      `Player ${isPurchase ? "purchased" : "upgraded"} ${
+        option.name
+      } by +${formatValueForLog(option.key, option.value)}${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
       logType,
       currentTurnLogs
     );
   } else {
     newPlayer[option.key] += value;
     addLog(
-      `Player ${isPurchase ? 'purchased' : 'upgraded'} ${option.name} by +${formatValueForLog(option.key, option.value)}${isPurchase ? ` for ${option.price} gold` : ''}!`,
+      `Player ${isPurchase ? "purchased" : "upgraded"} ${
+        option.name
+      } by +${formatValueForLog(option.key, option.value)}${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
       logType,
       currentTurnLogs
     );
@@ -199,7 +227,13 @@ const useGameLogic = ({
     if (player.gold < option.price || boughtOptions.includes(index)) return;
     setPlayer((prev) => {
       const currentTurnLogs = [];
-      const newPlayer = updatePlayerAndLog(prev, option, currentTurnLogs, "purchase", true);
+      const newPlayer = updatePlayerAndLog(
+        prev,
+        option,
+        currentTurnLogs,
+        "purchase",
+        true
+      );
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
@@ -237,7 +271,12 @@ const useGameLogic = ({
   const handleUpgrade = (option) => {
     setPlayer((prev) => {
       const currentTurnLogs = [];
-      const newPlayer = updatePlayerAndLog(prev, option, currentTurnLogs, "upgrade");
+      const newPlayer = updatePlayerAndLog(
+        prev,
+        option,
+        currentTurnLogs,
+        "upgrade"
+      );
       newPlayer.effects = resetEffects(newPlayer);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;

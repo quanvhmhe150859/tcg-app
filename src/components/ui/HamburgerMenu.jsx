@@ -218,7 +218,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🤖 <span>AI</span> {expanded.ai ? "▼" : "▶"}
+                    🧠 <span>{t("experts")}</span> {expanded.ai ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.ai && (
@@ -235,7 +235,7 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            💻 Chat
+                            🤖 Chatbot
                           </Link>
                         </li>
                         <li>
@@ -244,7 +244,7 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            🖥️ Art
+                            🤖 Artbot
                           </Link>
                         </li>
                       </motion.ul>
@@ -260,7 +260,7 @@ const HamburgerMenu = () => {
                     }}
                     className="flex items-center"
                   >
-                    🧪 <span>Test</span> {expanded.test ? "▼" : "▶"}
+                    🫨 <span>{t("other")}</span> {expanded.test ? "▼" : "▶"}
                   </Link>
                   <AnimatePresence>
                     {expanded.test && (
@@ -286,7 +286,7 @@ const HamburgerMenu = () => {
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
-                            🐞 Testing
+                            🧪 Test
                           </Link>
                         </li>
                       </motion.ul>

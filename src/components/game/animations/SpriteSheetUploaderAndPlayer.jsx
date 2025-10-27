@@ -9,7 +9,6 @@ import React, {
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   useEffect(() => {
     document.body.style.minWidth = "640px";
-
     return () => {
       document.body.style.minWidth = ""; // reset khi rời trang
     };
@@ -24,9 +23,11 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   const [leftOffset, setLeftOffset] = useState(0);
   const [topOffset, setTopOffset] = useState(0);
   const [columns, setColumns] = useState(5);
+  const [rows, setRows] = useState(1);
   const [speed, setSpeed] = useState(120);
   const [delay, setDelay] = useState(0);
   const [flip, setFlip] = useState(false);
+  const [isVerticalFirst, setIsVerticalFirst] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [index, setIndex] = useState(0);
@@ -72,11 +73,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     }
   };
 
-  // Toggle scale
-  const handleToggleScale = () => {
-    setIsScaledDown((prev) => !prev);
-  };
-
   // Calculate total duration
   const totalDuration = frameCount * speed + delay;
 
@@ -113,14 +109,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   }, [isPlaying, isLooping, totalDuration, delay, speed, frameCount]);
 
   // Controls
-  const handlePlayOnce = () => {
-    cancelAnimationFrame(frameReq.current);
-    setIsLooping(false);
-    setIndex(0);
-    startTime.current = performance.now();
-    setIsPlaying(true);
-  };
-
   const handleToggleLoop = () => {
     cancelAnimationFrame(frameReq.current);
     if (isLooping) {
@@ -131,6 +119,21 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
       startTime.current = performance.now();
       setIsLooping(true);
     }
+  };
+
+  // New handlers for Prev and Next buttons
+  const handlePrevFrame = () => {
+    cancelAnimationFrame(frameReq.current);
+    setIsPlaying(false);
+    setIsLooping(false);
+    setIndex((prev) => (prev - 1 + frameCount) % frameCount);
+  };
+
+  const handleNextFrame = () => {
+    cancelAnimationFrame(frameReq.current);
+    setIsPlaying(false);
+    setIsLooping(false);
+    setIndex((prev) => (prev + 1) % frameCount);
   };
 
   // Handle drag for offset
@@ -165,16 +168,33 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   }, [isDragging, dragStart]);
 
   useImperativeHandle(ref, () => ({
-    handlePlayOnce,
     handleToggleLoop,
+    handlePrevFrame,
+    handleNextFrame,
     getElement: () => containerRef.current,
   }));
 
   // Calculate background position for current frame
-  const backgroundPositionX =
-    -(index % columns) * (frameWidth + horizontalSpacing) + leftOffset;
-  const backgroundPositionY =
-    -Math.floor(index / columns) * (frameHeight + verticalSpacing) + topOffset;
+  const calculateFramePosition = () => {
+    if (isVerticalFirst) {
+      const rowIndex = index % rows;
+      const colIndex = Math.floor(index / rows);
+      return {
+        x: -(colIndex * (frameWidth + horizontalSpacing)) + leftOffset,
+        y: -(rowIndex * (frameHeight + verticalSpacing)) + topOffset,
+      };
+    } else {
+      const colIndex = index % columns;
+      const rowIndex = Math.floor(index / columns);
+      return {
+        x: -(colIndex * (frameWidth + horizontalSpacing)) + leftOffset,
+        y: -(rowIndex * (frameHeight + verticalSpacing)) + topOffset,
+      };
+    }
+  };
+
+  const { x: backgroundPositionX, y: backgroundPositionY } =
+    calculateFramePosition();
 
   // Calculate display dimensions
   const displayWidth = isScaledDown
@@ -186,14 +206,34 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
 
   // Calculate highlight frame position (scaled to match display)
   const highlightScale = isScaledDown ? 0.25 : 1;
-  const highlightX =
-    (index % columns) * (frameWidth + horizontalSpacing) * highlightScale -
-    leftOffset * highlightScale;
-  const highlightY =
-    Math.floor(index / columns) *
-      (frameHeight + verticalSpacing) *
-      highlightScale -
-    topOffset * highlightScale;
+  const calculateHighlightPosition = () => {
+    if (isVerticalFirst) {
+      const rowIndex = index % rows;
+      const colIndex = Math.floor(index / rows);
+      return {
+        x: colIndex * (frameWidth + horizontalSpacing) * highlightScale - leftOffset * highlightScale,
+        y: rowIndex * (frameHeight + verticalSpacing) * highlightScale - topOffset * highlightScale,
+      };
+    } else {
+      const colIndex = index % columns;
+      const rowIndex = Math.floor(index / columns);
+      return {
+        x: colIndex * (frameWidth + horizontalSpacing) * highlightScale - leftOffset * highlightScale,
+        y: rowIndex * (frameHeight + verticalSpacing) * highlightScale - topOffset * highlightScale,
+      };
+    }
+  };
+
+  const { x: highlightX, y: highlightY } = calculateHighlightPosition();
+
+  // Toggle handlers
+  const handleToggleDirection = () => {
+    setIsVerticalFirst((prev) => !prev);
+  };
+
+  const handleToggleFlip = () => {
+    setFlip((prev) => !prev);
+  };
 
   return (
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
@@ -214,7 +254,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
 
       {/* Grid for inputs (2 columns) */}
       <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Cột 1: Các input */}
+        {/* Column 1: Inputs */}
         <div>
           <label>Frame Count:</label>
           <input
@@ -260,13 +300,20 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           />
         </div>
 
-        {/* Cột 2: Các input còn lại */}
+        {/* Column 2: Inputs */}
         <div>
-          <label>Columns:</label>
+          <label>{isVerticalFirst ? "Rows" : "Columns"}:</label>
           <input
             type="number"
-            value={columns}
-            onChange={(e) => setColumns(Math.max(1, parseInt(e.target.value)))}
+            value={isVerticalFirst ? rows : columns}
+            onChange={(e) => {
+              const value = Math.max(1, parseInt(e.target.value));
+              if (isVerticalFirst) {
+                setRows(value);
+              } else {
+                setColumns(value);
+              }
+            }}
             className="border p-1 w-full"
           />
           <label className="block mt-2">Top Offset (px):</label>
@@ -298,37 +345,50 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           <input
             type="number"
             value={delay}
-            step={10}
+            step={100}
             onChange={(e) => setDelay(Math.max(0, parseInt(e.target.value)))}
             className="border p-1 w-full"
           />
         </div>
       </div>
 
-      {/* Div thứ 3: Checkbox, Buttons, Animation - Đặt bên dưới và căn giữa */}
+      {/* Controls and Animation */}
       <div className="flex flex-col items-center mb-4">
-        <label className="mb-2">
-          <input
-            type="checkbox"
-            checked={flip}
-            onChange={(e) => setFlip(e.target.checked)}
-          />
-          Flip Sprite (scaleX(-1))
-        </label>
+        <div className="flex gap-4 mb-2">
+          <button
+            onClick={handleToggleFlip}
+            aria-pressed={flip}
+          >
+            {flip ? "Flipped ↪️🙃" : "Original ↩️🙂"}
+          </button>
+          <button
+            onClick={handleToggleDirection}
+            aria-pressed={isVerticalFirst}
+          >
+            {isVerticalFirst ? "Vertical ⬇️➡️" : "Horizontal ➡️⬇️"}
+          </button>
+        </div>
         <div className="flex gap-4 mb-4">
           <button
-            onClick={handlePlayOnce}
+            onClick={handlePrevFrame}
             disabled={!loaded}
-            className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400"
+            className="disabled:opacity-50"
           >
-            Once
+            Prev ⏪
           </button>
           <button
             onClick={handleToggleLoop}
             disabled={!loaded}
-            className="bg-green-500 text-white p-2 rounded disabled:bg-gray-400"
+            className="disabled:opacity-50"
           >
-            {isLooping ? "Stop" : "Loop"}
+            {isLooping ? "Stop ⏹️" : "Loop ▶️"}
+          </button>
+          <button
+            onClick={handleNextFrame}
+            disabled={!loaded}
+            className="disabled:opacity-50"
+          >
+            Next ⏩
           </button>
         </div>
         <div

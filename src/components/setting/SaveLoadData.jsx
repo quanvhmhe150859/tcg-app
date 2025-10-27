@@ -100,11 +100,11 @@ export default function CardSaveLoad() {
 
       <div className="flex w-full w-fit sm:mx-auto gap-2 sm:justify-center mt-4 lg:w-1/2">
         <button className="min-w-0 flex-1 flex flex-col items-center" onClick={saveLocalCardsToFile}>
-          ⬇️ {t("saveFile")}
+          🔽 {t("saveFile")}
         </button>
 
         <button className="min-w-0 flex-1 flex flex-col items-center" onClick={() => document.getElementById("file-upload").click()}>
-          ⬆️ {t("loadFile")}
+          🔼 {t("loadFile")}
         </button>
         <input
           id="file-upload"
