@@ -453,6 +453,17 @@ const rawConfigs = {
   },
 };
 
+// Define the BACKEND_URL and base folder logic
+const USE_LOCAL_SPRITES = import.meta.env.VITE_USE_LOCAL_SPRITES === 'true';
+const BASE_SPRITE_PATH = '/sprites/';
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
+const getSpriteFolder = (key, type) => {
+  // Check if the public sprites folder exists; if not, fallback to BACKEND_URL
+  // This is a simplified check; you might need a more robust check depending on your environment
+  const basePath = USE_LOCAL_SPRITES ? BASE_SPRITE_PATH : `${BACKEND_URL}/sprites/`;
+  return `${basePath}${key}/${type}/`;
+};
+
 export const ANIMATION_CONFIGS = Object.fromEntries(
   Object.entries(rawConfigs).map(([key, config]) => [
     key,
@@ -461,12 +472,12 @@ export const ANIMATION_CONFIGS = Object.fromEntries(
       layers: [
         {
           name: "player",
-          folder: `/sprites/${key}/player/`,
+          folder: getSpriteFolder(key, 'player'),
           ...config.layers.player,
         },
         {
           name: "slash",
-          folder: `/sprites/${key}/slash/`,
+          folder: getSpriteFolder(key, 'slash'),
           ...config.layers.slash,
         },
       ],
@@ -482,49 +493,10 @@ export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
       layers: [
         {
           name: "front",
-          folder: `/sprites/${key}/front/`,
+          folder: getSpriteFolder(key, 'front'),
           ...config.layers.front,
         },
       ],
     },
   ])
 );
-
-// const BACKEND_URL = import.meta.env.VITE_API_BASE_URL
-
-// export const ANIMATION_CONFIGS = Object.fromEntries(
-//   Object.entries(rawConfigs).map(([key, config]) => [
-//     key,
-//     {
-//       ...config,
-//       layers: [
-//         {
-//           name: "player",
-//           folder: `${BACKEND_URL}/sprites/${key}/player/`,
-//           ...config.layers.player,
-//         },
-//         {
-//           name: "slash",
-//           folder: `${BACKEND_URL}/sprites/${key}/slash/`,
-//           ...config.layers.slash,
-//         },
-//       ],
-//     },
-//   ])
-// );
-
-// export const ANIMATION_SELECT_CHARACTER_CONFIGS = Object.fromEntries(
-//   Object.entries(rawConfigs).map(([key, config]) => [
-//     key,
-//     {
-//       ...config,
-//       layers: [
-//         {
-//           name: "front",
-//           folder: `${BACKEND_URL}/sprites/${key}/front/`,
-//           ...config.layers.front,
-//         },
-//       ],
-//     },
-//   ])
-// );
