@@ -28,7 +28,7 @@ const Homepage = () => {
     },
     {
       label: t("game"),
-      path: "/game",
+      path: "/character-selection",
       backgroundImage: "url(/bg/game-bg.png)",
       backgroundVideo: "/bg/game-video.mp4",
     },

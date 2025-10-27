@@ -20,7 +20,7 @@ const BattleGame = () => {
 
   useEffect(() => {
     if (!playerCharacter) {
-      navigate("/characterselection");
+      navigate("/character-selection");
     }
   }, [playerCharacter, navigate]);
 
