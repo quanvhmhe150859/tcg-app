@@ -6,11 +6,13 @@ import React, {
   forwardRef,
 } from "react";
 
+import SpriteSheetPlayer from "./SpriteSheetPlayer";
+
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   useEffect(() => {
     document.body.style.minWidth = "640px";
     return () => {
-      document.body.style.minWidth = ""; // reset khi rời trang
+      document.body.style.minWidth = "";
     };
   }, []);
 
@@ -45,7 +47,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   const containerRef = useRef(null);
   const originalImageRef = useRef(null);
 
-  // Preload sprite sheet and get original dimensions
+  // Preload sprite sheet
   useEffect(() => {
     if (spriteSheetUrl) {
       const img = new Image();
@@ -59,7 +61,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     }
   }, [spriteSheetUrl]);
 
-  // Handle file upload
+  // Handle upload
   const handleUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "image/png") {
@@ -73,7 +75,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     }
   };
 
-  // Calculate total duration
   const totalDuration = frameCount * speed + delay;
 
   // Animation loop
@@ -108,7 +109,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     return () => cancelAnimationFrame(frameReq.current);
   }, [isPlaying, isLooping, totalDuration, delay, speed, frameCount]);
 
-  // Controls
   const handleToggleLoop = () => {
     cancelAnimationFrame(frameReq.current);
     if (isLooping) {
@@ -121,7 +121,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     }
   };
 
-  // New handlers for Prev and Next buttons
   const handlePrevFrame = () => {
     cancelAnimationFrame(frameReq.current);
     setIsPlaying(false);
@@ -136,7 +135,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     setIndex((prev) => (prev + 1) % frameCount);
   };
 
-  // Handle drag for offset
   const handleMouseDown = (e) => {
     if (!loaded) return;
     setIsDragging(true);
@@ -174,7 +172,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     getElement: () => containerRef.current,
   }));
 
-  // Calculate background position for current frame
   const calculateFramePosition = () => {
     if (isVerticalFirst) {
       const rowIndex = index % rows;
@@ -196,7 +193,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   const { x: backgroundPositionX, y: backgroundPositionY } =
     calculateFramePosition();
 
-  // Calculate display dimensions
   const displayWidth = isScaledDown
     ? originalDimensions.width * 0.25
     : originalDimensions.width;
@@ -204,39 +200,139 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     ? originalDimensions.height * 0.25
     : originalDimensions.height;
 
-  // Calculate highlight frame position (scaled to match display)
   const highlightScale = isScaledDown ? 0.25 : 1;
   const calculateHighlightPosition = () => {
     if (isVerticalFirst) {
       const rowIndex = index % rows;
       const colIndex = Math.floor(index / rows);
       return {
-        x: colIndex * (frameWidth + horizontalSpacing) * highlightScale - leftOffset * highlightScale,
-        y: rowIndex * (frameHeight + verticalSpacing) * highlightScale - topOffset * highlightScale,
+        x:
+          colIndex * (frameWidth + horizontalSpacing) * highlightScale -
+          leftOffset * highlightScale,
+        y:
+          rowIndex * (frameHeight + verticalSpacing) * highlightScale -
+          topOffset * highlightScale,
       };
     } else {
       const colIndex = index % columns;
       const rowIndex = Math.floor(index / columns);
       return {
-        x: colIndex * (frameWidth + horizontalSpacing) * highlightScale - leftOffset * highlightScale,
-        y: rowIndex * (frameHeight + verticalSpacing) * highlightScale - topOffset * highlightScale,
+        x:
+          colIndex * (frameWidth + horizontalSpacing) * highlightScale -
+          leftOffset * highlightScale,
+        y:
+          rowIndex * (frameHeight + verticalSpacing) * highlightScale -
+          topOffset * highlightScale,
       };
     }
   };
 
   const { x: highlightX, y: highlightY } = calculateHighlightPosition();
 
-  // Toggle handlers
-  const handleToggleDirection = () => {
-    setIsVerticalFirst((prev) => !prev);
-  };
+  const handleToggleDirection = () => setIsVerticalFirst((prev) => !prev);
+  const handleToggleFlip = () => setFlip((prev) => !prev);
 
-  const handleToggleFlip = () => {
-    setFlip((prev) => !prev);
+  // CẮT ẢNH: ĐỔI DẤU OFFSET + BỎ SPACING + TẢI NGAY
+  const handleCutSpriteSheet = () => {
+    if (!loaded || !spriteSheetUrl) return;
+
+    const img = new Image();
+    img.src = spriteSheetUrl;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // ĐỔI DẤU: Âm → Dương
+      const cutLeftOffset = leftOffset < 0 ? -leftOffset : leftOffset;
+      const cutTopOffset = topOffset < 0 ? -topOffset : topOffset;
+
+      const frames = [];
+      for (let i = 0; i < frameCount; i++) {
+        let col, row;
+
+        if (isVerticalFirst) {
+          row = i % rows;
+          col = Math.floor(i / rows);
+        } else {
+          col = i % columns;
+          row = Math.floor(i / columns);
+        }
+
+        const srcX = col * (frameWidth + horizontalSpacing) + cutLeftOffset;
+        const srcY = row * (frameHeight + verticalSpacing) + cutTopOffset;
+
+        if (
+          srcX < 0 ||
+          srcY < 0 ||
+          srcX + frameWidth > img.width ||
+          srcY + frameHeight > img.height
+        ) {
+          console.warn(`Frame ${i} out of bounds, skipping.`);
+          continue;
+        }
+
+        frames.push({ srcX, srcY });
+      }
+
+      if (frames.length === 0) {
+        alert("Không có frame hợp lệ để cắt!");
+        return;
+      }
+
+      // TÍNH LƯỚI MỚI: KHÔNG CÓ SPACING → SÁT NHAU
+      const colsOut = Math.ceil(Math.sqrt(frames.length));
+      const rowsOut = Math.ceil(frames.length / colsOut);
+
+      canvas.width = colsOut * frameWidth;
+      canvas.height = rowsOut * frameHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      frames.forEach((frame, i) => {
+        const col = i % colsOut;
+        const row = Math.floor(i / colsOut);
+        const destX = col * frameWidth;
+        const destY = row * frameHeight;
+
+        ctx.drawImage(
+          img,
+          frame.srcX,
+          frame.srcY,
+          frameWidth,
+          frameHeight,
+          destX,
+          destY,
+          frameWidth,
+          frameHeight
+        );
+      });
+
+      // TẢI NGAY
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `sprite-cut_${frameCount}f_${frameWidth}x${frameHeight}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    };
+
+    img.onerror = () => alert("Lỗi tải ảnh!");
   };
 
   return (
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
+      <SpriteSheetPlayer
+        image="/sprites/demo.png"
+        frameCount={21}
+        columns={5}
+        frameWidth={256}
+        frameHeight={128}
+        speed={120}
+        flipped={false}
+      />
+
       <h2 className="text-lg font-bold mb-4">
         Upload Sprite Sheet and Play Animation
       </h2>
@@ -252,9 +348,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
         />
       </div>
 
-      {/* Grid for inputs (2 columns) */}
       <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Column 1: Inputs */}
         <div>
           <label>Frame Count:</label>
           <input
@@ -300,7 +394,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           />
         </div>
 
-        {/* Column 2: Inputs */}
         <div>
           <label>{isVerticalFirst ? "Rows" : "Columns"}:</label>
           <input
@@ -308,11 +401,8 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             value={isVerticalFirst ? rows : columns}
             onChange={(e) => {
               const value = Math.max(1, parseInt(e.target.value));
-              if (isVerticalFirst) {
-                setRows(value);
-              } else {
-                setColumns(value);
-              }
+              if (isVerticalFirst) setRows(value);
+              else setColumns(value);
             }}
             className="border p-1 w-full"
           />
@@ -355,10 +445,7 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
       {/* Controls and Animation */}
       <div className="flex flex-col items-center mb-4">
         <div className="flex gap-4 mb-2">
-          <button
-            onClick={handleToggleFlip}
-            aria-pressed={flip}
-          >
+          <button onClick={handleToggleFlip} aria-pressed={flip}>
             {flip ? "Flipped ↪️🙃" : "Original ↩️🙂"}
           </button>
           <button
@@ -391,6 +478,19 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
             Next ⏩
           </button>
         </div>
+
+        {/* Cut button */}
+        {loaded && spriteSheetUrl && (
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={handleCutSpriteSheet}
+              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition font-medium"
+            >
+              Cut and Download New Sprite Sheet ✂️
+            </button>
+          </div>
+        )}
+
         <div
           ref={containerRef}
           className="relative border border-gray-400 rounded-md overflow-visible"
@@ -426,8 +526,8 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
       {loaded && spriteSheetUrl && (
         <div className="mb-4 relative">
           <h3 className="text-md font-semibold mb-2">
-            Original Sprite Sheet ({originalDimensions.width + " "}x
-            {" " + originalDimensions.height})
+            Original Sprite Sheet ({originalDimensions.width} x{" "}
+            {originalDimensions.height})
           </h3>
           <div className="relative inline-block">
             <img

@@ -81,7 +81,7 @@ export default function App() {
             <Route path="/game" element={<BattleGame />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/image-generator" element={<ImageGenerator />} />
-            <Route path="/sprite-sheet" element={<SpriteSheetUploaderAndPlayer />} />
+            <Route path="/sprite-sheet-animation" element={<SpriteSheetUploaderAndPlayer />} />
           </Route>
 
           {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}

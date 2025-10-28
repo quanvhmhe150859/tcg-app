@@ -273,7 +273,7 @@ const HamburgerMenu = () => {
                       >
                         <li>
                           <Link
-                            to="/sprite-sheet"
+                            to="/sprite-sheet-animation"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"
                           >
