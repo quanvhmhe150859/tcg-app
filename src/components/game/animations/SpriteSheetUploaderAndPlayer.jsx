@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import SpriteSheetPlayer from "./SpriteSheetPlayer";
+import SpriteSheetDemo from "./SpriteSheetDemo";
 
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   useEffect(() => {
@@ -323,49 +324,14 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
 
   return (
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
-      <SpriteSheetPlayer
-        folder={{
-          idle: {
-            image: "/sprites/idle.png",
-            frameCount: 10,
-            columns: 4,
-            frameWidth: 96,
-            frameHeight: 96,
-            speed: 200,
-            loop: true,
-          },
-          melee: {
-            image: "/sprites/melee.png",
-            frameCount: 13,
-            columns: 4,
-            frameWidth: 96,
-            frameHeight: 96,
-            speed: 100,
-            loop: true,
-            flip: false, // Lật riêng cho melee
-          },
-          special: {
-            image: "/sprites/special.png",
-            frameCount: 33,
-            columns: 6,
-            frameWidth: 256,
-            frameHeight:128,
-            speed: 120,
-            loop: false,
-          },
-          death: {
-            image: "/sprites/death.png",
-            frameCount: 14,
-            columns: 4,
-            frameWidth: 256,
-            frameHeight: 128,
-            speed: 150,
-            loop: false,
-          },
-        }}
-        defaultAction="idle"
-        flipped={false} // Có thể ghi đè toàn bộ
-      />
+      <div className="rounded-md bg-game-animate">
+        {/* <SpriteSheetDemo /> */}
+        <SpriteSheetPlayer
+          characterName={"demon"}
+          defaultAction="idle"
+          flipped={false} // Có thể ghi đè toàn bộ
+        />
+      </div>
 
       <h2 className="text-lg font-bold mb-4">
         Upload Sprite Sheet and Play Animation
@@ -513,18 +479,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           </button>
         </div>
 
-        {/* Cut button */}
-        {loaded && spriteSheetUrl && (
-          <div className="flex justify-center mb-4">
-            <button
-              onClick={handleCutSpriteSheet}
-              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition font-medium"
-            >
-              Cut and Download New Sprite Sheet ✂️
-            </button>
-          </div>
-        )}
-
         <div
           ref={containerRef}
           className="relative border border-gray-400 rounded-md overflow-visible"
@@ -555,6 +509,18 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
           )}
         </div>
       </div>
+
+      {/* Cut button */}
+      {loaded && spriteSheetUrl && (
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handleCutSpriteSheet}
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition font-medium"
+          >
+            Sprite Sheet ✂️
+          </button>
+        </div>
+      )}
 
       {/* Original image display */}
       {loaded && spriteSheetUrl && (

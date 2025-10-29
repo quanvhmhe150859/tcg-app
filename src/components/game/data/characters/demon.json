@@ -1,0 +1,39 @@
+{
+  "idle": {
+    "image": "/sprites/dazw/demon/idle.png",
+    "frameCount": 10,
+    "columns": 4,
+    "frameWidth": 96,
+    "frameHeight": 96,
+    "speed": 200,
+    "loop": true
+  },
+  "melee": {
+    "image": "/sprites/dazw/demon/melee.png",
+    "frameCount": 13,
+    "columns": 4,
+    "frameWidth": 96,
+    "frameHeight": 96,
+    "speed": 100,
+    "loop": true,
+    "flip": false
+  },
+  "special": {
+    "image": "/sprites/dazw/demon/special.png",
+    "frameCount": 33,
+    "columns": 6,
+    "frameWidth": 256,
+    "frameHeight": 128,
+    "speed": 120,
+    "loop": false
+  },
+  "death": {
+    "image": "/sprites/dazw/demon/death.png",
+    "frameCount": 14,
+    "columns": 4,
+    "frameWidth": 256,
+    "frameHeight": 128,
+    "speed": 150,
+    "loop": false
+  }
+}
