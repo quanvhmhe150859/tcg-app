@@ -1,206 +1,328 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+
+const imageCache = new Map();
 
 const SpriteSheetPlayer = ({
-  image, // URL hoặc dataURL
-  frameCount = 1,
-  columns = 1,
-  leftOffset = 0,
-  topOffset = 0,
-  frameWidth = 64,
-  frameHeight = 64,
-  horizontalSpacing = 0,
-  verticalSpacing = 0,
-  speed = 100, // ms per frame
-  flipped = false, // THÊM PROP: LẬT ẢNH
+  folder,
+  defaultAction = "idle",
+  flipped = false,
 }) => {
+  const [currentAction, setCurrentAction] = useState(defaultAction);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [loaded, setLoaded] = useState(false);
+  const [imageStatus, setImageStatus] = useState({});
+  const [isAttackLooping, setIsAttackLooping] = useState(false);
+  const [pendingAttackLoop, setPendingAttackLoop] = useState(false);
 
   const canvasRef = useRef(null);
-  const imgRef = useRef(null);
   const animationRef = useRef(null);
   const startTimeRef = useRef(null);
 
-  // Load image
-  useEffect(() => {
-    const img = new Image();
-    img.src = image;
-    img.onload = () => {
-      imgRef.current = img;
-      setLoaded(true);
-      setCurrentFrame(0);
-    };
-    img.onerror = () => {
-      console.error("Failed to load sprite sheet image");
-      setLoaded(false);
-    };
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [image]);
+  // TÍNH KÍCH THƯỚC CANVAS CỐ ĐỊNH
+  const { maxWidth, maxHeight } = useMemo(() => {
+    let mw = 64,
+      mh = 64;
+    Object.values(folder).forEach((action) => {
+      if (action?.frameWidth > mw) mw = action.frameWidth;
+      if (action?.frameHeight > mh) mh = action.frameHeight;
+    });
+    return { maxWidth: mw, maxHeight: mh };
+  }, [folder]);
 
-  // Reset khi props thay đổi (bao gồm flipped)
-  useEffect(() => {
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+  // Config hiện tại
+  const config = folder[currentAction] || {};
+  const {
+    image,
+    frameCount = 1,
+    columns = 1,
+    leftOffset = 0,
+    topOffset = 0,
+    frameWidth = maxWidth,
+    frameHeight = maxHeight,
+    horizontalSpacing = 0,
+    verticalSpacing = 0,
+    speed = 100,
+    flip: actionFlip = flipped,
+  } = config;
+
+  // CĂN THEO CHÂN
+  const offsetX = Math.floor((maxWidth - frameWidth) / 2);
+  const offsetY = maxHeight - frameHeight;
+
+  // XÁC ĐỊNH LOOP
+  const isLooping =
+    currentAction === "idle" || (currentAction === "melee" && isAttackLooping);
+
+  // LẤY ẢNH TỪ CACHE
+  const img = useMemo(() => {
+    if (!image) return null;
+
+    if (imageCache.has(image)) {
+      const cached = imageCache.get(image);
+      if (cached.complete && cached.naturalWidth > 0) {
+        setImageStatus((prev) => ({ ...prev, [currentAction]: "loaded" }));
+      } else if (cached.complete) {
+        setImageStatus((prev) => ({ ...prev, [currentAction]: "error" }));
       }
-    };
-  }, [
-    frameCount, columns, leftOffset, topOffset, frameWidth, frameHeight,
-    horizontalSpacing, verticalSpacing, speed, flipped // Theo dõi flipped
-  ]);
+      return cached;
+    }
 
-  // Animation loop
+    const imgObj = new Image();
+    imgObj.src = image;
+    setImageStatus((prev) => ({ ...prev, [currentAction]: "loading" }));
+
+    imgObj.onload = () => {
+      imageCache.set(image, imgObj);
+      setImageStatus((prev) => ({ ...prev, [currentAction]: "loaded" }));
+    };
+
+    imgObj.onerror = () => {
+      setImageStatus((prev) => ({ ...prev, [currentAction]: "error" }));
+    };
+
+    return imgObj;
+  }, [image, currentAction]);
+
+  // KHI ĐỔI ACTION → CHẠY NGAY + TẮT ATTACK LOOP NẾU LÀ DEATH
   useEffect(() => {
-    if (!loaded || (!isPlaying && !isLooping)) return;
+    setCurrentFrame(0);
+    setIsPlaying(true);
+
+    if (currentAction === "death") {
+      setIsAttackLooping(false);
+      setPendingAttackLoop(false);
+    } else if (isAttackLooping && currentAction !== "melee") {
+      setPendingAttackLoop(true);
+    } else {
+      setPendingAttackLoop(false);
+    }
+  }, [currentAction, isAttackLooping]);
+
+  // ANIMATION LOOP
+  useEffect(() => {
+    if (!img || imageStatus[currentAction] === "error") return;
+    if (!isPlaying) return;
 
     startTimeRef.current = performance.now();
 
     const tick = (now) => {
       const elapsed = now - startTimeRef.current;
       const totalDuration = frameCount * speed;
-      const cycleTime = isLooping ? elapsed % totalDuration : Math.min(elapsed, totalDuration);
 
-      const newFrame = Math.floor(cycleTime / speed);
-      setCurrentFrame(newFrame);
+      if (isLooping) {
+        const cycleTime = elapsed % totalDuration;
+        const newFrame = Math.floor(cycleTime / speed);
+        setCurrentFrame(newFrame);
+        animationRef.current = requestAnimationFrame(tick);
+      } else {
+        if (elapsed >= totalDuration) {
+          setIsPlaying(false);
+          setCurrentFrame(frameCount - 1);
 
-      if (!isLooping && elapsed >= totalDuration) {
-        setIsPlaying(false);
-        setCurrentFrame(0);
-        return;
+          if (currentAction === "death") {
+            return; // ĐÃ TẮT LOOP TRƯỚC ĐÓ → DỪNG LUÔN
+          }
+
+          if (pendingAttackLoop) {
+            setCurrentAction("melee");
+            setIsAttackLooping(true);
+            setPendingAttackLoop(false);
+          } else {
+            setCurrentAction("idle");
+          }
+          return;
+        }
+
+        const newFrame = Math.floor(elapsed / speed);
+        setCurrentFrame(newFrame);
+        animationRef.current = requestAnimationFrame(tick);
       }
-
-      animationRef.current = requestAnimationFrame(tick);
     };
 
     animationRef.current = requestAnimationFrame(tick);
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying, isLooping, loaded, frameCount, speed]);
+  }, [
+    isPlaying,
+    currentAction,
+    img,
+    frameCount,
+    speed,
+    isLooping,
+    pendingAttackLoop,
+    imageStatus,
+  ]);
 
-  // Draw frame to canvas (với flipped)
+  // VẼ FRAME
   useEffect(() => {
-    if (!loaded || !imgRef.current || !canvasRef.current) return;
+    if (!canvasRef.current || !img || imageStatus[currentAction] !== "loaded")
+      return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const img = imgRef.current;
 
-    // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Bắt đầu transform để lật
-    ctx.save();
-
-    if (flipped) {
-      ctx.scale(-1, 1); // Lật ngang
-      ctx.translate(-frameWidth, 0); // Đẩy về phải để lật đúng tâm
-    }
-
-    // Tính vị trí frame
     const col = currentFrame % columns;
     const row = Math.floor(currentFrame / columns);
-
     const srcX = col * (frameWidth + horizontalSpacing) + leftOffset;
     const srcY = row * (frameHeight + verticalSpacing) + topOffset;
 
-    // Clip nếu ra ngoài
     const drawX = Math.max(0, -srcX);
     const drawY = Math.max(0, -srcY);
     const drawWidth = Math.min(frameWidth, img.width - Math.max(0, srcX));
     const drawHeight = Math.min(frameHeight, img.height - Math.max(0, srcY));
 
-    if (drawWidth > 0 && drawHeight > 0) {
-      ctx.drawImage(
-        img,
-        Math.max(0, srcX),
-        Math.max(0, srcY),
-        drawWidth,
-        drawHeight,
-        flipped ? drawX : drawX, // Nếu lật, drawX vẫn đúng vì đã scale
-        drawY,
-        drawWidth,
-        drawHeight
-      );
+    if (drawWidth <= 0 || drawHeight <= 0) return;
+
+    const destX = offsetX + drawX;
+    const destY = offsetY + drawY;
+
+    ctx.save();
+
+    if (actionFlip) {
+      const centerX = destX + drawWidth / 2;
+      const centerY = destY + drawHeight / 2;
+      ctx.translate(centerX, centerY);
+      ctx.scale(-1, 1);
+      ctx.translate(-centerX, -centerY);
     }
 
-    ctx.restore(); // Khôi phục context
+    ctx.drawImage(
+      img,
+      Math.max(0, srcX),
+      Math.max(0, srcY),
+      drawWidth,
+      drawHeight,
+      destX,
+      destY,
+      drawWidth,
+      drawHeight
+    );
+
+    ctx.restore();
   }, [
-    currentFrame, loaded, leftOffset, topOffset, frameWidth, frameHeight,
-    horizontalSpacing, verticalSpacing, columns, flipped // Theo dõi flipped
+    currentFrame,
+    currentAction,
+    imageStatus,
+    actionFlip,
+    leftOffset,
+    topOffset,
+    frameWidth,
+    frameHeight,
+    horizontalSpacing,
+    verticalSpacing,
+    columns,
+    maxWidth,
+    maxHeight,
+    offsetX,
+    offsetY,
+    img,
   ]);
 
-  // Xử lý nút
-  const handlePlayOnce = () => {
-    setIsLooping(false);
-    setIsPlaying(true);
-    setCurrentFrame(0);
+  // NÚT ATTACK LOOP
+  const handleAttackLoop = () => {
+    if (isAttackLooping) {
+      setIsAttackLooping(false);
+      setPendingAttackLoop(false);
+      if (currentAction === "melee") {
+        setCurrentAction("idle");
+      }
+    } else {
+      setIsAttackLooping(true);
+      setPendingAttackLoop(false);
+      setCurrentAction("melee");
+    }
   };
 
-  const handleLoop = () => {
-    setIsPlaying(false);
-    setIsLooping(true);
-    setCurrentFrame(0);
-  };
-
-  const handleStop = () => {
-    setIsPlaying(false);
-    setIsLooping(false);
-    setCurrentFrame(0);
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-  };
+  // LỌC NÚT: CHỈ HIỆN NÚT CÓ TRONG FOLDER (BỎ idle)
+  const availableActions = Object.keys(folder).filter(
+    (action) => action !== "idle"
+  );
 
   return (
-    <div className="p-4 border border-gray-300 rounded-md max-w-md mx-auto bg-white shadow-sm">
-      <h3 className="text-lg font-semibold mb-3 text-center">Sprite Animation Player</h3>
+    <div className="p-6 border border-gray-300 rounded-lg max-w-2xl mx-auto bg-white shadow-md">
+      <h3 className="text-xl font-bold mb-4 text-center text-gray-800">
+        Character Animation Player
+      </h3>
 
-      <div className="flex justify-center mb-4">
+      {/* NÚT HÀNH ĐỘNG */}
+      <div className="flex flex-wrap gap-2 justify-center mb-5">
+        {availableActions.map((action) => {
+          const status = imageStatus[action];
+          const isActive = currentAction === action;
+
+          return (
+            <button
+              key={action}
+              onClick={() => setCurrentAction(action)}
+              disabled={currentAction === action}
+              className={`
+                px-4 py-2 rounded font-medium text-sm transition relative
+                ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                }
+                ${
+                  status === "loading" &&
+                  "bg-yellow-100 text-yellow-800 animate-pulse"
+                }
+                ${status === "error" && "bg-red-100 text-red-800"}
+              `}
+            >
+              {action.charAt(0).toUpperCase() + action.slice(1)}
+              {status === "loading" && <span className="ml-1">Loading</span>}
+              {status === "error" && <span className="ml-1">Failed</span>}
+            </button>
+          );
+        })}
+
+        {/* NÚT ATTACK LOOP */}
+        <button
+          onClick={handleAttackLoop}
+          className={`
+            px-4 py-2 rounded font-medium text-sm transition
+            ${
+              isAttackLooping
+                ? "bg-red-600 text-white shadow-md"
+                : "bg-orange-500 text-white hover:bg-orange-600"
+            }
+          `}
+        >
+          {isAttackLooping ? "Stop Attack" : "Attack Loop"}
+        </button>
+      </div>
+
+      {/* CANVAS */}
+      <div className="flex justify-center mb-4 relative">
         <canvas
           ref={canvasRef}
-          width={frameWidth}
-          height={frameHeight}
-          className="border border-gray-400 rounded bg-gray-50"
+          width={maxWidth}
+          height={maxHeight}
+          className="border-2 border-dashed border-gray-400 rounded bg-gray-50"
           style={{ imageRendering: "pixelated" }}
         />
       </div>
 
-      <div className="flex gap-2 justify-center">
-        <button
-          onClick={handlePlayOnce}
-          disabled={!loaded || isPlaying || isLooping}
-          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-          Play Once
-        </button>
-        <button
-          onClick={handleLoop}
-          disabled={!loaded || isLooping}
-          className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-          {isLooping ? "Looping..." : "Loop"}
-        </button>
-        {(isPlaying || isLooping) && (
-          <button
-            onClick={handleStop}
-            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
-          >
-            Stop
-          </button>
-        )}
-      </div>
-
-      <div className="mt-3 text-xs text-gray-600 text-center">
-        Frame: {currentFrame + 1}/{frameCount} |{" "}
-        {isLooping ? "Looping" : isPlaying ? "Playing..." : "Stopped"} |{" "}
-        {flipped ? "Flipped" : "Normal"}
+      {/* THÔNG TIN */}
+      <div className="text-xs text-gray-600 text-center space-y-1">
+        <div>
+          <strong>Action:</strong> {currentAction} | <strong>Frame:</strong>{" "}
+          {currentFrame + 1}/{frameCount}
+        </div>
+        <div>
+          <strong>Status:</strong>{" "}
+          {imageStatus[currentAction] === "loading" && "Loading..."}
+          {imageStatus[currentAction] === "error" && "Failed"}
+          {imageStatus[currentAction] === "loaded" &&
+            (isLooping ? "Looping" : "Playing")}
+        </div>
+        <div>
+          <strong>Attack Loop:</strong> {isAttackLooping ? "ON" : "OFF"}
+        </div>
       </div>
     </div>
   );

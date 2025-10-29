@@ -324,13 +324,47 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
   return (
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
       <SpriteSheetPlayer
-        image="/sprites/demo.png"
-        frameCount={21}
-        columns={5}
-        frameWidth={256}
-        frameHeight={128}
-        speed={120}
-        flipped={false}
+        folder={{
+          idle: {
+            image: "/sprites/idle.png",
+            frameCount: 10,
+            columns: 4,
+            frameWidth: 96,
+            frameHeight: 96,
+            speed: 200,
+            loop: true,
+          },
+          melee: {
+            image: "/sprites/melee.png",
+            frameCount: 13,
+            columns: 4,
+            frameWidth: 96,
+            frameHeight: 96,
+            speed: 100,
+            loop: true,
+            flip: false, // Lật riêng cho melee
+          },
+          special: {
+            image: "/sprites/special.png",
+            frameCount: 33,
+            columns: 6,
+            frameWidth: 256,
+            frameHeight:128,
+            speed: 120,
+            loop: false,
+          },
+          death: {
+            image: "/sprites/death.png",
+            frameCount: 14,
+            columns: 4,
+            frameWidth: 256,
+            frameHeight: 128,
+            speed: 150,
+            loop: false,
+          },
+        }}
+        defaultAction="idle"
+        flipped={false} // Có thể ghi đè toàn bộ
       />
 
       <h2 className="text-lg font-bold mb-4">
