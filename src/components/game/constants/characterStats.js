@@ -3,36 +3,36 @@ export const CHARACTER_STATS = {
     default: {
       armor: 8,
       maxAttack: 10,
-      //   special: "Fire Strike",
+      specialId: 1,
     },
     heretic_punisher_captain: {
       armor: 2,
       maxAttack: 20,
-      //   special: "Flaming Barrage",
+      specialId: 2,
     },
     undead: {
       maxHealth: -200,
       armor: -5,
       maxAttack: 10,
       lifeSteal: 0.15,
-      //   special: "Dark Cleave",
+      specialId: 3,
     },
     pristine_winter: {
       armor: 15,
       maxAttack: 5,
-      //   special: "Frostbite Edge",
+      specialId: 4,
     },
     knight: {
       armor: 8,
       maxAttack: 10,
       dodge: 0.05,
-      //   special: "Shield Bash",
+      specialId: 5,
     },
   },
   bardrey: {
     default: {
       armor: 7,
-      //   special: "Wind Slash",
+      specialId: 6,
       rareStats: {
         burn: 10,
       },
@@ -42,7 +42,7 @@ export const CHARACTER_STATS = {
     default: {
       armor: 10,
       dodge: 0.05,
-      //   special: "Holy Shield",
+      specialId: 7,
     },
     holy_king: {
       armor: 12,
@@ -50,7 +50,7 @@ export const CHARACTER_STATS = {
       rareStats: {
         barrier: 1,
       },
-      //   special: "Divine Light",
+      specialId: 8,
     },
   },
   esthea: {
@@ -59,7 +59,7 @@ export const CHARACTER_STATS = {
       rareStats: {
         shield: 50,
       },
-      //   special: "Swift Arrow",
+      specialId: 9,
     },
     poison_apple: {
       armor: 2,
@@ -67,14 +67,14 @@ export const CHARACTER_STATS = {
       rareStats: {
         poison: 2,
       },
-      //   special: "Toxic Slam",
+      specialId: 10,
     },
   },
   gidnil: {
     default: {
       armor: 9,
       critDamage: 1,
-      //   special: "Earth Smash",
+      specialId: 11,
     },
   },
   haerang: {
@@ -82,20 +82,20 @@ export const CHARACTER_STATS = {
       armor: 8,
       critChance: 0.05,
       critDamage: 0.5,
-      //   special: "Thunder Kick",
+      specialId: 12,
     },
   },
   hansi: {
     default: {
       minAttack: 5,
       maxAttack: 15,
-      //   special: "Shadow Blade",
+      specialId: 13,
     },
   },
   ian: {
     default: {
       maxAttack: 35,
-      //   special: "Ice Lance",
+      specialId: 14,
     },
   },
   bombie: {
@@ -105,12 +105,12 @@ export const CHARACTER_STATS = {
       rareStats: {
         swiftness: 0.1,
       },
-      //   special: "Explosive Charge",
+      specialId: 15,
     },
   },
   jol: {
     default: {
-      //   special: "Lightning Bolt",
+      specialId: 16,
       rareStats: {
         swiftness: 0.15,
       },
@@ -124,8 +124,8 @@ export const CHARACTER_STATS = {
       maxAttack: 6,
       critChance: 0.06,
       critDamage: 0.6,
-      lifeSteal: 0.06
-      //   special: "Stone Fist",
+      lifeSteal: 0.06,
+      specialId: 17,
     },
   },
 };
