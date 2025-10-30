@@ -5,8 +5,9 @@ export const SPECIALS = [
     effect:
       "Gây 150% sát thương tấn công và đốt cháy kẻ địch trong 3 lượt (mất 5% HP mỗi lượt).",
     cooldown: 4,
+    cooldownType: "turn",
+    usingType: "manual",
     power: 1.5,
-    type: "attack",
     image: "flame_burst.png",
   },
   {
@@ -15,8 +16,9 @@ export const SPECIALS = [
     effect:
       "Tạo lá chắn nước hấp thụ sát thương bằng 25% HP tối đa trong 2 lượt.",
     cooldown: 5,
+    cooldownType: "level",
+    usingType: "auto",
     power: 0.25,
-    type: "defense",
     image: "aqua_shield.png",
   },
   {
@@ -25,8 +27,9 @@ export const SPECIALS = [
     effect:
       "Tấn công mục tiêu với 130% sát thương và có 40% làm tê liệt 1 lượt.",
     cooldown: 3,
+    cooldownType: "turn",
+    usingType: "manual",
     power: 1.3,
-    type: "attack",
     image: "thunder_strike.png",
   },
   {
@@ -34,8 +37,9 @@ export const SPECIALS = [
     name: "Healing Light",
     effect: "Hồi phục 30% HP cho bản thân hoặc đồng minh.",
     cooldown: 4,
-    power: 0.3,
-    type: "heal",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "healing_light.png",
   },
   {
@@ -44,8 +48,9 @@ export const SPECIALS = [
     effect:
       "Tạo đám độc gây 10% HP sát thương mỗi lượt trong 4 lượt cho toàn bộ kẻ địch.",
     cooldown: 6,
-    power: 0.1,
-    type: "debuff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "poison_cloud.png",
   },
   {
@@ -53,8 +58,9 @@ export const SPECIALS = [
     name: "Battle Roar",
     effect: "Tăng 25% tấn công cho toàn đội trong 3 lượt.",
     cooldown: 5,
-    power: 0.25,
-    type: "buff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "battle_roar.png",
   },
   {
@@ -62,8 +68,9 @@ export const SPECIALS = [
     name: "Stone Skin",
     effect: "Giảm 40% sát thương nhận vào trong 2 lượt.",
     cooldown: 4,
-    power: 0.4,
-    type: "defense",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "stone_skin.png",
   },
   {
@@ -71,8 +78,9 @@ export const SPECIALS = [
     name: "Shadow Step",
     effect: "Tránh né đòn kế tiếp và tăng 20% tấn công ở lượt sau.",
     cooldown: 3,
-    power: 0.2,
-    type: "buff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "shadow_step.png",
   },
   {
@@ -81,8 +89,9 @@ export const SPECIALS = [
     effect:
       "Gây 100% sát thương cho tất cả kẻ địch và làm chậm 30% tốc độ trong 2 lượt.",
     cooldown: 5,
-    power: 1.0,
-    type: "attack",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "frost_nova.png",
   },
   {
@@ -90,8 +99,9 @@ export const SPECIALS = [
     name: "Divine Blessing",
     effect: "Loại bỏ tất cả hiệu ứng xấu và tăng 15% phòng thủ trong 3 lượt.",
     cooldown: 6,
-    power: 0.15,
-    type: "buff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "divine_blessing.png",
   },
   {
@@ -99,8 +109,9 @@ export const SPECIALS = [
     name: "Death Mark",
     effect: "Đánh dấu mục tiêu: nhận thêm 30% sát thương trong 3 lượt.",
     cooldown: 5,
-    power: 0.3,
-    type: "debuff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "death_mark.png",
   },
   {
@@ -109,8 +120,9 @@ export const SPECIALS = [
     effect:
       "Tạo lốc lửa tấn công toàn bộ kẻ địch với 120% sát thương và có 30% cơ hội đốt cháy 2 lượt.",
     cooldown: 6,
-    power: 1.2,
-    type: "attack",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "blazing_tornado.png",
   },
   {
@@ -119,8 +131,9 @@ export const SPECIALS = [
     effect:
       "Hút 20% HP và 10% năng lượng từ mục tiêu, chuyển thành máu cho bản thân.",
     cooldown: 5,
-    power: 0.2,
-    type: "drain",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "spirit_drain.png",
   },
   {
@@ -128,8 +141,9 @@ export const SPECIALS = [
     name: "Iron Will",
     effect: "Miễn nhiễm hiệu ứng xấu trong 2 lượt và tăng 15% phòng thủ.",
     cooldown: 6,
-    power: 0.15,
-    type: "buff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "iron_will.png",
   },
   {
@@ -138,8 +152,9 @@ export const SPECIALS = [
     effect:
       "Tăng 50% sức mạnh phép thuật trong 1 lượt, sau đó giảm 10% HP do phản chấn.",
     cooldown: 4,
-    power: 0.5,
-    type: "buff",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "arcane_overload.png",
   },
   {
@@ -148,8 +163,9 @@ export const SPECIALS = [
     effect:
       "Cắn độc gây 80% sát thương và 20% cơ hội khiến mục tiêu bị trúng độc 3 lượt.",
     cooldown: 3,
-    power: 0.8,
-    type: "attack",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "venom_fang.png",
   },
   {
@@ -157,8 +173,9 @@ export const SPECIALS = [
     name: "Celestial Heal",
     effect: "Hồi 40% HP cho toàn đội và xoá 1 hiệu ứng xấu ngẫu nhiên.",
     cooldown: 7,
-    power: 0.4,
-    type: "heal",
+    cooldownType: "turn",
+    usingType: "manual",
+    power: 1.5,
     image: "celestial_heal.png",
   },
 ];

@@ -74,9 +74,9 @@ const BattleGame = () => {
     handleReroll,
     handleExitShop,
     handleUpgrade,
-    endGame,
     handleEndRun,
     handleAttack,
+    handleSpecial,
     toggleAuto,
     resetGame,
   } = useGameLogic({

@@ -408,3 +408,7 @@ export const enemyTurn = (newPlayer, newEnemy, currentTurnLogs) => {
 
   applyPoison(newEnemy, "Enemy", currentTurnLogs);
 };
+
+export const playerSpecial = (newPlayer, newEnemy, currentTurnLogs) => {
+  
+};

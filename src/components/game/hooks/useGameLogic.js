@@ -5,7 +5,7 @@ import {
   generateRareUpgradeOptions,
   resetEffects,
 } from "../initializers";
-import { playerTurn, enemyTurn } from "../gameLogic";
+import { playerTurn, playerSpecial, enemyTurn } from "../gameLogic";
 import { addLog, checkGameOver, startTurn } from "../utils";
 import { useNavigate } from "react-router-dom";
 
@@ -354,6 +354,24 @@ const useGameLogic = ({
     }
   };
 
+  const handleSpecial = () => {
+    if (gameOver || showUpgradeOptions || showShop) return;
+
+    let newPlayer = { ...player, rareStats: { ...player.rareStats } };
+    let newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
+    const currentTurnLogs = [];
+
+    playerSpecial(newPlayer, newEnemy, currentTurnLogs);
+    let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
+    if (gameStatus.isOver || gameStatus.levelUp) {
+      newPlayer.level++;
+      endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
+      return;
+    }
+
+    endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
+  };
+
   const toggleAuto = () => {
     setIsAuto((prev) => !prev);
   };
@@ -385,9 +403,9 @@ const useGameLogic = ({
     handleReroll,
     handleExitShop,
     handleUpgrade,
-    endGame,
     handleEndRun,
     handleAttack,
+    handleSpecial,
     toggleAuto,
     resetGame,
   };
