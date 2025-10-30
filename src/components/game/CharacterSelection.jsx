@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
 import { CHARACTER_STATS } from "./constants/characterStats";
-import { SPECIALS } from "./constants/specials";
 import "../styles/CardItem.css";
 
 const CharacterSelection = () => {
@@ -19,9 +18,6 @@ const CharacterSelection = () => {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [modalFrame, setModalFrame] = useState(0);
   const navigate = useNavigate();
-
-  const [maxCardHeight, setMaxCardHeight] = useState(0);
-  const cardRefs = useRef([]);
 
   // Lọc chỉ lấy nhân vật default (có dạng "character/default")
   const defaultCharacters = Object.keys(ANIMATION_SELECT_CHARACTER_CONFIGS)
@@ -131,31 +127,6 @@ const CharacterSelection = () => {
     navigate("/game", { state: { playerCharacter: randomCharacter } });
   };
 
-  useEffect(() => {
-    if (!selectedCharacter || cardRefs.current.length === 0) return;
-
-    // Reset
-    cardRefs.current = cardRefs.current.slice(
-      0,
-      getVariants(selectedCharacter).length
-    );
-
-    // Đợi DOM render xong
-    const timer = setTimeout(() => {
-      const heights = cardRefs.current
-        .filter((ref) => ref)
-        .map((ref) => {
-          const content = ref.querySelector(".card-content");
-          return content ? content.offsetHeight : 0;
-        });
-
-      const max = Math.max(...heights, 0);
-      setMaxCardHeight(max);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [selectedCharacter, modalFrame]);
-
   return (
     <div className="inline-flex flex-col items-center p-8 rounded-lg bg-game">
       <h1 className="text-4xl font-bold mb-8">Select Your Character</h1>
@@ -218,11 +189,7 @@ const CharacterSelection = () => {
       {selectedCharacter && (
         <div
           className="modal-overlay"
-          onClick={() => {
-            setSelectedCharacter(null);
-            setMaxCardHeight(0);
-            cardRefs.current = [];
-          }}
+          onClick={() => setSelectedCharacter(null)}
         >
           <div
             className="rounded-lg p-6 w-full relative bg-game mr-4 ml-4"
@@ -230,11 +197,7 @@ const CharacterSelection = () => {
           >
             <button
               className="absolute top-2 right-3 text-white text-2xl"
-              onClick={() => {
-                setSelectedCharacter(null);
-                setMaxCardHeight(0);
-                cardRefs.current = [];
-              }}
+              onClick={() => setSelectedCharacter(null)}
             >
               ×
             </button>
@@ -244,51 +207,38 @@ const CharacterSelection = () => {
             </h2>
 
             <div className="flex flex-wrap gap-4 justify-center">
-              {getVariants(selectedCharacter).map((variantKey, index) => {
-                const baseName = variantKey.split("/")[0];
-                const variantName = variantKey.includes("/")
-                  ? variantKey.split("/")[1]
-                  : "default";
-                const stats = CHARACTER_STATS[baseName][variantName];
-                const specialId = stats.specialId;
-                const special = SPECIALS.find((s) => s.id === specialId);
-
+              {getVariants(selectedCharacter).map((variantKey) => {
+                const stats =
+                  CHARACTER_STATS[variantKey.split("/")[0]][
+                    variantKey.includes("/")
+                      ? variantKey.split("/")[1]
+                      : "default"
+                  ];
                 return (
                   <div
                     key={variantKey}
-                    ref={(el) => {
-                      if (el) cardRefs.current[index] = el;
-                    }}
-                    className="w-36 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary hover:bg-game-secondary/80 flex flex-col"
-                    style={{
-                      minHeight: maxCardHeight
-                        ? `${maxCardHeight + 100}px`
-                        : "auto",
-                    }} // +100 cho ảnh special
+                    className="w-36 pb-4 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
                     onClick={() => handleSelectVariant(variantKey)}
                   >
-                    {/* Sprite */}
                     <div
-                      className="relative w-full h-32 overflow-visible bg-cover"
+                      className="relative w-full h-32 overflow-visible"
                       style={{
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center center",
+                        backgroundSize: "auto",
                         backgroundImage: `url(${getSpriteUrl(
                           variantKey,
                           modalFrame
                         )})`,
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
                       }}
-                    />
-
-                    {/* Tên biến thể */}
-                    <span className="block text-sm font-bold capitalize px-2 mt-2">
+                    ></div>
+                    <span className="block text-sm font-bold capitalize h-12">
                       {variantKey === selectedCharacter
                         ? "Default"
                         : formatVariantName(variantKey)}
                     </span>
-
-                    {/* Nội dung stats – đo chiều cao */}
-                    <div className="card-content flex-1 px-2 mt-1 mb-1 text-xs flex flex-col justify-start">
+                    {/* Hiển thị chỉ số bonus động dựa trên characterStats.js */}
+                    <div className="text-xs mt-1 flex flex-col items-center justify-center">
                       {Object.entries(stats).flatMap(([statKey, statValue]) =>
                         statKey === "rareStats"
                           ? Object.entries(statValue).map(
@@ -304,7 +254,7 @@ const CharacterSelection = () => {
                                 );
                               }
                             )
-                          : statKey !== "specialId" && statKey !== "special"
+                          : statKey !== "special"
                           ? [
                               <p
                                 className={
@@ -319,21 +269,6 @@ const CharacterSelection = () => {
                           : []
                       )}
                     </div>
-
-                    {/* Special Ability – luôn ở đáy */}
-                    {/* {special && (
-                      <div className="mt-auto p-2 border-t border-white/20">
-                        <img
-                          src={`/specials/${special.image}`}
-                          alt={special.name}
-                          className="w-6 h-6 mx-auto object-contain rounded-full border border-yellow-500 shadow-md"
-                          title={special.name}
-                        />
-                        <p className="text-xs mt-1 text-yellow-400 font-semibold truncate px-1">
-                          {special.name}
-                        </p>
-                      </div>
-                    )} */}
                   </div>
                 );
               })}
