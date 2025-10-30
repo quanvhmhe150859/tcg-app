@@ -12,7 +12,6 @@ import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
 
-import { CHARACTER_STATS } from "./constants/characterStats";
 import { SPECIALS } from "./constants/specials";
 
 const BattleGame = () => {
@@ -254,69 +253,56 @@ const BattleGame = () => {
             toggleNormalStats={toggleNormalStats}
             toggleRareStats={toggleRareStats}
           />
-          <div className="text-center space-y-3 p-3 bg-black/30 rounded-lg">
-            <p className="text-yellow-500 text-lg">Gold: {player.gold} Gold</p>
+          <p className="text-center text-yellow-500">Gold: {player.gold} 💰</p>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {player.specials?.map((special, index) => {
+              const specialData = SPECIALS.find(
+                (s) => s.id === special.specialId
+              );
+              if (!specialData) return null;
 
-            {(() => {
-              const [base, variant = "default"] =
-                playerCharacter?.split("/") ?? [];
-              const stats = CHARACTER_STATS[base]?.[variant];
-              const special = SPECIALS.find((s) => s.id === stats?.specialId);
-              if (!special) return null;
-
-              // const levelsNeeded = Math.max(0, specialUnlockLevel - level);
+              const isOnCooldown = special.currentCooldown > 0;
+              const imagePath = `/specials/${specialData.image}`;
 
               return (
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={handleSpecial}
-                    // disabled={!canUseSpecial}
-                    // className={`relative p-2 rounded-xl transition-all ${
-                    //   !canUseSpecial
-                    //     ? "bg-gray-600 opacity-60"
-                    //     : "bg-gradient-to-r from-emerald-500 to-purple-600 hover:scale-110 shadow-lg"
-                    // }`}
-                    // title={`${special.name}\n${special.effect}\nNext: Level ${specialUnlockLevel}`}
-                  >
-                    <img
-                      src={`/specials/${special.image}`}
-                      alt={special.name}
-                      className="w-12 h-12 object-contain rounded-lg"
-                    />
-                    {/* {levelsNeeded > 0 && (
-                      <div className="absolute inset-0 bg-red-600/90 rounded-xl flex flex-col items-center justify-center">
-                        <span className="text-white font-bold">
-                          Lvl {specialUnlockLevel}
-                        </span>
-                        <span className="text-xs">({levelsNeeded} more)</span>
-                      </div>
-                    )} */}
-                    {/* {isAuto && levelsNeeded === 0 && (
-                      <div className="absolute inset-0 bg-yellow-500/90 rounded-xl flex items-center justify-center">
-                        <span className="text-black font-bold text-xs">
-                          AUTO
-                        </span>
-                      </div>
-                    )} */}
-                  </button>
-
-                  <p
-                    // className={`text-xs font-bold ${
-                    //   !canUseSpecial ? "text-gray-400" : "text-emerald-300"
-                    // }`}
-                  >
-                    {special.name}
-                  </p>
-                  {/* {levelsNeeded > 0 ? (
-                    <p className="text-xs text-orange-400">
-                      Level {level} / {specialUnlockLevel}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-emerald-400">Ready!</p>
-                  )} */}
-                </div>
+                <button
+                  key={index}
+                  onClick={() => handleSpecial(special.specialId)}
+                  disabled={
+                    isOnCooldown || gameOver || showUpgradeOptions || showShop
+                  }
+                  className={`
+                    relative w-16 h-12 rounded-lg border-2 overflow-hidden
+                    transition-all duration-200
+                    ${
+                      isOnCooldown
+                        ? "opacity-50 grayscale border-gray-500 cursor-not-allowed"
+                        : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
+                    }
+                    ${
+                      gameOver || showUpgradeOptions || showShop
+                        ? "cursor-not-allowed"
+                        : ""
+                    }
+                  `}
+                  title={`${specialData.name}\n${specialData.effect}\nCooldown: ${special.currentCooldown}/${specialData.cooldown}`}
+                >
+                  <img
+                    src={imagePath}
+                    alt={specialData.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "/default.jpg"; // fallback nếu ảnh lỗi
+                    }}
+                  />
+                  {isOnCooldown && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 text-white text-xs font-bold">
+                      {special.currentCooldown}
+                    </div>
+                  )}
+                </button>
               );
-            })()}
+            })}
           </div>
         </div>
 

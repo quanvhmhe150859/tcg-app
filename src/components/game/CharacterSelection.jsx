@@ -254,7 +254,7 @@ const CharacterSelection = () => {
                                 );
                               }
                             )
-                          : statKey !== "special"
+                          : statKey !== "specials"
                           ? [
                               <p
                                 className={

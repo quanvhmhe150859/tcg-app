@@ -26,7 +26,7 @@ export const initPlayer = (characterKey) => {
     dodge: 0.01,
     gold: 0,
     rareStats: {
-      burn: 0,
+      burn: 100,
       poison: 0,
       thorn: 0,
       stunChance: 0,
@@ -71,7 +71,7 @@ export const initPlayer = (characterKey) => {
     dodge: basePlayer.dodge + (characterStats.dodge || 0),
     gold: basePlayer.gold + (characterStats.gold || 0),
 
-    special: characterStats.special || basePlayer.special,
+    specials: characterStats.specials || basePlayer.specials,
     rareStats: {
       ...basePlayer.rareStats,
       burn: basePlayer.rareStats.burn + (characterStats.rareStats?.burn || 0),
@@ -136,7 +136,7 @@ export const initEnemy = (level) => {
         0.9 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
       barrier: Math.floor(
-        0.06 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
+        0.05 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
     },
   };

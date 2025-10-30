@@ -5,9 +5,11 @@ import {
   generateRareUpgradeOptions,
   resetEffects,
 } from "../initializers";
-import { playerTurn, playerSpecial, enemyTurn } from "../gameLogic";
-import { addLog, checkGameOver, startTurn } from "../utils";
+import { playerTurn, playerSpecialTurn, enemyTurn } from "../gameLogic";
+import { addLog } from "../utils";
 import { useNavigate } from "react-router-dom";
+
+import { SPECIALS } from "../constants/specials";
 
 // Các thuộc tính cần hiển thị dưới dạng phần trăm
 const PERCENTAGE_KEYS = [
@@ -320,51 +322,81 @@ const useGameLogic = ({
    * Handles a single attack turn for player and enemy.
    */
   const handleAttack = () => {
+  if (gameOver || showUpgradeOptions || showShop) return;
+
+  // ---------- 1. Clone state ----------
+  let newPlayer = { ...player, rareStats: { ...player.rareStats } };
+  let newEnemy  = { ...enemy,  rareStats: { ...enemy.rareStats } };
+  const currentTurn = turnCount;
+  const currentTurnLogs = [];
+
+  // ---------- 2. Giảm cooldown "turn" ----------
+  newPlayer = reduceTurnCooldowns(newPlayer);
+
+  // ---------- 4. Turn thường ----------
+  startTurn(currentTurn, level, currentTurnLogs);
+  const enemyAlive = playerTurn(newPlayer, newEnemy, currentTurnLogs);
+
+  // ---------- 5. Kiểm tra kết quả ----------
+  let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
+
+  // Nếu có level-up hoặc game-over → giảm cooldown "level"
+  if (gameStatus.levelUp) {
+    newPlayer.level++;
+    newPlayer = reduceLevelCooldowns(newPlayer);
+  }
+
+  // Enemy còn sống → lượt enemy
+  if (enemyAlive && !gameStatus.isOver && !gameStatus.levelUp) {
+    enemyTurn(newPlayer, newEnemy, currentTurnLogs);
+    gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
+  }
+
+  // ---------- 6. END TURN (chỉ 1 lần) ----------
+  endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
+
+  // cập nhật turn counter
+  setGlobalTurnCount((prev) => prev + 1);
+  if (!gameStatus.levelUp) setTurnCount(currentTurn + 1);
+};
+
+  const handleSpecial = (specialId) => {
     if (gameOver || showUpgradeOptions || showShop) return;
 
     let newPlayer = { ...player, rareStats: { ...player.rareStats } };
     let newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
-    const currentTurn = turnCount;
     const currentTurnLogs = [];
 
-    startTurn(currentTurn, level, currentTurnLogs);
-
-    const enemyAliveAfterPlayer = playerTurn(
-      newPlayer,
-      newEnemy,
-      currentTurnLogs
+    const playerSpecial = player.specials.find(
+      (s) => s.specialId === specialId
     );
+    if (!playerSpecial || playerSpecial.currentCooldown > 0) return;
+
+    const specialData = SPECIALS.find((s) => s.id === specialId);
+    if (!specialData) return;
+
+    // Thực hiện special
+    playerSpecialTurn(specialId, newPlayer, newEnemy, currentTurnLogs);
+
+    // ✅ SET SPECIAL ON COOLDOWN
+    newPlayer.specials = newPlayer.specials.map((s) =>
+      s.specialId === specialId
+        ? { ...s, currentCooldown: specialData.cooldown }
+        : s
+    );
+
+    // Log thông báo cooldown
+    // addLog(
+    //   `${specialData.name} is now on cooldown for ${specialData.cooldown} turns!`,
+    //   "special",
+    //   currentTurnLogs
+    // );
+
     let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     if (gameStatus.isOver || gameStatus.levelUp) {
       newPlayer.level++;
-      endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
-      return;
-    }
-
-    if (enemyAliveAfterPlayer) {
-      enemyTurn(newPlayer, newEnemy, currentTurnLogs);
-      gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
-    }
-
-    endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
-
-    setGlobalTurnCount((prev) => prev + 1);
-    if (!gameStatus.levelUp) {
-      setTurnCount(currentTurn + 1);
-    }
-  };
-
-  const handleSpecial = () => {
-    if (gameOver || showUpgradeOptions || showShop) return;
-
-    let newPlayer = { ...player, rareStats: { ...player.rareStats } };
-    let newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
-    const currentTurnLogs = [];
-
-    playerSpecial(newPlayer, newEnemy, currentTurnLogs);
-    let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
-    if (gameStatus.isOver || gameStatus.levelUp) {
-      newPlayer.level++;
+      // Giảm cooldown "level"
+      newPlayer = reduceLevelCooldowns(newPlayer);
       endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
       return;
     }
@@ -396,6 +428,76 @@ const useGameLogic = ({
     // setShowShop(false);
     // setShopOptions([]);
     // resetShopState();
+  };
+
+  // Giảm cooldown "turn"
+  const reduceTurnCooldowns = (newPlayer) => {
+    return {
+      ...newPlayer,
+      specials: newPlayer.specials.map((s) => {
+        const specialData = SPECIALS.find((sp) => sp.id === s.specialId);
+        if (specialData?.cooldownType === "turn" && s.currentCooldown > 0) {
+          return { ...s, currentCooldown: s.currentCooldown - 1 };
+        }
+        return s;
+      }),
+    };
+  };
+
+  // Giảm cooldown "level"
+  const reduceLevelCooldowns = (newPlayer) => {
+    return {
+      ...newPlayer,
+      specials: newPlayer.specials.map((s) => {
+        const specialData = SPECIALS.find((sp) => sp.id === s.specialId);
+        if (specialData?.cooldownType === "level" && s.currentCooldown > 0) {
+          return { ...s, currentCooldown: s.currentCooldown - 1 };
+        }
+        return s;
+      }),
+    };
+  };
+
+  const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
+    if (newEnemy.currentHealth <= 0) {
+      const goldGained = Math.floor(
+        newEnemy.maxHealth +
+          newEnemy.minAttack +
+          newEnemy.maxAttack +
+          newEnemy.critChance * 100 +
+          newEnemy.critDamage * 100 +
+          newEnemy.lifeSteal * 100 +
+          newEnemy.regeneration +
+          newEnemy.dodge * 100 +
+          newEnemy.armor +
+          newEnemy.rareStats.burn +
+          newEnemy.rareStats.poison +
+          newEnemy.rareStats.thorn +
+          newEnemy.rareStats.counterattack * 100 +
+          newEnemy.rareStats.stunChance * 100 +
+          newEnemy.rareStats.swiftness * 100 +
+          newEnemy.rareStats.shield +
+          newEnemy.rareStats.barrier * 100
+      );
+      newPlayer.gold += goldGained;
+      addLog(
+        `Enemy defeated! Level up to ${level + 1}!`,
+        "levelUp",
+        currentTurnLogs
+      );
+      addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
+
+      return { isOver: false, levelUp: true };
+    }
+    if (newPlayer.currentHealth <= 0) {
+      addLog("Player defeated!", "gameOver", currentTurnLogs);
+      return { isOver: true, levelUp: false };
+    }
+    return { isOver: false, levelUp: false };
+  };
+
+  const startTurn = (turn, level, currentTurnLogs) => {
+    addLog(`Turn ${turn}`, "turn", currentTurnLogs);
   };
 
   return {

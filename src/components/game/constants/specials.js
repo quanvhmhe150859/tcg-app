@@ -3,11 +3,11 @@ export const SPECIALS = [
     id: 1,
     name: "Flame Burst",
     effect:
-      "Gây 150% sát thương tấn công và đốt cháy kẻ địch trong 3 lượt (mất 5% HP mỗi lượt).",
+      "Gây 450% sát thương tấn công và đốt cháy kẻ địch (mất 5% HP mỗi lượt).",
     cooldown: 4,
-    cooldownType: "turn",
+    cooldownType: "level",
     usingType: "manual",
-    power: 1.5,
+    power: 4.5,
     image: "flame_burst.png",
   },
   {
@@ -27,7 +27,7 @@ export const SPECIALS = [
     effect:
       "Tấn công mục tiêu với 130% sát thương và có 40% làm tê liệt 1 lượt.",
     cooldown: 3,
-    cooldownType: "turn",
+    cooldownType: "level",
     usingType: "manual",
     power: 1.3,
     image: "thunder_strike.png",
@@ -39,7 +39,7 @@ export const SPECIALS = [
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.3,
     image: "healing_light.png",
   },
   {
@@ -50,7 +50,7 @@ export const SPECIALS = [
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.1,
     image: "poison_cloud.png",
   },
   {
@@ -60,7 +60,7 @@ export const SPECIALS = [
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.25,
     image: "battle_roar.png",
   },
   {
@@ -70,7 +70,7 @@ export const SPECIALS = [
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.4,
     image: "stone_skin.png",
   },
   {
@@ -80,7 +80,7 @@ export const SPECIALS = [
     cooldown: 3,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.2,
     image: "shadow_step.png",
   },
   {
@@ -91,7 +91,7 @@ export const SPECIALS = [
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 1.0,
     image: "frost_nova.png",
   },
   {
@@ -101,7 +101,7 @@ export const SPECIALS = [
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.15,
     image: "divine_blessing.png",
   },
   {
@@ -111,7 +111,7 @@ export const SPECIALS = [
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.3,
     image: "death_mark.png",
   },
   {
@@ -122,7 +122,7 @@ export const SPECIALS = [
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 1.2,
     image: "blazing_tornado.png",
   },
   {
@@ -133,7 +133,7 @@ export const SPECIALS = [
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.2,
     image: "spirit_drain.png",
   },
   {
@@ -143,7 +143,7 @@ export const SPECIALS = [
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.15,
     image: "iron_will.png",
   },
   {
@@ -154,7 +154,7 @@ export const SPECIALS = [
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.5,
     image: "arcane_overload.png",
   },
   {
@@ -165,7 +165,7 @@ export const SPECIALS = [
     cooldown: 3,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.8,
     image: "venom_fang.png",
   },
   {
@@ -175,7 +175,7 @@ export const SPECIALS = [
     cooldown: 7,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.5,
+    power: 0.4,
     image: "celestial_heal.png",
   },
 ];
