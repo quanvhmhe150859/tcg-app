@@ -77,6 +77,7 @@ const BattleGame = () => {
     handleEndRun,
     handleAttack,
     handleSpecial,
+    handleAutoTurn,
     toggleAuto,
     resetGame,
   } = useGameLogic({
@@ -126,7 +127,7 @@ const BattleGame = () => {
   useEffect(() => {
     if (isAuto && !gameOver && !showUpgradeOptions && !showShop) {
       const interval = setInterval(() => {
-        handleAttack();
+        handleAutoTurn();
       }, autoSpeed);
 
       return () => clearInterval(interval);
@@ -153,7 +154,7 @@ const BattleGame = () => {
 
   // Modified handleAttack to trigger handlePlayOnce for both sprites
   const enhancedHandleAttack = () => {
-    handleAttack();
+    handleAutoTurn();
     if (playerSpriteRef.current && player.currentHealth > 0) {
       playerSpriteRef.current.handlePlayOnce();
     }

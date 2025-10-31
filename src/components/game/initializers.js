@@ -26,7 +26,7 @@ export const initPlayer = (characterKey) => {
     dodge: 0.01,
     gold: 0,
     rareStats: {
-      burn: 100,
+      burn: 0,
       poison: 0,
       thorn: 0,
       stunChance: 0,

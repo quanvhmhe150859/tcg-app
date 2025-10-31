@@ -46,7 +46,7 @@ const SpriteAnimation = forwardRef(
           if (keys.length > 0) {
             const newName = keys[Math.floor(Math.random() * keys.length)];
             setRandomName(newName);
-            console.log("new enemy sprites");
+            // console.log("new enemy sprites");
           }
         }, fadeDuration + 100);
         return () => clearTimeout(timeout);

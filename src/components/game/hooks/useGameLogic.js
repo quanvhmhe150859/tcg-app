@@ -322,43 +322,43 @@ const useGameLogic = ({
    * Handles a single attack turn for player and enemy.
    */
   const handleAttack = () => {
-  if (gameOver || showUpgradeOptions || showShop) return;
+    if (gameOver || showUpgradeOptions || showShop) return;
 
-  // ---------- 1. Clone state ----------
-  let newPlayer = { ...player, rareStats: { ...player.rareStats } };
-  let newEnemy  = { ...enemy,  rareStats: { ...enemy.rareStats } };
-  const currentTurn = turnCount;
-  const currentTurnLogs = [];
+    // ---------- 1. Clone state ----------
+    let newPlayer = { ...player, rareStats: { ...player.rareStats } };
+    let newEnemy = { ...enemy, rareStats: { ...enemy.rareStats } };
+    const currentTurn = turnCount;
+    const currentTurnLogs = [];
 
-  // ---------- 2. Giảm cooldown "turn" ----------
-  newPlayer = reduceTurnCooldowns(newPlayer);
+    // ---------- 2. Giảm cooldown "turn" ----------
+    newPlayer = reduceTurnCooldowns(newPlayer);
 
-  // ---------- 4. Turn thường ----------
-  startTurn(currentTurn, level, currentTurnLogs);
-  const enemyAlive = playerTurn(newPlayer, newEnemy, currentTurnLogs);
+    // ---------- 4. Turn thường ----------
+    startTurn(currentTurn, level, currentTurnLogs);
+    const enemyAlive = playerTurn(newPlayer, newEnemy, currentTurnLogs);
 
-  // ---------- 5. Kiểm tra kết quả ----------
-  let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
+    // ---------- 5. Kiểm tra kết quả ----------
+    let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
 
-  // Nếu có level-up hoặc game-over → giảm cooldown "level"
-  if (gameStatus.levelUp) {
-    newPlayer.level++;
-    newPlayer = reduceLevelCooldowns(newPlayer);
-  }
+    // Nếu có level-up hoặc game-over → giảm cooldown "level"
+    if (gameStatus.levelUp) {
+      newPlayer.level++;
+      newPlayer = reduceLevelCooldowns(newPlayer);
+    }
 
-  // Enemy còn sống → lượt enemy
-  if (enemyAlive && !gameStatus.isOver && !gameStatus.levelUp) {
-    enemyTurn(newPlayer, newEnemy, currentTurnLogs);
-    gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
-  }
+    // Enemy còn sống → lượt enemy
+    if (enemyAlive && !gameStatus.isOver && !gameStatus.levelUp) {
+      enemyTurn(newPlayer, newEnemy, currentTurnLogs);
+      gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
+    }
 
-  // ---------- 6. END TURN (chỉ 1 lần) ----------
-  endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
+    // ---------- 6. END TURN (chỉ 1 lần) ----------
+    endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
 
-  // cập nhật turn counter
-  setGlobalTurnCount((prev) => prev + 1);
-  if (!gameStatus.levelUp) setTurnCount(currentTurn + 1);
-};
+    // cập nhật turn counter
+    setGlobalTurnCount((prev) => prev + 1);
+    if (!gameStatus.levelUp) setTurnCount(currentTurn + 1);
+  };
 
   const handleSpecial = (specialId) => {
     if (gameOver || showUpgradeOptions || showShop) return;
@@ -385,13 +385,6 @@ const useGameLogic = ({
         : s
     );
 
-    // Log thông báo cooldown
-    // addLog(
-    //   `${specialData.name} is now on cooldown for ${specialData.cooldown} turns!`,
-    //   "special",
-    //   currentTurnLogs
-    // );
-
     let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     if (gameStatus.isOver || gameStatus.levelUp) {
       newPlayer.level++;
@@ -412,22 +405,6 @@ const useGameLogic = ({
 
   const resetGame = () => {
     navigate("/character-selection");
-
-    // setPlayer(initPlayer());
-    // setEnemy(initEnemy(1));
-    // setTurnLogs([]);
-    // setGameOver(false);
-    // setTurnCount(1);
-    // setGlobalTurnCount(1);
-    // setLogId(1);
-    // setLevel(1);
-    // setIsAuto(false);
-    // setShowUpgradeOptions(false);
-    // setUpgradeOptions([]);
-    // setIsRareUpgrade(false);
-    // setShowShop(false);
-    // setShopOptions([]);
-    // resetShopState();
   };
 
   // Giảm cooldown "turn"
@@ -437,6 +414,7 @@ const useGameLogic = ({
       specials: newPlayer.specials.map((s) => {
         const specialData = SPECIALS.find((sp) => sp.id === s.specialId);
         if (specialData?.cooldownType === "turn" && s.currentCooldown > 0) {
+          // console.log("call");
           return { ...s, currentCooldown: s.currentCooldown - 1 };
         }
         return s;
@@ -456,6 +434,25 @@ const useGameLogic = ({
         return s;
       }),
     };
+  };
+
+  /**
+   * Xử lý lượt tự động: ưu tiên special "auto" nếu có thể dùng, nếu không thì tấn công thường.
+   */
+  const handleAutoTurn = () => {
+    if (gameOver || showUpgradeOptions || showShop) return;
+
+    // Tìm special có usingType = "auto" và cooldown = 0
+    const autoSpecial = player.specials.find((s) => {
+      const specialData = SPECIALS.find((sp) => sp.id === s.specialId);
+      return specialData?.usingType === "auto" && s.currentCooldown === 0;
+    });
+
+    if (autoSpecial) {
+      handleSpecial(autoSpecial.specialId);
+    } else {
+      handleAttack();
+    }
   };
 
   const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
@@ -507,6 +504,7 @@ const useGameLogic = ({
     handleUpgrade,
     handleEndRun,
     handleAttack,
+    handleAutoTurn,
     handleSpecial,
     toggleAuto,
     resetGame,

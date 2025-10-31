@@ -5,8 +5,8 @@ export const SPECIALS = [
     effect:
       "Gây 450% sát thương tấn công và đốt cháy kẻ địch (mất 5% HP mỗi lượt).",
     cooldown: 4,
-    cooldownType: "level",
-    usingType: "manual",
+    cooldownType: "turn",
+    usingType: "auto",
     power: 4.5,
     image: "flame_burst.png",
   },

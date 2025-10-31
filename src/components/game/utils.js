@@ -19,6 +19,7 @@ export const addLog = (message, type, currentTurnLogs) => {
     purchase: "text-yellow-500",
     gold: "text-yellow-500",
     ticket: "text-pink-500",
+    special: "text-red-600",
   };
   currentTurnLogs.push({ message, color: colorMap[type] || "" });
 };
