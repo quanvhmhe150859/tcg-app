@@ -73,9 +73,9 @@ const CharacterSelection = () => {
       ? `${(value * 100).toFixed(0)}%`
       : `${Math.abs(value)}`;
     if (value > 0) {
-      return { text: `+ ${formattedValue}`, className: "text-green-500" };
+      return { text: `+${formattedValue}`, className: "text-green-500" };
     } else if (value < 0) {
-      return { text: `- ${formattedValue}`, className: "text-red-500" };
+      return { text: `-${formattedValue}`, className: "text-red-500" };
     } else {
       return { text: formattedValue, className: "text-white" };
     }

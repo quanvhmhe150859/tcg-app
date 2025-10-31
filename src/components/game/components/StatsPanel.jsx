@@ -129,6 +129,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
             {renderStat("Swiftness", entity.rareStats.swiftness, true)}
             {renderStat("Shield", entity.rareStats.shield)}
             {renderStat("Barrier", entity.rareStats.barrier)}
+            {renderStat("CDR", entity.rareStats.cooldownReduction)}
           </div>
         </div>
       )}

@@ -270,7 +270,7 @@ const BattleGame = () => {
                   key={index}
                   onClick={() => handleSpecial(special.specialId)}
                   disabled={
-                    isOnCooldown || gameOver || showUpgradeOptions || showShop
+                    isOnCooldown || gameOver || showUpgradeOptions || showShop || isAuto
                   }
                   className={`
                     relative w-16 h-12 rounded-lg border-2 overflow-hidden
@@ -281,7 +281,7 @@ const BattleGame = () => {
                         : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
                     }
                     ${
-                      gameOver || showUpgradeOptions || showShop
+                      gameOver || showUpgradeOptions || showShop || isAuto
                         ? "cursor-not-allowed"
                         : ""
                     }

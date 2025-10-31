@@ -36,7 +36,7 @@ const ShopPanel = ({
               }`}
             >
               {/* 🔹 Nếu màn hình to → hiện tên, nhỏ → hiện icon */}
-              <span className="hidden sm:inline">{option.name}: </span>
+              <span className="sm:inline hidden">{option.name}: </span>
               <span className="sm:hidden">{icon} </span>
               {option.format(option.value)} | {option.price} 💰
             </button>

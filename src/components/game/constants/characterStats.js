@@ -1,8 +1,10 @@
 export const CHARACTER_STATS = {
   agathe: {
     default: {
-      armor: 8,
-      maxAttack: 10,
+      maxAttack: 1,
+      rareStats: {
+        cooldownReduction: 1,
+      },
       specials: [{ specialId: 1, currentCooldown: 0 }],
     },
     heretic_punisher_captain: {

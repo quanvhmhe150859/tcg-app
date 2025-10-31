@@ -379,11 +379,16 @@ const useGameLogic = ({
     playerSpecialTurn(specialId, newPlayer, newEnemy, currentTurnLogs);
 
     // ✅ SET SPECIAL ON COOLDOWN
-    newPlayer.specials = newPlayer.specials.map((s) =>
-      s.specialId === specialId
-        ? { ...s, currentCooldown: specialData.cooldown }
-        : s
-    );
+    newPlayer.specials = newPlayer.specials.map((s) => {
+      if (s.specialId === specialId) {
+        console.log(newPlayer);
+        const reduction = newPlayer.rareStats?.cooldownReduction || 0;
+        const reduced = specialData.cooldown - reduction;
+        const finalCooldown = Math.max(Math.ceil(reduced), 1); // không thấp hơn 1
+        return { ...s, currentCooldown: finalCooldown };
+      }
+      return s;
+    });
 
     let gameStatus = checkGameOver(newPlayer, newEnemy, currentTurnLogs, level);
     if (gameStatus.isOver || gameStatus.levelUp) {

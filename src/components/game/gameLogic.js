@@ -426,7 +426,7 @@ export const playerSpecialTurn = (
     case 1:
       const flameDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, flameDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.effects.burnDot = Math.floor(0.05 * newEnemy.maxHealth);
+      newEnemy.effects.burnDot = Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
       break;
 
     // 2. Aqua Shield (AUTO)

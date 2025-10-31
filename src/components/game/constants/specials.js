@@ -3,10 +3,10 @@ export const SPECIALS = [
     id: 1,
     name: "Flame Burst",
     effect:
-      "Gây 450% sát thương tấn công và đốt cháy kẻ địch (mất 5% HP mỗi lượt).",
+      "Gây 450% sát thương tấn công và đốt cháy kẻ địch (mất 4.5% HP mỗi lượt).",
     cooldown: 4,
     cooldownType: "turn",
-    usingType: "auto",
+    usingType: "manual",
     power: 4.5,
     image: "flame_burst.png",
   },
@@ -14,11 +14,11 @@ export const SPECIALS = [
     id: 2,
     name: "Aqua Shield",
     effect:
-      "Tạo lá chắn nước hấp thụ sát thương bằng 25% HP tối đa trong 2 lượt.",
+      "Tạo lá chắn nước hấp thụ sát thương bằng 10% HP tối đa.",
     cooldown: 5,
-    cooldownType: "level",
+    cooldownType: "turn",
     usingType: "auto",
-    power: 0.25,
+    power: 0.1,
     image: "aqua_shield.png",
   },
   {

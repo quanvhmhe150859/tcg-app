@@ -135,4 +135,12 @@ export const statIcons = {
     maxValue: 999,
     desc: "Negates incoming attacks and is restored every battle.",
   },
+  "CDR": {
+    icon: "⌛",
+    label: "Cooldown Reduction",
+    type: "flat",
+    stackable: false,
+    maxValue: 99,
+    desc: "Reduces the cooldown time of special abilities.",
+  },
 };
