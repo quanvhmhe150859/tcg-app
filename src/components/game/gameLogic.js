@@ -426,7 +426,7 @@ export const playerSpecialTurn = (
     case 1:
       const flameDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, flameDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.effects.burnDot = Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
+      // newEnemy.effects.burnDot = Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
       break;
 
     // 2. Aqua Shield (AUTO)
@@ -463,72 +463,71 @@ export const playerSpecialTurn = (
       break;
 
     // 5. Poison Cloud
-    case 5:
-      newEnemy.effects.poisonBase = newEnemy.maxHealth * specialData.power;
-      newEnemy.effects.poisonDot = newEnemy.maxHealth * specialData.power;
-      newEnemy.effects.poisonTurns = 4;
-      addLog("Enemy is poisoned for 4 turns!", "poison", currentTurnLogs);
-      break;
+    // case 5:
+    //   newEnemy.effects.poisonBase = newEnemy.maxHealth * specialData.power;
+    //   newEnemy.effects.poisonDot = newEnemy.maxHealth * specialData.power;
+    //   addLog("Enemy is poisoned for 4 turns!", "poison", currentTurnLogs);
+    //   break;
 
     // 6. Battle Roar
-    case 6:
-      newPlayer.effects.attackBuff = specialData.power;
-      newPlayer.effects.attackBuffTurns = 3;
-      newPlayer.minAttack *= 1 + specialData.power;
-      newPlayer.maxAttack *= 1 + specialData.power;
-      break;
+    // case 6:
+    //   newPlayer.effects.attackBuff = specialData.power;
+    //   newPlayer.effects.attackBuffTurns = 3;
+    //   newPlayer.minAttack *= 1 + specialData.power;
+    //   newPlayer.maxAttack *= 1 + specialData.power;
+    //   break;
 
     // 7. Stone Skin
-    case 7:
-      newPlayer.effects.armorBuff = specialData.power;
-      newPlayer.effects.armorBuffTurns = 2;
-      newPlayer.armor *= 1 + specialData.power;
-      break;
+    // case 7:
+    //   newPlayer.effects.armorBuff = specialData.power;
+    //   newPlayer.effects.armorBuffTurns = 2;
+    //   newPlayer.armor *= 1 + specialData.power;
+    //   break;
 
     // 8. Shadow Step
-    case 8:
-      newPlayer.effects.dodgeNext = true;
-      newPlayer.effects.attackBuffNextTurn = specialData.power;
-      addLog(
-        "Player dodges next attack and gains attack buff!",
-        "dodge",
-        currentTurnLogs
-      );
-      break;
+    // case 8:
+    //   newPlayer.effects.dodgeNext = true;
+    //   newPlayer.effects.attackBuffNextTurn = specialData.power;
+    //   addLog(
+    //     "Player dodges next attack and gains attack buff!",
+    //     "dodge",
+    //     currentTurnLogs
+    //   );
+    //   break;
 
     // 9. Frost Nova
     case 9:
       const frostDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, frostDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.effects.slow = 0.3;
-      newEnemy.effects.slowTurns = 2;
+      // newEnemy.effects.slow = 0.3;
+      // newEnemy.effects.slowTurns = 2;
       break;
 
     // 10. Divine Blessing
-    case 10:
-      // Xóa tất cả debuff
-      newPlayer.effects = {
-        ...newPlayer.effects,
-        burnDot: 0,
-        poisonDot: 0,
-        poisonBase: 0,
-        isStuned: false,
-        slow: 0,
-        burnTurns: 0,
-        poisonTurns: 0,
-        slowTurns: 0,
-      };
-      newPlayer.effects.armorBuff = specialData.power;
-      newPlayer.effects.armorBuffTurns = 3;
-      newPlayer.armor *= 1 + specialData.power;
-      break;
+    // case 10:
+    //   // Xóa tất cả debuff
+    //   newPlayer.effects = {
+    //     ...newPlayer.effects,
+    //     burnDot: 0,
+    //     poisonDot: 0,
+    //     poisonBase: 0,
+    //     isStuned: false,
+    //     slow: 0,
+    //     burnTurns: 0,
+    //     poisonTurns: 0,
+    //     slowTurns: 0,
+    //   };
+    //   newPlayer.effects.armorBuff = specialData.power;
+    //   newPlayer.effects.armorBuffTurns = 3;
+    //   newPlayer.armor *= 1 + specialData.power;
+    //   break;
 
     // 11. Death Mark
-    case 11:
-      newEnemy.effects.deathMark = specialData.power;
-      newEnemy.effects.deathMarkTurns = 3;
-      addLog("Enemy is marked for extra damage!", "debuff", currentTurnLogs);
-      break;
+    // case 11:
+    //   newEnemy.effects.deathMark = specialData.power;
+    //   newEnemy.effects.deathMarkTurns = 3;
+    //   addLog("Enemy is marked for extra damage!", "debuff", currentTurnLogs);
+    //   break;
 
     // 12. Blazing Tornado
     case 12:
@@ -540,17 +539,14 @@ export const playerSpecialTurn = (
         "attack",
         currentTurnLogs
       );
-      if (Math.random() < 0.3) {
-        newEnemy.effects.burnDot = 0.05 * newEnemy.maxHealth;
-        newEnemy.effects.burnTurns = 2;
-        addLog("Enemy is burning!", "burn", currentTurnLogs);
-      }
+      // if (Math.random() < 0.3) {
+      //   newEnemy.effects.burnDot = 0.05 * newEnemy.maxHealth;
+      // }
       break;
 
     // 13. Spirit Drain
     case 13:
       const drainHP = Math.floor(newEnemy.maxHealth * 0.2);
-      const drainEnergy = Math.floor(newEnemy.maxHealth * 0.1);
       newEnemy.currentHealth = Math.max(0, newEnemy.currentHealth - drainHP);
       newPlayer.currentHealth += drainHP;
       limitHealth(newPlayer);
@@ -562,60 +558,60 @@ export const playerSpecialTurn = (
       break;
 
     // 14. Iron Will
-    case 14:
-      newPlayer.effects.immunity = 2; // Miễn nhiễm 2 lượt
-      newPlayer.effects.armorBuff = specialData.power;
-      newPlayer.effects.armorBuffTurns = 2;
-      newPlayer.armor *= 1 + specialData.power;
-      break;
+    // case 14:
+    //   newPlayer.effects.immunity = 2;
+      // newPlayer.effects.armorBuff = specialData.power;
+      // newPlayer.effects.armorBuffTurns = 2;
+      // newPlayer.armor *= 1 + specialData.power;
+      // break;
 
     // 15. Arcane Overload
-    case 15:
-      newPlayer.effects.magicBuff = specialData.power;
-      newPlayer.effects.magicBuffTurns = 1;
-      newPlayer.minAttack *= 1 + specialData.power;
-      newPlayer.maxAttack *= 1 + specialData.power;
-      // Phản chấn
-      const backlash = Math.floor(newPlayer.maxHealth * 0.1);
-      newPlayer.currentHealth -= backlash;
-      addLog(
-        `Player takes ${backlash} backlash damage!`,
-        "damage",
-        currentTurnLogs
-      );
-      break;
+    // case 15:
+    //   newPlayer.effects.magicBuff = specialData.power;
+    //   newPlayer.effects.magicBuffTurns = 1;
+    //   newPlayer.minAttack *= 1 + specialData.power;
+    //   newPlayer.maxAttack *= 1 + specialData.power;
+    //   // Phản chấn
+    //   const backlash = Math.floor(newPlayer.maxHealth * 0.1);
+    //   newPlayer.currentHealth -= backlash;
+    //   addLog(
+    //     `Player takes ${backlash} backlash damage!`,
+    //     "damage",
+    //     currentTurnLogs
+    //   );
+      // break;
 
     // 16. Venom Fang
     case 16:
       const venomDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, venomDamage, "Enemy", "attack", currentTurnLogs);
-      if (Math.random() < 0.2) {
-        newEnemy.effects.poisonBase = newEnemy.maxHealth * 0.05; // 5% HP
-        newEnemy.effects.poisonDot = newEnemy.maxHealth * 0.05;
-        newEnemy.effects.poisonTurns = 3;
-        addLog("Enemy is poisoned!", "poison", currentTurnLogs);
-      }
+      // if (Math.random() < 0.2) {
+      //   newEnemy.effects.poisonBase = newEnemy.maxHealth * 0.05; // 5% HP
+      //   newEnemy.effects.poisonDot = newEnemy.maxHealth * 0.05;
+      //   newEnemy.effects.poisonTurns = 3;
+      //   addLog("Enemy is poisoned!", "poison", currentTurnLogs);
+      // }
       break;
 
     // 17. Celestial Heal
-    case 17:
-      const teamHeal = Math.floor(newPlayer.maxHealth * specialData.power);
-      newPlayer.currentHealth = Math.min(
-        newPlayer.currentHealth + teamHeal,
-        newPlayer.maxHealth
-      );
-      // Xóa 1 debuff ngẫu nhiên
-      const debuffs = ["burnDot", "poisonDot", "isStuned"];
-      const randomDebuff = debuffs[Math.floor(Math.random() * debuffs.length)];
-      if (newPlayer.effects[randomDebuff] > 0) {
-        newPlayer.effects[randomDebuff] = 0;
-        addLog(`Removed ${randomDebuff}!`, "buff", currentTurnLogs);
-      }
-      addLog(`Player team heals for ${teamHeal} HP!`, "heal", currentTurnLogs);
-      break;
+    // case 17:
+    //   const teamHeal = Math.floor(newPlayer.maxHealth * specialData.power);
+    //   newPlayer.currentHealth = Math.min(
+    //     newPlayer.currentHealth + teamHeal,
+    //     newPlayer.maxHealth
+    //   );
+    //   // Xóa 1 debuff ngẫu nhiên
+    //   const debuffs = ["burnDot", "poisonDot", "isStuned"];
+    //   const randomDebuff = debuffs[Math.floor(Math.random() * debuffs.length)];
+    //   if (newPlayer.effects[randomDebuff] > 0) {
+    //     newPlayer.effects[randomDebuff] = 0;
+    //     addLog(`Removed ${randomDebuff}!`, "buff", currentTurnLogs);
+    //   }
+    //   addLog(`Player team heals for ${teamHeal} HP!`, "heal", currentTurnLogs);
+    //   break;
 
     default:
-      addLog(`Unknown special ${specialId}!`, "error", currentTurnLogs);
+      addLog(`Coming soon special ${specialId}!`, "error", currentTurnLogs);
   }
 
   // Kiểm tra enemy chết sau special

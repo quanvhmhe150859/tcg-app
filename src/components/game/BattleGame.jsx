@@ -254,7 +254,16 @@ const BattleGame = () => {
             toggleNormalStats={toggleNormalStats}
             toggleRareStats={toggleRareStats}
           />
-          <p className="text-center text-yellow-500">Gold: {player.gold} 💰</p>
+          <div className="grid grid-cols-[30%_30%_40%] text-xs sm:text-sm">
+            <p className="text-red-500">
+              CDR: {player.rareStats.cooldownReduction} ⏰
+            </p>
+            <p className="text-green-500">Luck: {player.luck} 🍀</p>
+            <p className="text-yellow-500">Gold: {player.gold} 💰</p>
+          </div>
+          <p className="font-semibold mt-4 mb-1 border-t border-gray-500 pt-2">
+            Special Skills
+          </p>
           <div className="flex gap-2 mt-2 flex-wrap">
             {player.specials?.map((special, index) => {
               const specialData = SPECIALS.find(
@@ -270,19 +279,24 @@ const BattleGame = () => {
                   key={index}
                   onClick={() => handleSpecial(special.specialId)}
                   disabled={
-                    isOnCooldown || gameOver || showUpgradeOptions || showShop || isAuto
+                    isOnCooldown ||
+                    gameOver ||
+                    showUpgradeOptions ||
+                    showShop ||
+                    isAuto
                   }
                   className={`
-                    relative w-16 h-12 rounded-lg border-2 overflow-hidden
+                    relative w-14 h-10 sm:w-16 sm:h-12
+                    rounded-lg border-2 overflow-hidden
                     transition-all duration-200
                     ${
                       isOnCooldown
-                        ? "opacity-50 grayscale border-gray-500 cursor-not-allowed"
+                        ? "opacity-50 grayscale border-gray-500 !cursor-not-allowed"
                         : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
                     }
                     ${
                       gameOver || showUpgradeOptions || showShop || isAuto
-                        ? "cursor-not-allowed"
+                        ? "!cursor-not-allowed"
                         : ""
                     }
                   `}

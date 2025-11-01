@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
 import { CHARACTER_STATS } from "./constants/characterStats";
+import { SPECIALS } from "./constants/specials";
 import "../styles/CardItem.css";
 
 const CharacterSelection = () => {
@@ -158,7 +159,8 @@ const CharacterSelection = () => {
           return (
             <div
               key={characterKey}
-              className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer"
+              className="relative w-32 h-42 bg-game-secondary rounded-lg overflow-hidden shadow-lg transform transition 
+              duration-300 hover:scale-105 cursor-pointer"
               onMouseEnter={() => setHoveredCharacter(characterKey)}
               onMouseLeave={() => setHoveredCharacter(null)}
               onClick={() => setSelectedCharacter(characterKey)}
@@ -185,93 +187,134 @@ const CharacterSelection = () => {
         })}
       </div>
 
-      {/* 🔹 Modal hiển thị biến thể */}
+      {/* ==================== MODAL ==================== */}
       {selectedCharacter && (
         <div
-          className="modal-overlay"
+          className="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-2000"
           onClick={() => setSelectedCharacter(null)}
         >
+          {/* Thêm overflow-y-auto và giới hạn chiều cao */}
           <div
-            className="rounded-lg p-6 w-full relative bg-game mr-4 ml-4"
+            className="bg-game rounded-lg p-6 w-full max-w-6xl relative flex flex-col max-h-full"
+            style={{ maxHeight: "calc(100vh - 2rem)" }} // trừ padding 2rem (p-4)
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Nút đóng - luôn hiển thị, cố định góc */}
             <button
-              className="absolute top-2 right-3 text-white text-2xl"
+              className="absolute top-3 right-3 text-3xl text-white hover:text-red-400 z-10 bg-black/50 rounded-full w-10 h-10 
+              flex items-center justify-center"
               onClick={() => setSelectedCharacter(null)}
             >
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 capitalize text-center">
+            <h2 className="text-2xl font-bold mb-6 text-center capitalize pr-10">
               {selectedCharacter.split("/")[0]} Variants
             </h2>
 
-            <div className="flex flex-wrap gap-4 justify-center">
-              {getVariants(selectedCharacter).map((variantKey) => {
-                const stats =
-                  CHARACTER_STATS[variantKey.split("/")[0]][
-                    variantKey.includes("/")
-                      ? variantKey.split("/")[1]
-                      : "default"
-                  ];
-                return (
-                  <div
-                    key={variantKey}
-                    className="w-36 pb-4 rounded-md overflow-hidden text-center text-white cursor-pointer transition bg-game-secondary"
-                    onClick={() => handleSelectVariant(variantKey)}
-                  >
+            {/* Nội dung cuộn được */}
+            <div className="flex-1 overflow-y-auto pr-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-4">
+                {getVariants(selectedCharacter).map((variantKey) => {
+                  const baseName = variantKey.split("/")[0];
+                  const variantName = variantKey.includes("/")
+                    ? variantKey.split("/")[1]
+                    : "default";
+
+                  const stats = CHARACTER_STATS[baseName][variantName];
+                  const special = stats.specials?.[0]
+                    ? SPECIALS.find((s) => s.id === stats.specials[0].specialId)
+                    : null;
+
+                  return (
                     <div
-                      className="relative w-full h-32 overflow-visible"
-                      style={{
-                        backgroundRepeat: "no-repeat",
-                        backgroundPosition: "center center",
-                        backgroundSize: "auto",
-                        backgroundImage: `url(${getSpriteUrl(
-                          variantKey,
-                          modalFrame
-                        )})`,
-                      }}
-                    ></div>
-                    <span className="block text-sm font-bold capitalize h-12">
-                      {variantKey === selectedCharacter
-                        ? "Default"
-                        : formatVariantName(variantKey)}
-                    </span>
-                    {/* Hiển thị chỉ số bonus động dựa trên characterStats.js */}
-                    <div className="text-xs mt-1 flex flex-col items-center justify-center">
-                      {Object.entries(stats).flatMap(([statKey, statValue]) =>
-                        statKey === "rareStats"
-                          ? Object.entries(statValue).map(
-                              ([subKey, subValue]) => {
-                                const { text, className } = formatStatValue(
-                                  subKey,
-                                  subValue
-                                );
-                                return (
-                                  <p className={className} key={subKey}>
-                                    {formatStatName(subKey)}: {text}
-                                  </p>
-                                );
-                              }
-                            )
-                          : statKey !== "specials"
-                          ? [
-                              <p
-                                className={
-                                  formatStatValue(statKey, statValue).className
-                                }
-                                key={statKey}
-                              >
-                                {formatStatName(statKey)}:{" "}
-                                {formatStatValue(statKey, statValue).text}
-                              </p>,
-                            ]
-                          : []
-                      )}
+                      key={variantKey}
+                      className="bg-game-secondary rounded-lg overflow-hidden text-white
+                         cursor-pointer transition-all duration-200
+                         hover:ring-4 hover:ring-yellow-400 hover:scale-105
+                         shadow-lg flex flex-col h-96"
+                      onClick={() => handleSelectVariant(variantKey)}
+                    >
+                      {/* ---------- SPRITE (cố định 160px) ---------- */}
+                      <div
+                        className="relative w-full h-40 bg-gradient-to-b from-transparent to-black/50
+                                flex items-center justify-center overflow-hidden"
+                      >
+                        <img
+                          src={getSpriteUrl(variantKey, modalFrame)}
+                          alt={variantKey}
+                          className="max-w-full max-h-full object-contain pointer-events-none select-none"
+                          style={{ imageRendering: "pixelated" }}
+                          loading="eager"
+                        />
+                      </div>
+
+                      {/* ---------- NỘI DUNG DƯỚI ---------- */}
+                      <div className="flex-1 flex flex-col px-3 pt-2">
+                        <h3 className="text-sm font-bold text-center h-10 flex items-center justify-center">
+                          {variantKey === selectedCharacter
+                            ? "Default"
+                            : formatVariantName(variantKey)}
+                        </h3>
+
+                        <div className="text-xs space-y-0.5 flex-1 overflow-y-auto max-h-28 px-1">
+                          {Object.entries(stats).flatMap(
+                            ([statKey, statValue]) =>
+                              statKey === "rareStats"
+                                ? Object.entries(statValue).map(
+                                    ([subKey, subValue]) => {
+                                      const { text, className } =
+                                        formatStatValue(subKey, subValue);
+                                      return (
+                                        <p
+                                          key={subKey}
+                                          className={`font-medium ${className}`}
+                                        >
+                                          {formatStatName(subKey)}: {text}
+                                        </p>
+                                      );
+                                    }
+                                  )
+                                : statKey !== "specials"
+                                ? (() => {
+                                    const { text, className } = formatStatValue(
+                                      statKey,
+                                      statValue
+                                    );
+                                    return (
+                                      <p
+                                        key={statKey}
+                                        className={`font-medium ${className}`}
+                                      >
+                                        {formatStatName(statKey)}: {text}
+                                      </p>
+                                    );
+                                  })()
+                                : []
+                          )}
+                        </div>
+
+                        {special && (
+                          <div className="mt-2 border-t border-gray-600 pt-2 flex flex-col items-center">
+                            <img
+                              src={`/specials/${special.image}`}
+                              alt={special.name}
+                              className="w-10 h-10 object-contain mb-1"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                                e.target.nextSibling.textContent = "Skill";
+                              }}
+                            />
+                            <p className="text-xs font-semibold text-cyan-300 truncate w-full text-center drop-shadow-[0_0_1px_black]">
+                              {special.name}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

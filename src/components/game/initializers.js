@@ -24,6 +24,7 @@ export const initPlayer = (characterKey) => {
     critDamage: 1.5,
     lifeSteal: 0.05,
     dodge: 0.01,
+    luck: 0,
     gold: 0,
     rareStats: {
       burn: 0,
@@ -70,6 +71,7 @@ export const initPlayer = (characterKey) => {
     critDamage: basePlayer.critDamage + (characterStats.critDamage || 0),
     lifeSteal: basePlayer.lifeSteal + (characterStats.lifeSteal || 0),
     dodge: basePlayer.dodge + (characterStats.dodge || 0),
+    luck: basePlayer.luck + (characterStats.luck || 0),
     gold: basePlayer.gold + (characterStats.gold || 0),
 
     specials: characterStats.specials || basePlayer.specials,
@@ -118,10 +120,10 @@ export const initEnemy = (level) => {
     armor: Math.floor(0.4 * scale * baseFactor * bossMultiplier),
     minAttack: Math.floor(0.7 * scale * baseFactor * bossMultiplier),
     maxAttack: Math.floor(2 * scale * baseFactor * bossMultiplier),
-    critChance: 0.005 * scale * baseFactor,
-    critDamage: 1 + 0.05 * scale * baseFactor,
-    lifeSteal: 0.003 * scale * baseFactor,
-    dodge: 0.001 * scale * baseFactor,
+    critChance: Math.floor(0.005 * scale * baseFactor),
+    critDamage: Math.floor(1 + 0.05 * scale * baseFactor),
+    lifeSteal: Math.floor(0.003 * scale * baseFactor),
+    dodge: Math.floor(0.001 * scale * baseFactor),
     rareStats: {
       burn: Math.floor(
         0.08 * (level >= 10 ? scale : 0) * baseFactor * bossMultiplier
@@ -141,7 +143,6 @@ export const initEnemy = (level) => {
       barrier: Math.floor(
         0.05 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
-      cooldownReduction: 0,
     },
   };
   return {

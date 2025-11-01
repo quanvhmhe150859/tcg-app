@@ -63,6 +63,14 @@ export const statIcons = {
     maxValue: 1,
     desc: "Chance to completely avoid an attack.",
   },
+  Luck: {
+    icon: "🍀",
+    label: "Luck",
+    type: "flat",
+    stackable: false,
+    maxValue: 99,
+    desc: "Increases chances of finding rare items.",
+  },
   Gold: {
     icon: "💰",
     label: "Gold",
@@ -70,6 +78,14 @@ export const statIcons = {
     stackable: false,
     maxValue: null,
     desc: "Currency used to buy upgrades or items.",
+  },
+  "CDR": {
+    icon: "⏰",
+    label: "Cooldown Reduction",
+    type: "flat",
+    stackable: false,
+    maxValue: 99,
+    desc: "Reduces the cooldown time of special abilities.",
   },
   Burn: {
     icon: "🔥",
@@ -134,13 +150,5 @@ export const statIcons = {
     stackable: false,
     maxValue: 999,
     desc: "Negates incoming attacks and is restored every battle.",
-  },
-  "CDR": {
-    icon: "⌛",
-    label: "Cooldown Reduction",
-    type: "flat",
-    stackable: false,
-    maxValue: 99,
-    desc: "Reduces the cooldown time of special abilities.",
   },
 };

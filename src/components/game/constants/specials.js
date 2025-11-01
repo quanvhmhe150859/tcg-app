@@ -129,7 +129,7 @@ export const SPECIALS = [
     id: 13,
     name: "Spirit Drain",
     effect:
-      "Hút 20% HP và 10% năng lượng từ mục tiêu, chuyển thành máu cho bản thân.",
+      "Hút 20% HP từ mục tiêu, chuyển thành máu cho bản thân.",
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
