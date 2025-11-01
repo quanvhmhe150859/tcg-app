@@ -299,7 +299,7 @@ const CharacterSelection = () => {
                             <img
                               src={`/specials/${special.image}`}
                               alt={special.name}
-                              className="w-10 h-10 object-contain mb-1"
+                              className="w-10 h-10 object-contain mb-1 special-icon"
                               onError={(e) => {
                                 e.target.style.display = "none";
                                 e.target.nextSibling.textContent = "Skill";
