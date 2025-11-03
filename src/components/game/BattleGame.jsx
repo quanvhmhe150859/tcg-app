@@ -283,7 +283,8 @@ const BattleGame = () => {
                     gameOver ||
                     showUpgradeOptions ||
                     showShop ||
-                    isAuto
+                    isAuto ||
+                    specialData.usingType == "auto"
                   }
                   className={`
                     relative w-14 h-10 sm:w-16 sm:h-12
@@ -295,12 +296,21 @@ const BattleGame = () => {
                         : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
                     }
                     ${
-                      gameOver || showUpgradeOptions || showShop || isAuto
+                      gameOver ||
+                      showUpgradeOptions ||
+                      showShop ||
+                      isAuto ||
+                      specialData.usingType == "auto"
                         ? "!cursor-not-allowed"
                         : ""
                     }
                   `}
-                  title={`${specialData.name}\n${specialData.effect}\nCooldown: ${special.currentCooldown}/${specialData.cooldown}`}
+                  title={`${
+                    specialData.name +
+                    (specialData.usingType == "auto" ? " (Passive)" : "")
+                  }\n${specialData.effect}\nCooldown: ${
+                    special.currentCooldown
+                  }/${specialData.cooldown}`}
                 >
                   <img
                     src={getSpecialIconPath(specialData.image)}

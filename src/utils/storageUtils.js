@@ -5,7 +5,6 @@ export function addCardsToLocalStorage(result, gameType, spinMode, noResultWarni
     localStorage.setItem("spinMode", "free");
   }
   if (spinMode === "free" || noResultWarning) {
-    console.log("Skipping adding cards to localStorage due to spinMode or noResultWarning");
     return;
   }
   // Đọc dữ liệu hiện tại

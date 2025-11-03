@@ -381,7 +381,6 @@ const useGameLogic = ({
     // ✅ SET SPECIAL ON COOLDOWN
     newPlayer.specials = newPlayer.specials.map((s) => {
       if (s.specialId === specialId) {
-        console.log(newPlayer);
         const reduction = newPlayer.rareStats?.cooldownReduction || 0;
         const reduced = specialData.cooldown - reduction;
         const finalCooldown = Math.max(Math.ceil(reduced), 1); // không thấp hơn 1
