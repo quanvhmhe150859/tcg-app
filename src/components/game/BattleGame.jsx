@@ -13,6 +13,7 @@ import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
 
 import { SPECIALS } from "./constants/specials";
+import { getSpecialIconPath } from "./constants/specialConfig";
 
 const BattleGame = () => {
   const navigate = useNavigate();
@@ -272,7 +273,6 @@ const BattleGame = () => {
               if (!specialData) return null;
 
               const isOnCooldown = special.currentCooldown > 0;
-              const imagePath = `/specials/${specialData.image}`;
 
               return (
                 <button
@@ -303,7 +303,7 @@ const BattleGame = () => {
                   title={`${specialData.name}\n${specialData.effect}\nCooldown: ${special.currentCooldown}/${specialData.cooldown}`}
                 >
                   <img
-                    src={imagePath}
+                    src={getSpecialIconPath(specialData.image)}
                     alt={specialData.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

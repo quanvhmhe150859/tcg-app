@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
 import { CHARACTER_STATS } from "./constants/characterStats";
 import { SPECIALS } from "./constants/specials";
+import { getSpecialIconPath } from "./constants/specialConfig";
 import "../styles/CardItem.css";
 
 const CharacterSelection = () => {
@@ -297,12 +298,12 @@ const CharacterSelection = () => {
                         {special && (
                           <div className="mt-2 border-t border-gray-600 pt-2 flex flex-col items-center">
                             <img
-                              src={`/specials/${special.image}`}
+                              src={getSpecialIconPath(special.image)}
                               alt={special.name}
                               className="w-10 h-10 object-contain mb-1 special-icon"
                               onError={(e) => {
                                 e.target.style.display = "none";
-                                e.target.nextSibling.textContent = "Skill";
+                                // e.target.nextSibling.textContent = "Skill";
                               }}
                             />
                             <p className="text-xs font-semibold text-cyan-300 truncate w-full text-center drop-shadow-[0_0_1px_black]">
