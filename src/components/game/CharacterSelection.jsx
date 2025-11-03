@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./constants/animationConstants";
+import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./configs/spriteConfig";
 import { CHARACTER_STATS } from "./constants/characterStats";
 import { SPECIALS } from "./constants/specials";
-import { getSpecialIconPath } from "./constants/specialConfig";
+import { getSpecialIconPath } from "./configs/specialConfig";
 import "../styles/CardItem.css";
 
 const CharacterSelection = () => {
@@ -296,7 +296,7 @@ const CharacterSelection = () => {
                         </div>
 
                         {special && (
-                          <div className="mt-2 border-t border-gray-600 pt-2 flex flex-col items-center">
+                          <div className="mt-2 mb-2 border-t border-gray-600 pt-2 flex flex-col items-center">
                             <img
                               src={getSpecialIconPath(special.image)}
                               alt={special.name}

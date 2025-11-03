@@ -13,7 +13,7 @@ import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
 
 import { SPECIALS } from "./constants/specials";
-import { getSpecialIconPath } from "./constants/specialConfig";
+import { getSpecialIconPath } from "./configs/specialConfig";
 
 const BattleGame = () => {
   const navigate = useNavigate();

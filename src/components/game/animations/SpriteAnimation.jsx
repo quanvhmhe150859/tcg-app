@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { ANIMATION_CONFIGS } from "../constants/animationConstants";
+import { ANIMATION_CONFIGS } from "../configs/spriteConfig";
 
 const SpriteAnimation = forwardRef(
   (
