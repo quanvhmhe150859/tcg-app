@@ -1,6 +1,10 @@
 import { addLog } from "./utils";
 import { SPECIALS } from "./constants/specials";
 
+export const startTurn = (turn, level, currentTurnLogs) => {
+  addLog(`Turn ${turn}`, "turn", currentTurnLogs);
+};
+
 // Hàm kiểm tra và giới hạn hồi máu không vượt quá maxHealth
 const limitHealth = (entity) => {
   entity.currentHealth = Math.min(entity.currentHealth, entity.maxHealth);
@@ -78,7 +82,7 @@ const receiveDamage = (
   return checkHealth(entity, entityName, currentTurnLogs);
 };
 
-export const checkHealth = (entity, entityName, currentTurnLogs) => {
+const checkHealth = (entity, entityName, currentTurnLogs) => {
   if (entity.currentHealth <= 0) {
     entity.effects = {
       burnDot: 0,
@@ -93,7 +97,7 @@ export const checkHealth = (entity, entityName, currentTurnLogs) => {
   return true;
 };
 
-export const applyDodge = (defender, attackerName, currentTurnLogs) => {
+const applyDodge = (defender, attackerName, currentTurnLogs) => {
   if (Math.random() < Math.min(defender.dodge, 0.6)) {
     addLog(
       `${attackerName === "Player" ? "Enemy" : "Player"} dodges the attack!`,
@@ -105,7 +109,7 @@ export const applyDodge = (defender, attackerName, currentTurnLogs) => {
   return false;
 };
 
-export const calculateCrit = (attacker, baseDamage) => {
+const calculateCrit = (attacker, baseDamage) => {
   const isCritical = Math.random() < attacker.critChance;
   return {
     damage: isCritical
@@ -115,11 +119,11 @@ export const calculateCrit = (attacker, baseDamage) => {
   };
 };
 
-export const applyArmor = (defender, preArmorDamage) => {
+const applyArmor = (defender, preArmorDamage) => {
   return Math.floor(preArmorDamage * (100 / (100 + defender.armor)));
 };
 
-export const applyThorn = (
+const applyThorn = (
   attacker,
   defender,
   attackerName,
@@ -137,7 +141,7 @@ export const applyThorn = (
   return true;
 };
 
-export const applyLifeSteal = (
+const applyLifeSteal = (
   attacker,
   attackerName,
   finalDamage,
@@ -159,7 +163,7 @@ export const applyLifeSteal = (
   return false;
 };
 
-export const applyStun = (
+const applyStun = (
   attacker,
   defender,
   attackerName,
@@ -177,24 +181,26 @@ export const applyStun = (
   return false;
 };
 
-export const applyBurnEffect = (attacker, defender) => {
-  if (attacker.rareStats.burn > 0) {
-    defender.effects.burnDot = attacker.rareStats.burn;
+const applyBurnEffect = (attacker, defender) => {
+  if (attacker.rareStats.burn > 0 && attacker.effects.isBurnAttack) {
+    defender.effects.burnDot += attacker.rareStats.burn;
+    attacker.effects.isBurnAttack = false;
     return true;
   }
   return false;
 };
 
-export const applyPoisonEffect = (attacker, defender) => {
-  if (attacker.rareStats.poison > 0 && defender.effects.poisonBase === 0) {
-    defender.effects.poisonBase = attacker.rareStats.poison;
-    defender.effects.poisonDot = attacker.rareStats.poison;
+const applyPoisonEffect = (attacker, defender) => {
+  if (attacker.rareStats.poison > 0 && attacker.effects.isPoisonAttack) {
+    defender.effects.poisonBase += attacker.rareStats.poison;
+    defender.effects.poisonDot += attacker.rareStats.poison;
+    attacker.effects.isPoisonAttack = false;
     return true;
   }
   return false;
 };
 
-export const applyCounterattack = (
+const applyCounterattack = (
   attacker,
   defender,
   attackerName,
@@ -224,7 +230,7 @@ export const applyCounterattack = (
   return true;
 };
 
-export const applySwiftness = (
+const applySwiftness = (
   attacker,
   defender,
   attackerName,
@@ -252,7 +258,7 @@ export const applySwiftness = (
   return true;
 };
 
-export const attackPhase = (
+const attackPhase = (
   attacker,
   defender,
   attackerName,
@@ -308,7 +314,7 @@ export const attackPhase = (
   return true;
 };
 
-export const applyBurn = (entity, entityName, currentTurnLogs) => {
+const applyBurn = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.burnDot > 0) {
     return receiveDamage(
       entity,
@@ -321,7 +327,7 @@ export const applyBurn = (entity, entityName, currentTurnLogs) => {
   return true;
 };
 
-export const applyPoison = (entity, entityName, currentTurnLogs) => {
+const applyPoison = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.poisonDot > 0) {
     const damage = entity.effects.poisonDot;
     const result = receiveDamage(
@@ -337,7 +343,7 @@ export const applyPoison = (entity, entityName, currentTurnLogs) => {
   return true;
 };
 
-export const applyRegeneration = (entity, entityName, currentTurnLogs) => {
+const applyRegeneration = (entity, entityName, currentTurnLogs) => {
   if (entity.regeneration > 0) {
     entity.currentHealth += entity.regeneration;
     limitHealth(entity);
@@ -351,7 +357,7 @@ export const applyRegeneration = (entity, entityName, currentTurnLogs) => {
   return false;
 };
 
-export const checkStun = (entity, entityName, currentTurnLogs) => {
+const checkStun = (entity, entityName, currentTurnLogs) => {
   if (entity.effects.isStuned) {
     addLog(
       `${entityName} is stunned and misses the turn!`,
@@ -426,7 +432,7 @@ export const playerSpecialTurn = (
     case 1:
       const flameDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, flameDamage, "Enemy", "attack", currentTurnLogs);
-      // newEnemy.effects.burnDot = Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
+      newEnemy.effects.burnDot += Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
       break;
 
     // 2. Aqua Shield (AUTO)
@@ -459,15 +465,13 @@ export const playerSpecialTurn = (
         newPlayer.currentHealth + healAmount,
         newPlayer.maxHealth
       );
-      addLog(`Player heals for ${healAmount} HP!`, "heal", currentTurnLogs);
       break;
 
     // 5. Poison Cloud
-    // case 5:
-    //   newEnemy.effects.poisonBase = newEnemy.maxHealth * specialData.power;
-    //   newEnemy.effects.poisonDot = newEnemy.maxHealth * specialData.power;
-    //   addLog("Enemy is poisoned for 4 turns!", "poison", currentTurnLogs);
-    //   break;
+    case 5:
+      newEnemy.effects.poisonBase += newEnemy.maxHealth * specialData.power;
+      newEnemy.effects.poisonDot += newEnemy.maxHealth * specialData.power;
+      break;
 
     // 6. Battle Roar
     // case 6:
@@ -539,9 +543,9 @@ export const playerSpecialTurn = (
         "attack",
         currentTurnLogs
       );
-      // if (Math.random() < 0.3) {
-      //   newEnemy.effects.burnDot = 0.05 * newEnemy.maxHealth;
-      // }
+      if (Math.random() < 0.3) {
+        newEnemy.effects.burnDot += 0.05 * newEnemy.maxHealth;
+      }
       break;
 
     // 13. Spirit Drain
@@ -560,10 +564,10 @@ export const playerSpecialTurn = (
     // 14. Iron Will
     // case 14:
     //   newPlayer.effects.immunity = 2;
-      // newPlayer.effects.armorBuff = specialData.power;
-      // newPlayer.effects.armorBuffTurns = 2;
-      // newPlayer.armor *= 1 + specialData.power;
-      // break;
+    // newPlayer.effects.armorBuff = specialData.power;
+    // newPlayer.effects.armorBuffTurns = 2;
+    // newPlayer.armor *= 1 + specialData.power;
+    // break;
 
     // 15. Arcane Overload
     // case 15:
@@ -579,18 +583,16 @@ export const playerSpecialTurn = (
     //     "damage",
     //     currentTurnLogs
     //   );
-      // break;
+    // break;
 
     // 16. Venom Fang
     case 16:
       const venomDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, venomDamage, "Enemy", "attack", currentTurnLogs);
-      // if (Math.random() < 0.2) {
-      //   newEnemy.effects.poisonBase = newEnemy.maxHealth * 0.05; // 5% HP
-      //   newEnemy.effects.poisonDot = newEnemy.maxHealth * 0.05;
-      //   newEnemy.effects.poisonTurns = 3;
-      //   addLog("Enemy is poisoned!", "poison", currentTurnLogs);
-      // }
+      if (Math.random() < 0.2) {
+        newEnemy.effects.poisonBase += newEnemy.maxHealth * 0.05;
+        newEnemy.effects.poisonDot += newEnemy.maxHealth * 0.05;
+      }
       break;
 
     // 17. Celestial Heal

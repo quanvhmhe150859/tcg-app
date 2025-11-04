@@ -5,7 +5,7 @@ import {
   generateRareUpgradeOptions,
   resetEffects,
 } from "../initializers";
-import { playerTurn, playerSpecialTurn, enemyTurn } from "../gameLogic";
+import { startTurn, playerTurn, playerSpecialTurn, enemyTurn } from "../gameLogic";
 import { addLog } from "../utils";
 import { useNavigate } from "react-router-dom";
 
@@ -495,10 +495,6 @@ const useGameLogic = ({
       return { isOver: true, levelUp: false };
     }
     return { isOver: false, levelUp: false };
-  };
-
-  const startTurn = (turn, level, currentTurnLogs) => {
-    addLog(`Turn ${turn}`, "turn", currentTurnLogs);
   };
 
   return {
