@@ -10,6 +10,66 @@ const limitHealth = (entity) => {
   entity.currentHealth = Math.min(entity.currentHealth, entity.maxHealth);
 };
 
+// Hàm giảm duration của buffs/debuffs và khôi phục stats khi hết thời gian
+const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
+  // Xử lý buffs
+  if (entity.buffs && entity.buffs.length > 0) {
+    entity.buffs = entity.buffs.filter(buff => {
+      buff.duration -= 1;
+      console.log(buff.duration);
+
+      if (buff.duration < 0) {
+        // Hủy hiệu ứng khi hết thời gian
+        switch (buff.id) {
+          case "attack":
+            entity.minAttack = Math.floor(entity.minAttack / (1 + buff.value));
+            entity.maxAttack = Math.floor(entity.maxAttack / (1 + buff.value));
+            addLog(
+              `${entityName}'s attack boost has expired!`,
+              "buffExpire",
+              currentTurnLogs
+            );
+            break;
+            case "armor":
+            entity.armor = Math.floor(entity.armor / (1 + buff.value));
+            addLog(
+              `${entityName}'s armor boost has expired!`,
+              "buffExpire",
+              currentTurnLogs
+            );
+            break;
+        }
+        return false; // Xóa buff
+      }
+      return true; // Giữ buff
+    });
+  }
+
+  // Xử lý debuffs
+  if (entity.debuffs && entity.debuffs.length > 0) {
+    entity.debuffs = entity.debuffs.filter(debuff => {
+      debuff.duration -= 1;
+
+      if (debuff.duration < 0) {
+        // Hủy debuff khi hết thời gian
+        switch (debuff.id) {
+          case "attack":
+            entity.minAttack = Math.floor(entity.minAttack / (1 - debuff.value));
+            entity.maxAttack = Math.floor(entity.maxAttack / (1 - debuff.value));
+            addLog(
+              `${entityName}'s attack debuff has expired!`,
+              "debuffExpire",
+              currentTurnLogs
+            );
+            break;
+        }
+        return false;
+      }
+      return true;
+    });
+  }
+};
+
 // Hàm nhận sát thương chung
 const receiveDamage = (
   entity,
@@ -371,6 +431,9 @@ const checkStun = (entity, entityName, currentTurnLogs) => {
 };
 
 export const playerTurn = (newPlayer, newEnemy, currentTurnLogs) => {
+  // Giảm duration buffs/debuffs sau lượt player
+  applyBuffDebuffDecay(newPlayer, "Player", currentTurnLogs);
+
   if (!applyBurn(newPlayer, "Player", currentTurnLogs)) {
     return false;
   }
@@ -397,6 +460,9 @@ export const playerTurn = (newPlayer, newEnemy, currentTurnLogs) => {
 };
 
 export const enemyTurn = (newPlayer, newEnemy, currentTurnLogs) => {
+  // Giảm duration buffs/debuffs sau lượt enemy
+  applyBuffDebuffDecay(newEnemy, "Enemy", currentTurnLogs);
+
   if (!applyBurn(newEnemy, "Enemy", currentTurnLogs)) {
     return;
   }
@@ -474,64 +540,26 @@ export const playerSpecialTurn = (
       break;
 
     // 6. Battle Roar
-    // case 6:
-    //   newPlayer.effects.attackBuff = specialData.power;
-    //   newPlayer.effects.attackBuffTurns = 3;
-    //   newPlayer.minAttack *= 1 + specialData.power;
-    //   newPlayer.maxAttack *= 1 + specialData.power;
-    //   break;
+    case 6:
+      newPlayer.buffs.push({ id: "attack", value: specialData.power, duration: 3 });
+      newPlayer.minAttack = Math.floor(newPlayer.minAttack * (1 + specialData.power));
+      newPlayer.maxAttack = Math.floor(newPlayer.maxAttack * (1 + specialData.power));
+      break;
 
     // 7. Stone Skin
-    // case 7:
-    //   newPlayer.effects.armorBuff = specialData.power;
-    //   newPlayer.effects.armorBuffTurns = 2;
-    //   newPlayer.armor *= 1 + specialData.power;
-    //   break;
-
-    // 8. Shadow Step
-    // case 8:
-    //   newPlayer.effects.dodgeNext = true;
-    //   newPlayer.effects.attackBuffNextTurn = specialData.power;
-    //   addLog(
-    //     "Player dodges next attack and gains attack buff!",
-    //     "dodge",
-    //     currentTurnLogs
-    //   );
-    //   break;
+    case 7:
+      newPlayer.buffs.push({ id: "armor", value: specialData.power, duration: 2 });
+      newPlayer.armor = Math.floor(newPlayer.armor * (1 + specialData.power));
+      break;
 
     // 9. Frost Nova
     case 9:
       const frostDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, frostDamage, "Enemy", "attack", currentTurnLogs);
-      // newEnemy.effects.slow = 0.3;
-      // newEnemy.effects.slowTurns = 2;
+      newEnemy.debuffs.push({ id: "attack", value: specialData.power, duration: 2 });
+      newEnemy.minAttack = Math.floor(newEnemy.minAttack * (1 - specialData.power));
+      newEnemy.maxAttack = Math.floor(newEnemy.maxAttack * (1 - specialData.power));
       break;
-
-    // 10. Divine Blessing
-    // case 10:
-    //   // Xóa tất cả debuff
-    //   newPlayer.effects = {
-    //     ...newPlayer.effects,
-    //     burnDot: 0,
-    //     poisonDot: 0,
-    //     poisonBase: 0,
-    //     isStuned: false,
-    //     slow: 0,
-    //     burnTurns: 0,
-    //     poisonTurns: 0,
-    //     slowTurns: 0,
-    //   };
-    //   newPlayer.effects.armorBuff = specialData.power;
-    //   newPlayer.effects.armorBuffTurns = 3;
-    //   newPlayer.armor *= 1 + specialData.power;
-    //   break;
-
-    // 11. Death Mark
-    // case 11:
-    //   newEnemy.effects.deathMark = specialData.power;
-    //   newEnemy.effects.deathMarkTurns = 3;
-    //   addLog("Enemy is marked for extra damage!", "debuff", currentTurnLogs);
-    //   break;
 
     // 12. Blazing Tornado
     case 12:
@@ -561,30 +589,6 @@ export const playerSpecialTurn = (
       );
       break;
 
-    // 14. Iron Will
-    // case 14:
-    //   newPlayer.effects.immunity = 2;
-    // newPlayer.effects.armorBuff = specialData.power;
-    // newPlayer.effects.armorBuffTurns = 2;
-    // newPlayer.armor *= 1 + specialData.power;
-    // break;
-
-    // 15. Arcane Overload
-    // case 15:
-    //   newPlayer.effects.magicBuff = specialData.power;
-    //   newPlayer.effects.magicBuffTurns = 1;
-    //   newPlayer.minAttack *= 1 + specialData.power;
-    //   newPlayer.maxAttack *= 1 + specialData.power;
-    //   // Phản chấn
-    //   const backlash = Math.floor(newPlayer.maxHealth * 0.1);
-    //   newPlayer.currentHealth -= backlash;
-    //   addLog(
-    //     `Player takes ${backlash} backlash damage!`,
-    //     "damage",
-    //     currentTurnLogs
-    //   );
-    // break;
-
     // 16. Venom Fang
     case 16:
       const venomDamage = Math.floor(newPlayer.minAttack * specialData.power);
@@ -594,23 +598,6 @@ export const playerSpecialTurn = (
         newEnemy.effects.poisonDot += newEnemy.maxHealth * 0.05;
       }
       break;
-
-    // 17. Celestial Heal
-    // case 17:
-    //   const teamHeal = Math.floor(newPlayer.maxHealth * specialData.power);
-    //   newPlayer.currentHealth = Math.min(
-    //     newPlayer.currentHealth + teamHeal,
-    //     newPlayer.maxHealth
-    //   );
-    //   // Xóa 1 debuff ngẫu nhiên
-    //   const debuffs = ["burnDot", "poisonDot", "isStuned"];
-    //   const randomDebuff = debuffs[Math.floor(Math.random() * debuffs.length)];
-    //   if (newPlayer.effects[randomDebuff] > 0) {
-    //     newPlayer.effects[randomDebuff] = 0;
-    //     addLog(`Removed ${randomDebuff}!`, "buff", currentTurnLogs);
-    //   }
-    //   addLog(`Player team heals for ${teamHeal} HP!`, "heal", currentTurnLogs);
-    //   break;
 
     default:
       addLog(`Coming soon special ${specialId}!`, "error", currentTurnLogs);

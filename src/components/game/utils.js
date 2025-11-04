@@ -12,6 +12,8 @@ export const addLog = (message, type, currentTurnLogs) => {
     counterattack: "text-yellow-600",
     swiftness: "text-cyan-400",
     burn: "text-orange-500",
+    buffExpire: "text-orange-600",
+    debuffExpire: "text-orange-600",
     poison: "text-purple-500",
     thorn: "text-red-700",
     levelUp: "text-blue-500",

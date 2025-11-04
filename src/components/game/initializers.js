@@ -39,6 +39,8 @@ export const initPlayer = (characterKey) => {
       barrier: 0,
       cooldownReduction: 0,
     },
+    buffs: [],
+    debuffs: [],
   };
 
   if (!characterKey) {
@@ -98,7 +100,8 @@ export const initPlayer = (characterKey) => {
       barrier:
         basePlayer.rareStats.barrier + (characterStats.rareStats?.barrier || 0),
       cooldownReduction:
-        basePlayer.rareStats.cooldownReduction + (characterStats.rareStats?.cooldownReduction || 0),
+        basePlayer.rareStats.cooldownReduction +
+        (characterStats.rareStats?.cooldownReduction || 0),
     },
   };
 
@@ -145,7 +148,10 @@ export const initEnemy = (level) => {
       barrier: Math.floor(
         0.05 * (level >= 30 ? scale : 0) * baseFactor * bossMultiplier
       ),
+      cooldownReduction: 0,
     },
+    buffs: [],
+    debuffs: [],
   };
   return {
     ...enemy,

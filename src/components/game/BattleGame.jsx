@@ -255,10 +255,7 @@ const BattleGame = () => {
             toggleNormalStats={toggleNormalStats}
             toggleRareStats={toggleRareStats}
           />
-          <div className="grid grid-cols-[30%_30%_40%] text-xs sm:text-sm">
-            <p className="text-red-500">
-              CDR: {player.rareStats.cooldownReduction} ⏰
-            </p>
+          <div className="grid grid-cols-[40%_60%] text-xs sm:text-sm">
             <p className="text-green-500">Luck: {player.luck} 🍀</p>
             <p className="text-yellow-500">Gold: {player.gold} 💰</p>
           </div>
