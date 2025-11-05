@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { initPlayer, initEnemy } from "./initializers";
+import { initPlayer, initEnemy } from "./logic/initializers";
 import { useTickets } from "../../context/TicketContext";
 import StatsPanel from "./components/StatsPanel";
 import BattleLog from "./components/BattleLog";
@@ -212,7 +212,7 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-7xl md:min-h-[770px] mx-auto rounded-lg bg-game">
+    <div className="p-4 max-w-7xl md:min-h-[825px] mx-auto rounded-lg bg-game">
       <Header level={level} />
 
       <div className="flex flex-col md:flex-row md:gap-4">

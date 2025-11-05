@@ -1,4 +1,4 @@
-import { CHARACTER_STATS } from "./constants/characterStats";
+import { CHARACTER_STATS } from "../constants/characterStats";
 
 export const resetEffects = (entity) => {
   return {
@@ -166,7 +166,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Max Health",
       basePrice: 0.1,
       min: 100,
-      max: 300,
+      max: 300 + player.luck * 20,
       format: (val) => `+${val}`,
     },
     {
@@ -174,7 +174,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Current Health",
       basePrice: 0.1,
       min: 200,
-      max: 500,
+      max: 500 + player.luck * 30,
       format: (val) => `+${val}`,
     },
     {
@@ -182,7 +182,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Regeneration",
       basePrice: 10,
       min: player.level - 6 <= 0 ? 1 : (player.level - 6) / 2,
-      max: (player.level + 0) / 2,
+      max: (player.level + 0) / 2 + player.luck,
       format: (val) => `+${val}`,
     },
     {
@@ -190,7 +190,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Armor",
       basePrice: 10,
       min: 3,
-      max: 5,
+      max: 5 + player.luck,
       format: (val) => `+${val}`,
     },
     {
@@ -198,7 +198,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Min Attack",
       basePrice: 10,
       min: 5,
-      max: 7,
+      max: 7 + player.luck,
       format: (val) => `+${val}`,
     },
     {
@@ -206,7 +206,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Max Attack",
       basePrice: 12,
       min: 6,
-      max: 11,
+      max: 11 + player.luck,
       format: (val) => `+${val}`,
     },
     {
@@ -214,7 +214,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Crit Chance",
       basePrice: 20,
       min: 5,
-      max: 7,
+      max: 7 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
     {
@@ -222,7 +222,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Crit Damage",
       basePrice: 1,
       min: 20,
-      max: 30,
+      max: 30 + player.luck * 5,
       format: (val) => `+${val}%`,
     },
     {
@@ -230,7 +230,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Life Steal",
       basePrice: 20,
       min: 2,
-      max: 4,
+      max: 4 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
     {
@@ -238,7 +238,7 @@ export const generateUpgradeOptions = (player) => {
       name: "Dodge",
       basePrice: 20,
       min: 3,
-      max: 5,
+      max: 5 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
   ].filter(
@@ -273,49 +273,56 @@ export const generateRareUpgradeOptions = (player) => {
       key: "poison",
       name: "Poison",
       min: 3,
-      max: 5,
+      max: 5 + player.luck,
       format: (val) => `+${val}`,
     },
     {
       key: "thorn",
       name: "Thorn",
       min: 10,
-      max: 20,
+      max: 20 + player.luck,
       format: (val) => `+${val}`,
     },
     {
       key: "stunChance",
       name: "Stun Chance",
       min: 2,
-      max: 5,
+      max: 5 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
     {
       key: "counterattack",
       name: "Counterattack",
       min: 7,
-      max: 15,
+      max: 15 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
     {
       key: "swiftness",
       name: "Swiftness",
       min: 5,
-      max: 10,
+      max: 10 + Math.floor(player.luck / 2),
       format: (val) => `+${val}%`,
     },
     {
       key: "shield",
       name: "Shield",
       min: 50,
-      max: 100,
+      max: 100 + player.luck * 10,
       format: (val) => `+${val}`,
     },
     {
       key: "barrier",
       name: "Barrier",
       min: 2,
-      max: 4,
+      max: 4 + Math.floor(player.luck / 2),
+      format: (val) => `+${val}`,
+    },
+    {
+      key: "luck",
+      name: "Luck",
+      min: 5,
+      max: 10 + Math.floor(player.luck / 2),
       format: (val) => `+${val}`,
     },
   ];

@@ -1,12 +1,13 @@
 import { addLog } from "./utils";
-import { SPECIALS } from "./constants/specials";
+import { SPECIALS } from "../constants/specials";
+import { applySpecial } from "./specialsLogic";
 
 export const startTurn = (turn, level, currentTurnLogs) => {
   addLog(`Turn ${turn}`, "turn", currentTurnLogs);
 };
 
 // Hàm kiểm tra và giới hạn hồi máu không vượt quá maxHealth
-const limitHealth = (entity) => {
+export const limitHealth = (entity) => {
   entity.currentHealth = Math.min(entity.currentHealth, entity.maxHealth);
 };
 
@@ -70,7 +71,7 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
 };
 
 // Hàm nhận sát thương chung
-const receiveDamage = (
+export const receiveDamage = (
   entity,
   damage,
   entityName,
@@ -141,7 +142,7 @@ const receiveDamage = (
   return checkHealth(entity, entityName, currentTurnLogs);
 };
 
-const checkHealth = (entity, entityName, currentTurnLogs) => {
+export const checkHealth = (entity, entityName, currentTurnLogs) => {
   if (entity.currentHealth <= 0) {
     entity.effects = {
       burnDot: 0,
@@ -487,121 +488,5 @@ export const playerSpecialTurn = (
   newEnemy,
   currentTurnLogs
 ) => {
-  const specialData = SPECIALS.find((s) => s.id === specialId);
-  if (!specialData) return;
-
-  addLog(`Player uses ${specialData.name}!`, "special", currentTurnLogs);
-
-  switch (specialData.id) {
-    // 1. Flame Burst
-    case 1:
-      const flameDamage = Math.floor(newPlayer.minAttack * specialData.power);
-      receiveDamage(newEnemy, flameDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.effects.burnDot += Math.floor(0.01 * specialData.power * newEnemy.maxHealth);
-      break;
-
-    // 2. Aqua Shield (AUTO)
-    case 2:
-      newPlayer.effects.shield = Math.floor(
-        newPlayer.maxHealth * specialData.power
-      );
-      break;
-
-    // 3. Thunder Strike
-    case 3:
-      const thunderDamage = Math.floor(newPlayer.minAttack * specialData.power);
-      receiveDamage(
-        newEnemy,
-        thunderDamage,
-        "Enemy",
-        "attack",
-        currentTurnLogs
-      );
-      if (Math.random() < 0.4) {
-        newEnemy.effects.isStuned = true;
-        addLog("Enemy is stunned for 1 turn!", "stun", currentTurnLogs);
-      }
-      break;
-
-    // 4. Healing Light
-    case 4:
-      const healAmount = Math.floor(newPlayer.maxHealth * specialData.power);
-      newPlayer.currentHealth = Math.min(
-        newPlayer.currentHealth + healAmount,
-        newPlayer.maxHealth
-      );
-      break;
-
-    // 5. Poison Cloud
-    case 5:
-      newEnemy.effects.poisonBase += newEnemy.maxHealth * specialData.power;
-      newEnemy.effects.poisonDot += newEnemy.maxHealth * specialData.power;
-      break;
-
-    // 6. Battle Roar
-    case 6:
-      newPlayer.buffs.push({ name: "Attack", value: specialData.power, duration: 3 });
-      newPlayer.minAttack = Math.floor(newPlayer.minAttack * (1 + specialData.power));
-      newPlayer.maxAttack = Math.floor(newPlayer.maxAttack * (1 + specialData.power));
-      break;
-
-    // 7. Stone Skin
-    case 7:
-      newPlayer.buffs.push({ name: "Armor", value: specialData.power, duration: 2 });
-      newPlayer.armor = Math.floor(newPlayer.armor * (1 + specialData.power));
-      break;
-
-    // 9. Frost Nova
-    case 9:
-      const frostDamage = Math.floor(newPlayer.minAttack * specialData.power);
-      receiveDamage(newEnemy, frostDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.debuffs.push({ name: "Attack", value: specialData.power, duration: 2 });
-      newEnemy.minAttack = Math.floor(newEnemy.minAttack * (1 - specialData.power));
-      newEnemy.maxAttack = Math.floor(newEnemy.maxAttack * (1 - specialData.power));
-      break;
-
-    // 12. Blazing Tornado
-    case 12:
-      const tornadoDamage = Math.floor(newPlayer.minAttack * specialData.power);
-      receiveDamage(
-        newEnemy,
-        tornadoDamage,
-        "Enemy",
-        "attack",
-        currentTurnLogs
-      );
-      if (Math.random() < 0.3) {
-        newEnemy.effects.burnDot += 0.05 * newEnemy.maxHealth;
-      }
-      break;
-
-    // 13. Spirit Drain
-    case 13:
-      const drainHP = Math.floor(newEnemy.maxHealth * 0.2);
-      newEnemy.currentHealth = Math.max(0, newEnemy.currentHealth - drainHP);
-      newPlayer.currentHealth += drainHP;
-      limitHealth(newPlayer);
-      addLog(
-        `Player drains ${drainHP} HP from enemy!`,
-        "lifesteal",
-        currentTurnLogs
-      );
-      break;
-
-    // 16. Venom Fang
-    case 16:
-      const venomDamage = Math.floor(newPlayer.minAttack * specialData.power);
-      receiveDamage(newEnemy, venomDamage, "Enemy", "attack", currentTurnLogs);
-      if (Math.random() < 0.2) {
-        newEnemy.effects.poisonBase += newEnemy.maxHealth * 0.05;
-        newEnemy.effects.poisonDot += newEnemy.maxHealth * 0.05;
-      }
-      break;
-
-    default:
-      addLog(`Coming soon special ${specialId}!`, "error", currentTurnLogs);
-  }
-
-  // Kiểm tra enemy chết sau special
-  return checkHealth(newEnemy, "Enemy", currentTurnLogs);
+  return applySpecial(specialId, newPlayer, newEnemy, currentTurnLogs);
 };

@@ -4,9 +4,9 @@ import {
   generateUpgradeOptions,
   generateRareUpgradeOptions,
   resetEffects,
-} from "../initializers";
-import { startTurn, playerTurn, playerSpecialTurn, enemyTurn } from "../gameLogic";
-import { addLog } from "../utils";
+} from "../logic/initializers";
+import { startTurn, playerTurn, playerSpecialTurn, enemyTurn } from "../logic/gameLogic";
+import { addLog } from "../logic/utils";
 import { useNavigate } from "react-router-dom";
 
 import { SPECIALS } from "../constants/specials";

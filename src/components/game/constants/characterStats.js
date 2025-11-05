@@ -33,11 +33,8 @@ export const CHARACTER_STATS = {
   },
   bardrey: {
     default: {
-      armor: 7,
+      luck: 4,
       specials: [{ specialId: 6, currentCooldown: 0 }],
-      rareStats: {
-        burn: 10,
-      },
     },
   },
   alberon: {
