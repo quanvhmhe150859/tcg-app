@@ -59,6 +59,8 @@ const BattleGame = () => {
   const [showRareStats, setShowRareStats] = useState(false);
   const [showNormalStats, setShowNormalStats] = useState(false);
 
+  const getConsumableIconPath = (id) => `/consumables/${id.replace(/([A-Z])/g, '_$1').toLowerCase()}.png`;
+
   useEffect(() => {
     const isDesktop = window.innerWidth >= 768;
     setShowRareStats(isDesktop);
@@ -79,6 +81,7 @@ const BattleGame = () => {
     handleAttack,
     handleSpecial,
     handleAutoTurn,
+    handleUseConsumable,
     toggleAuto,
     resetGame,
   } = useGameLogic({
@@ -259,10 +262,12 @@ const BattleGame = () => {
             <p className="text-green-500">Luck: {player.luck} 🍀</p>
             <p className="text-yellow-500">Gold: {player.gold} 💰</p>
           </div>
+          {/* ==================== SPECIAL + CONSUMABLES (CÙNG DÒNG) ==================== */}
           <p className="font-semibold mt-4 mb-1 border-t border-gray-500 pt-2">
-            Special Skills
+            Skills & Items
           </p>
           <div className="flex gap-2 mt-2 flex-wrap">
+            {/* --- Special Skills --- */}
             {player.specials?.map((special, index) => {
               const specialData = SPECIALS.find(
                 (s) => s.id === special.specialId
@@ -270,18 +275,19 @@ const BattleGame = () => {
               if (!specialData) return null;
 
               const isOnCooldown = special.currentCooldown > 0;
+              const isPassive = specialData.usingType === "auto";
 
               return (
                 <button
-                  key={index}
-                  onClick={() => handleSpecial(special.specialId)}
+                  key={`special-${index}`}
+                  onClick={() => !isPassive && handleSpecial(special.specialId)}
                   disabled={
                     isOnCooldown ||
                     gameOver ||
                     showUpgradeOptions ||
                     showShop ||
                     isAuto ||
-                    specialData.usingType == "auto"
+                    isPassive
                   }
                   className={`
                     relative w-14 h-10 sm:w-16 sm:h-12
@@ -290,36 +296,97 @@ const BattleGame = () => {
                     ${
                       isOnCooldown
                         ? "opacity-50 grayscale border-gray-500 !cursor-not-allowed"
+                        : isPassive
+                        ? "border-purple-400 opacity-80"
                         : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
                     }
                     ${
-                      gameOver ||
-                      showUpgradeOptions ||
-                      showShop ||
-                      isAuto ||
-                      specialData.usingType == "auto"
+                      gameOver || showUpgradeOptions || showShop || isAuto
                         ? "!cursor-not-allowed"
                         : ""
                     }
                   `}
-                  title={`${
-                    specialData.name +
-                    (specialData.usingType == "auto" ? " (Passive)" : "")
-                  }\n${specialData.effect}\nCooldown: ${
-                    special.currentCooldown
-                  }/${specialData.cooldown}`}
+                  title={`${specialData.name}${isPassive ? " (Passive)" : ""}
+                  ${specialData.effect}
+                  ${
+                    isPassive
+                      ? ""
+                      : `Cooldown: ${special.currentCooldown}/${specialData.cooldown}`
+                  }`}
                 >
                   <img
                     src={getSpecialIconPath(specialData.image)}
                     alt={specialData.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = "/default.jpg"; // fallback nếu ảnh lỗi
+                      e.target.src = "/default.jpg";
                     }}
                   />
                   {isOnCooldown && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 text-white text-xs font-bold">
                       {special.currentCooldown}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* --- Consumables --- */}
+            {player.consumables?.map((item, index) => {
+              const hasQuantity = item.quantity > 0;
+
+              return (
+                <button
+                  key={`consumable-${index}`}
+                  onClick={() => {
+                    if (
+                      hasQuantity &&
+                      !gameOver &&
+                      !showUpgradeOptions &&
+                      !showShop
+                    ) {
+                      handleUseConsumable(item.id);
+                    }
+                  }}
+                  disabled={
+                    !hasQuantity ||
+                    gameOver ||
+                    showUpgradeOptions ||
+                    showShop
+                  }
+                  className={`
+                    relative w-14 h-10 sm:w-16 sm:h-12
+                    rounded-lg border-2 overflow-hidden
+                    transition-all duration-200
+                    ${
+                      !hasQuantity
+                        ? "opacity-30 grayscale border-gray-600"
+                        : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
+                    }
+                    ${
+                      gameOver || showUpgradeOptions || showShop
+                        ? "!cursor-not-allowed"
+                        : ""
+                    }
+                  `}
+                  title={`+${item.value} HP`}
+                >
+                  <img
+                    src={getConsumableIconPath(item.id)}
+                    alt={item.id}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "/default.png";
+                    }}
+                  />
+                  {/* Hiển thị số lượng */}
+                  {hasQuantity ? (
+                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 rounded-tl">
+                      {item.quantity}
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 text-white text-xs font-bold">
+                      0
                     </div>
                   )}
                 </button>

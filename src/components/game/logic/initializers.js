@@ -39,6 +39,8 @@ export const initPlayer = (characterKey) => {
       barrier: 0,
       cooldownReduction: 0,
     },
+    relics: [],
+    consumables: [],
     buffs: [],
     debuffs: [],
   };
@@ -79,6 +81,7 @@ export const initPlayer = (characterKey) => {
     gold: basePlayer.gold + (characterStats.gold || 0),
 
     specials: characterStats.specials || basePlayer.specials,
+    consumables: characterStats.consumables || baseCharacter.consumables,
     rareStats: {
       ...basePlayer.rareStats,
       burn: basePlayer.rareStats.burn + (characterStats.rareStats?.burn || 0),
@@ -107,7 +110,7 @@ export const initPlayer = (characterKey) => {
 
   return {
     ...updatedPlayer,
-    currentHealth: updatedPlayer.maxHealth, // Ensure currentHealth matches updated maxHealth
+    currentHealth: updatedPlayer.currentHealth, // Ensure currentHealth matches updated maxHealth
     effects: resetEffects(updatedPlayer),
   };
 };
@@ -160,6 +163,10 @@ export const initEnemy = (level) => {
 };
 
 export const generateUpgradeOptions = (player) => {
+  // Tính xác suất potion xuất hiện: 50% + (luck * 10)%
+  const potionChance = 0.5 + player.luck * 0.1;
+  const includePotion = Math.random() < potionChance;
+
   const stats = [
     {
       key: "maxHealth",
@@ -245,23 +252,45 @@ export const generateUpgradeOptions = (player) => {
     (stat) => stat.key !== "minAttack" || player.minAttack !== player.maxAttack
   );
 
+  // Chỉ thêm potion nếu thỏa điều kiện xác suất
+  if (includePotion) {
+    stats.push({
+      key: "potion",
+      name: "500 Heal Potion",
+      basePrice: 500,
+      potionId: "healPotion",
+      potionValue: 500,
+      format: () => "+1",
+    });
+  }
+
+  // Trộn ngẫu nhiên và lấy 3 phần tử
   const shuffled = stats.sort(() => Math.random() - 0.5).slice(0, 3);
 
   return shuffled.map((stat) => {
-    const value = Math.floor(
-      stat.min + Math.random() * (stat.max - stat.min + 1)
-    );
-    const price = Math.floor(
-      stat.basePrice * value * Math.floor((player.level / 2) * 1.05) +
-        Math.random() * 100
-    );
+    let value, price, format;
+
+    if (stat.key === "potion") {
+      value = 1;
+      price = stat.basePrice + Math.floor(Math.random() * 30);
+      format = stat.format;
+    } else {
+      value = Math.floor(stat.min + Math.random() * (stat.max - stat.min + 1));
+      price = Math.floor(
+        stat.basePrice * value * Math.floor((player.level / 2) * 1.05) +
+          Math.random() * 100
+      );
+      format = stat.format;
+    }
 
     return {
       key: stat.key,
       name: stat.name,
       value,
-      format: stat.format,
+      format,
       price,
+      potionId: stat.potionId,
+      potionValue: stat.potionValue,
     };
   });
 };

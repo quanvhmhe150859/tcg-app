@@ -30,3 +30,4 @@ dist-ssr
 # Ignore images
 public/sprites/
 public/specials/
+public/consumables/

@@ -5,7 +5,12 @@ import {
   generateRareUpgradeOptions,
   resetEffects,
 } from "../logic/initializers";
-import { startTurn, playerTurn, playerSpecialTurn, enemyTurn } from "../logic/gameLogic";
+import {
+  startTurn,
+  playerTurn,
+  playerSpecialTurn,
+  enemyTurn,
+} from "../logic/gameLogic";
 import { addLog } from "../logic/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -227,18 +232,62 @@ const useGameLogic = ({
 
   const handlePurchase = (option, index) => {
     if (player.gold < option.price || boughtOptions.includes(index)) return;
+
     setPlayer((prev) => {
       const currentTurnLogs = [];
-      const newPlayer = updatePlayerAndLog(
-        prev,
-        option,
-        currentTurnLogs,
-        "purchase",
-        true
-      );
+      let newPlayer = { ...prev };
+
+      if (option.key === "potion") {
+        // XỬ LÝ MUA POTION
+        const { potionId, potionValue } = option;
+        const existingPotion = newPlayer.consumables.find(
+          (c) => c.id === potionId && c.value === potionValue
+        );
+
+        if (existingPotion) {
+          // CỘNG DỒN QUANTITY
+          existingPotion.quantity += option.value;
+        } else {
+          // TẠO MỚI VỚI instanceId DUY NHẤT
+          const newPotion = {
+            id: potionId,
+            value: potionValue,
+            quantity: option.value,
+          };
+          newPlayer.consumables = [...newPlayer.consumables, newPotion];
+        }
+
+        // TRỪ VÀNG
+        newPlayer.gold -= option.price;
+
+        // LOG
+        const potionName = option.name.replace("+1 ", "");
+        currentTurnLogs.push({
+          id: logId,
+          turn: globalTurnCount,
+          type: "purchase",
+          message: `${prev.name} bought +1 ${potionName} for ${option.price} gold!`,
+          isPlayer: true,
+        });
+      } else {
+        // XỬ LÝ MUA STAT THƯỜNG
+        const updated = updatePlayerAndLog(
+          prev,
+          option,
+          currentTurnLogs,
+          "purchase",
+          true
+        );
+        newPlayer = {
+          ...updated,
+          gold: updated.gold - option.price, // Trừ vàng
+        };
+      }
+
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
+
     setBoughtOptions((prev) => [...prev, index]);
   };
 
@@ -273,20 +322,57 @@ const useGameLogic = ({
   const handleUpgrade = (option) => {
     setPlayer((prev) => {
       const currentTurnLogs = [];
-      const newPlayer = updatePlayerAndLog(
-        prev,
-        option,
-        currentTurnLogs,
-        "upgrade"
-      );
+      let newPlayer = { ...prev };
+
+      if (option.key === "potion") {
+        // XỬ LÝ POTION: CỘNG DỒN HOẶC TẠO MỚI
+        const { potionId, potionValue } = option;
+        const existingPotion = newPlayer.consumables.find(
+          (c) => c.id === potionId && c.value === potionValue
+        );
+
+        if (existingPotion) {
+          // CỘNG DỒN QUANTITY
+          existingPotion.quantity += option.value;
+        } else {
+          // TẠO MỚI VỚI instanceId DUY NHẤT
+          const newPotion = {
+            id: potionId,
+            value: potionValue,
+            quantity: option.value,
+          };
+          newPlayer.consumables = [...newPlayer.consumables, newPotion];
+        }
+
+        // // Log
+        // const potionName = option.name.replace("+1 ", "");
+        // currentTurnLogs.push({
+        //   id: logId,
+        //   turn: globalTurnCount,
+        //   type: "upgrade",
+        //   message: `${prev.name} obtained +1 ${potionName}!`,
+        //   isPlayer: true,
+        // });
+      } else {
+        // XỬ LÝ STAT THƯỜNG
+        newPlayer = updatePlayerAndLog(
+          prev,
+          option,
+          currentTurnLogs,
+          "upgrade"
+        );
+      }
+
       newPlayer.effects = resetEffects(newPlayer);
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
+
     setLevel((prev) => prev + 1);
     setEnemy(initEnemy(level + 1));
     setTurnCount(1);
     setShowUpgradeOptions(false);
+
     if (level % 10 === 9) {
       setShowShop(true);
       setShopOptions(generateUpgradeOptions(player));
@@ -401,6 +487,42 @@ const useGameLogic = ({
     endTurn(newPlayer, newEnemy, currentTurnLogs, gameStatus);
   };
 
+  const handleUseConsumable = (consumableId) => {
+    const consumable = player.consumables.find((c) => c.id === consumableId);
+    if (!consumable || consumable.quantity <= 0) return;
+
+    const healAmount = consumable.value;
+    const newHealth = Math.min(
+      player.maxHealth,
+      player.currentHealth + healAmount
+    );
+
+    setPlayer((prev) => ({
+      ...prev,
+      currentHealth: newHealth,
+      consumables: prev.consumables
+        .map((c) =>
+          c.id === consumableId ? { ...c, quantity: c.quantity - 1 } : c
+        )
+        .filter((c) => c.quantity > 0), // XÓA NẾU quantity = 0
+    }));
+
+    // const displayName = consumableId
+    //   .replace(/([A-Z])/g, " $1")
+    //   .replace(/^./, (s) => s.toUpperCase())
+    //   .replace("Hp", "HP");
+
+    // const log = {
+    //   id: logId,
+    //   turn: globalTurnCount,
+    //   type: "consumable",
+    //   message: `${player.name} used ${displayName} and healed ${healAmount} HP!`,
+    //   isPlayer: true,
+    // };
+    // setTurnLogs((prev) => [log, ...prev]);
+    // setLogId((prev) => prev + 1);
+  };
+
   const toggleAuto = () => {
     setIsAuto((prev) => !prev);
   };
@@ -504,8 +626,9 @@ const useGameLogic = ({
     handleUpgrade,
     handleEndRun,
     handleAttack,
-    handleAutoTurn,
     handleSpecial,
+    handleAutoTurn,
+    handleUseConsumable,
     toggleAuto,
     resetGame,
   };

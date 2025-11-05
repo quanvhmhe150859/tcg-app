@@ -260,38 +260,85 @@ const CharacterSelection = () => {
 
                         <div className="text-xs space-y-0.5 flex-1 overflow-y-auto max-h-28 px-1">
                           {Object.entries(stats).flatMap(
-                            ([statKey, statValue]) =>
-                              statKey === "rareStats"
-                                ? Object.entries(statValue).map(
-                                    ([subKey, subValue]) => {
-                                      const { text, className } =
-                                        formatStatValue(subKey, subValue);
-                                      return (
-                                        <p
-                                          key={subKey}
-                                          className={`font-medium ${className}`}
-                                        >
-                                          {formatStatName(subKey)}: {text}
-                                        </p>
-                                      );
-                                    }
-                                  )
-                                : statKey !== "specials"
-                                ? (() => {
+                            ([statKey, statValue]) => {
+                              // Xử lý rareStats
+                              if (statKey === "rareStats") {
+                                return Object.entries(statValue).map(
+                                  ([subKey, subValue]) => {
                                     const { text, className } = formatStatValue(
-                                      statKey,
-                                      statValue
+                                      subKey,
+                                      subValue
                                     );
                                     return (
                                       <p
-                                        key={statKey}
+                                        key={subKey}
                                         className={`font-medium ${className}`}
                                       >
-                                        {formatStatName(statKey)}: {text}
+                                        {formatStatName(subKey)}: {text}
                                       </p>
                                     );
-                                  })()
-                                : []
+                                  }
+                                );
+                              }
+
+                              // Bỏ qua specials
+                              if (statKey === "specials") return [];
+
+                              // Xử lý consumables: "500 Health Potion: +1"
+                              if (
+                                statKey === "consumables" &&
+                                Array.isArray(statValue)
+                              ) {
+                                return statValue.map((item, idx) => {
+                                  // Format tên đẹp
+                                  const name = item.id
+                                    .replace(/([A-Z])/g, " $1")
+                                    .replace(/^./, (str) => str.toUpperCase())
+                                    .replace("Hp", "HP")
+                                    .trim();
+
+                                  // Giá trị (luôn có dấu + nếu dương)
+                                  const valueText =
+                                    item.value > 0
+                                      ? `+${item.value}`
+                                      : `${item.value}`;
+
+                                  // Màu theo loại
+                                  const isHeal =
+                                    item.id.toLowerCase().includes("heal") ||
+                                    item.id.toLowerCase().includes("potion");
+                                  const valueColor = isHeal
+                                    ? "text-green-400"
+                                    : "text-red-400";
+
+                                  return (
+                                    <p
+                                      key={`${item.id}-${idx}`}
+                                      className={`text-xs font-medium ${valueColor}`}
+                                    >
+                                      {Math.abs(item.value)} {name}:{" "}
+                                      <span className="text-green-400">
+                                        +{item.quantity}
+                                      </span>
+                                    </p>
+                                  );
+                                });
+                              }
+
+                              // Xử lý stat thông thường
+                              const { text, className } = formatStatValue(
+                                statKey,
+                                statValue
+                              );
+                              return (
+                                <p
+                                  key={statKey}
+                                  className={`font-medium ${className}`}
+                                >
+                                  {formatStatName(statKey)}: {text}
+                                </p>
+                              );
+                            }
                           )}
                         </div>
 
