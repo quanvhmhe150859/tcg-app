@@ -16,12 +16,11 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
   if (entity.buffs && entity.buffs.length > 0) {
     entity.buffs = entity.buffs.filter(buff => {
       buff.duration -= 1;
-      console.log(buff.duration);
 
       if (buff.duration < 0) {
         // Hủy hiệu ứng khi hết thời gian
-        switch (buff.id) {
-          case "attack":
+        switch (buff.name) {
+          case "Attack":
             entity.minAttack = Math.floor(entity.minAttack / (1 + buff.value));
             entity.maxAttack = Math.floor(entity.maxAttack / (1 + buff.value));
             addLog(
@@ -30,7 +29,7 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
               currentTurnLogs
             );
             break;
-            case "armor":
+            case "Armor":
             entity.armor = Math.floor(entity.armor / (1 + buff.value));
             addLog(
               `${entityName}'s armor boost has expired!`,
@@ -52,8 +51,8 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
 
       if (debuff.duration < 0) {
         // Hủy debuff khi hết thời gian
-        switch (debuff.id) {
-          case "attack":
+        switch (debuff.name) {
+          case "Attack":
             entity.minAttack = Math.floor(entity.minAttack / (1 - debuff.value));
             entity.maxAttack = Math.floor(entity.maxAttack / (1 - debuff.value));
             addLog(
@@ -541,14 +540,14 @@ export const playerSpecialTurn = (
 
     // 6. Battle Roar
     case 6:
-      newPlayer.buffs.push({ id: "attack", value: specialData.power, duration: 3 });
+      newPlayer.buffs.push({ name: "Attack", value: specialData.power, duration: 3 });
       newPlayer.minAttack = Math.floor(newPlayer.minAttack * (1 + specialData.power));
       newPlayer.maxAttack = Math.floor(newPlayer.maxAttack * (1 + specialData.power));
       break;
 
     // 7. Stone Skin
     case 7:
-      newPlayer.buffs.push({ id: "armor", value: specialData.power, duration: 2 });
+      newPlayer.buffs.push({ name: "Armor", value: specialData.power, duration: 2 });
       newPlayer.armor = Math.floor(newPlayer.armor * (1 + specialData.power));
       break;
 
@@ -556,7 +555,7 @@ export const playerSpecialTurn = (
     case 9:
       const frostDamage = Math.floor(newPlayer.minAttack * specialData.power);
       receiveDamage(newEnemy, frostDamage, "Enemy", "attack", currentTurnLogs);
-      newEnemy.debuffs.push({ id: "attack", value: specialData.power, duration: 2 });
+      newEnemy.debuffs.push({ name: "Attack", value: specialData.power, duration: 2 });
       newEnemy.minAttack = Math.floor(newEnemy.minAttack * (1 - specialData.power));
       newEnemy.maxAttack = Math.floor(newEnemy.maxAttack * (1 - specialData.power));
       break;

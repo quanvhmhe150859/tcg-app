@@ -87,11 +87,11 @@ export const SPECIALS = [
     id: 9,
     name: "Frost Nova",
     effect:
-      "Gây 100% sát thương cho tất cả kẻ địch và làm chậm 30% tốc độ trong 2 lượt.",
+      "Gây 30% sát thương cho tất cả kẻ địch và làm chậm 30% tốc độ trong 2 lượt.",
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
-    power: 1.0,
+    power: 0.3,
     image: "frost_nova.png",
   },
   {
