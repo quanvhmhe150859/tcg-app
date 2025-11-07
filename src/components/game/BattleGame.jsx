@@ -59,7 +59,8 @@ const BattleGame = () => {
   const [showRareStats, setShowRareStats] = useState(false);
   const [showNormalStats, setShowNormalStats] = useState(false);
 
-  const getConsumableIconPath = (id) => `/consumables/${id.replace(/([A-Z])/g, '_$1').toLowerCase()}.png`;
+  const getConsumableIconPath = (id) =>
+    `/consumables/${id.replace(/([A-Z])/g, "_$1").toLowerCase()}.png`;
 
   useEffect(() => {
     const isDesktop = window.innerWidth >= 768;
@@ -332,66 +333,93 @@ const BattleGame = () => {
             })}
 
             {/* --- Consumables --- */}
-            {player.consumables?.map((item, index) => {
-              const hasQuantity = item.quantity > 0;
+            {(() => {
+              const consumables = player.consumables;
 
-              return (
-                <button
-                  key={`consumable-${index}`}
-                  onClick={() => {
-                    if (
-                      hasQuantity &&
-                      !gameOver &&
-                      !showUpgradeOptions &&
-                      !showShop
-                    ) {
-                      handleUseConsumable(item.id);
-                    }
-                  }}
-                  disabled={
-                    !hasQuantity ||
-                    gameOver ||
-                    showUpgradeOptions ||
-                    showShop
-                  }
-                  className={`
-                    relative w-14 h-10 sm:w-16 sm:h-12
-                    rounded-lg border-2 overflow-hidden
-                    transition-all duration-200
-                    ${
-                      !hasQuantity
-                        ? "opacity-30 grayscale border-gray-600"
-                        : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
-                    }
-                    ${
-                      gameOver || showUpgradeOptions || showShop
-                        ? "!cursor-not-allowed"
-                        : ""
-                    }
-                  `}
-                  title={`+${item.value} HP`}
-                >
-                  <img
-                    src={getConsumableIconPath(item.id)}
-                    alt={item.id}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = "/default.png";
-                    }}
-                  />
-                  {/* Hiển thị số lượng */}
-                  {hasQuantity ? (
-                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 rounded-tl">
-                      {item.quantity}
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 text-white text-xs font-bold">
-                      0
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+              // Chỉ xử lý nếu consumables là object (không phải mảng)
+              if (
+                !consumables ||
+                typeof consumables !== "object" ||
+                Array.isArray(consumables)
+              ) {
+                return null; // hoặc return <div className="text-gray-500 text-xs">No items</div>;
+              }
+
+              return Object.entries(consumables)
+                .map(([id, quantity], index) => {
+                  const hasQuantity = quantity > 0;
+
+                  // Parse tên: health_500_fixed → "Health 500 Potion"
+                  const parts = id.split("_");
+                  if (parts.length < 3) return null;
+
+                  const type =
+                    parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+                  const value = parts[1];
+                  const mode = parts[2];
+                  const displayValue = mode === "percent" ? `${value}%` : value;
+                  const itemName = `${type} ${displayValue} Potion`;
+
+                  return (
+                    <button
+                      key={`consumable-${id}`}
+                      onClick={() => {
+                        if (
+                          hasQuantity &&
+                          !gameOver &&
+                          !showUpgradeOptions &&
+                          !showShop
+                        ) {
+                          handleUseConsumable(id);
+                        }
+                      }}
+                      disabled={
+                        !hasQuantity ||
+                        gameOver ||
+                        showUpgradeOptions ||
+                        showShop
+                      }
+                      className={`
+                        relative w-14 h-10 sm:w-16 sm:h-12
+                        rounded-lg border-2 overflow-hidden
+                        transition-all duration-200
+                        ${
+                          !hasQuantity
+                            ? "opacity-30 grayscale border-gray-600"
+                            : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
+                        }
+                        ${
+                          gameOver || showUpgradeOptions || showShop
+                            ? "!cursor-not-allowed"
+                            : ""
+                        }
+                      `}
+                      title={itemName}
+                    >
+                      <img
+                        src={getConsumableIconPath(id)}
+                        alt={id}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = "/default.jpg";
+                        }}
+                      />
+
+                      {/* Số lượng */}
+                      {hasQuantity ? (
+                        <div className="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 rounded-tl">
+                          {quantity}
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 text-white text-xs font-bold">
+                          0
+                        </div>
+                      )}
+                    </button>
+                  );
+                })
+                .filter(Boolean);
+            })()}
           </div>
         </div>
 

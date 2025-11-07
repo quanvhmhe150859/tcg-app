@@ -39,8 +39,6 @@ export const initPlayer = (characterKey) => {
       barrier: 0,
       cooldownReduction: 0,
     },
-    relics: [],
-    consumables: [],
     buffs: [],
     debuffs: [],
   };
@@ -256,10 +254,9 @@ export const generateUpgradeOptions = (player) => {
   if (includePotion) {
     stats.push({
       key: "potion",
-      name: "500 Heal Potion",
+      name: "Health 500 Potion",
+      potionId: "health_500_fixed",
       basePrice: 500,
-      potionId: "healPotion",
-      potionValue: 500,
       format: () => "+1",
     });
   }
@@ -290,7 +287,6 @@ export const generateUpgradeOptions = (player) => {
       format,
       price,
       potionId: stat.potionId,
-      potionValue: stat.potionValue,
     };
   });
 };

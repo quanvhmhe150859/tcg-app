@@ -79,7 +79,7 @@ export const statIcons = {
     maxValue: null,
     desc: "Currency used to buy upgrades or items.",
   },
-  "CDR": {
+  "Cooldown": {
     icon: "⏰",
     label: "Cooldown Reduction",
     type: "flat",

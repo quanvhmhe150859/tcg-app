@@ -111,6 +111,31 @@ const updatePlayerAndLog = (
       logType,
       currentTurnLogs
     );
+  } else if (option.key === "consumable") {
+    const { potionId, value: quantityToAdd } = option;
+
+    // Đảm bảo consumables là object
+    if (!newPlayer.consumables || Array.isArray(newPlayer.consumables)) {
+      newPlayer.consumables = {};
+    }
+
+    // Cộng dồn hoặc tạo mới
+    if (newPlayer.consumables[potionId]) {
+      newPlayer.consumables[potionId] += quantityToAdd;
+    } else {
+      newPlayer.consumables[potionId] = quantityToAdd;
+    }
+
+    // Log mua potion
+    addLog(
+      `Player ${isPurchase ? "purchased" : "upgraded"} ${
+        option.name
+      } by +${formatValueForLog(option.key, option.value)}${
+        isPurchase ? ` for ${option.price} gold` : ""
+      }!`,
+      logType,
+      currentTurnLogs
+    );
   } else {
     newPlayer[option.key] += value;
     addLog(
@@ -237,52 +262,23 @@ const useGameLogic = ({
       const currentTurnLogs = [];
       let newPlayer = { ...prev };
 
-      if (option.key === "potion") {
-        // XỬ LÝ MUA POTION
-        const { potionId, potionValue } = option;
-        const existingPotion = newPlayer.consumables.find(
-          (c) => c.id === potionId && c.value === potionValue
-        );
+      // === DÙNG CHUNG updatePlayerAndLog CHO CẢ POTION VÀ STAT ===
+      const updated = updatePlayerAndLog(
+        prev,
+        {
+          ...option,
+          // Ghi đè: potion sẽ được xử lý trong hàm
+          key: option.key === "potion" ? "consumable" : option.key,
+        },
+        currentTurnLogs,
+        "purchase",
+        true
+      );
 
-        if (existingPotion) {
-          // CỘNG DỒN QUANTITY
-          existingPotion.quantity += option.value;
-        } else {
-          // TẠO MỚI VỚI instanceId DUY NHẤT
-          const newPotion = {
-            id: potionId,
-            value: potionValue,
-            quantity: option.value,
-          };
-          newPlayer.consumables = [...newPlayer.consumables, newPotion];
-        }
-
-        // TRỪ VÀNG
-        newPlayer.gold -= option.price;
-
-        // LOG
-        const potionName = option.name.replace("+1 ", "");
-        currentTurnLogs.push({
-          id: logId,
-          turn: globalTurnCount,
-          type: "purchase",
-          message: `${prev.name} bought +1 ${potionName} for ${option.price} gold!`,
-          isPlayer: true,
-        });
-      } else {
-        // XỬ LÝ MUA STAT THƯỜNG
-        const updated = updatePlayerAndLog(
-          prev,
-          option,
-          currentTurnLogs,
-          "purchase",
-          true
-        );
-        newPlayer = {
-          ...updated,
-          gold: updated.gold - option.price, // Trừ vàng
-        };
-      }
+      newPlayer = {
+        ...updated,
+        gold: updated.gold - option.price, // Trừ vàng (cả potion và stat)
+      };
 
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
@@ -325,34 +321,21 @@ const useGameLogic = ({
       let newPlayer = { ...prev };
 
       if (option.key === "potion") {
-        // XỬ LÝ POTION: CỘNG DỒN HOẶC TẠO MỚI
-        const { potionId, potionValue } = option;
-        const existingPotion = newPlayer.consumables.find(
-          (c) => c.id === potionId && c.value === potionValue
-        );
+        // XỬ LÝ POTION: CỘNG DỒN HOẶC TẠO MỚI (dạng object)
+        const potionId = option.potionId;
+        const quantityToAdd = option.value;
 
-        if (existingPotion) {
-          // CỘNG DỒN QUANTITY
-          existingPotion.quantity += option.value;
-        } else {
-          // TẠO MỚI VỚI instanceId DUY NHẤT
-          const newPotion = {
-            id: potionId,
-            value: potionValue,
-            quantity: option.value,
-          };
-          newPlayer.consumables = [...newPlayer.consumables, newPotion];
+        // Đảm bảo consumables là object
+        if (!newPlayer.consumables || Array.isArray(newPlayer.consumables)) {
+          newPlayer.consumables = {};
         }
 
-        // // Log
-        // const potionName = option.name.replace("+1 ", "");
-        // currentTurnLogs.push({
-        //   id: logId,
-        //   turn: globalTurnCount,
-        //   type: "upgrade",
-        //   message: `${prev.name} obtained +1 ${potionName}!`,
-        //   isPlayer: true,
-        // });
+        // Cộng dồn nếu đã có, hoặc tạo mới
+        if (newPlayer.consumables[potionId]) {
+          newPlayer.consumables[potionId] += quantityToAdd;
+        } else {
+          newPlayer.consumables[potionId] = quantityToAdd;
+        }
       } else {
         // XỬ LÝ STAT THƯỜNG
         newPlayer = updatePlayerAndLog(
@@ -488,39 +471,50 @@ const useGameLogic = ({
   };
 
   const handleUseConsumable = (consumableId) => {
-    const consumable = player.consumables.find((c) => c.id === consumableId);
-    if (!consumable || consumable.quantity <= 0) return;
+    const consumables = player.consumables;
 
-    const healAmount = consumable.value;
+    if (
+      !consumables ||
+      typeof consumables !== "object" ||
+      Array.isArray(consumables) ||
+      !consumables[consumableId] ||
+      consumables[consumableId] <= 0
+    ) {
+      return;
+    }
+
+    const [type, rawValue, mode] = consumableId.split("_");
+    const value = parseInt(rawValue, 10);
+    const isPercent = mode === "percent";
+
+    let healAmount = 0;
+    if (type === "health") {
+      healAmount = isPercent
+        ? Math.floor((player.maxHealth * value) / 100)
+        : value;
+    }
+
     const newHealth = Math.min(
       player.maxHealth,
       player.currentHealth + healAmount
     );
 
-    setPlayer((prev) => ({
-      ...prev,
-      currentHealth: newHealth,
-      consumables: prev.consumables
-        .map((c) =>
-          c.id === consumableId ? { ...c, quantity: c.quantity - 1 } : c
-        )
-        .filter((c) => c.quantity > 0), // XÓA NẾU quantity = 0
-    }));
+    setPlayer((prev) => {
+      const newConsumables = { ...prev.consumables };
+      const newQuantity = newConsumables[consumableId] - 1;
 
-    // const displayName = consumableId
-    //   .replace(/([A-Z])/g, " $1")
-    //   .replace(/^./, (s) => s.toUpperCase())
-    //   .replace("Hp", "HP");
+      if (newQuantity <= 0) {
+        delete newConsumables[consumableId]; // XÓA ITEM HOÀN TOÀN
+      } else {
+        newConsumables[consumableId] = newQuantity;
+      }
 
-    // const log = {
-    //   id: logId,
-    //   turn: globalTurnCount,
-    //   type: "consumable",
-    //   message: `${player.name} used ${displayName} and healed ${healAmount} HP!`,
-    //   isPlayer: true,
-    // };
-    // setTurnLogs((prev) => [log, ...prev]);
-    // setLogId((prev) => prev + 1);
+      return {
+        ...prev,
+        currentHealth: newHealth,
+        consumables: newConsumables,
+      };
+    });
   };
 
   const toggleAuto = () => {

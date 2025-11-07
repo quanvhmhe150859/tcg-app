@@ -215,7 +215,7 @@ const CharacterSelection = () => {
 
             {/* Nội dung cuộn được */}
             <div className="flex-1 overflow-y-auto pr-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-5 p-4">
                 {getVariants(selectedCharacter).map((variantKey) => {
                   const baseName = variantKey.split("/")[0];
                   const variantName = variantKey.includes("/")
@@ -284,45 +284,66 @@ const CharacterSelection = () => {
                               // Bỏ qua specials
                               if (statKey === "specials") return [];
 
-                              // Xử lý consumables: "500 Health Potion: +1"
-                              if (
-                                statKey === "consumables" &&
-                                Array.isArray(statValue)
-                              ) {
-                                return statValue.map((item, idx) => {
-                                  // Format tên đẹp
-                                  const name = item.id
-                                    .replace(/([A-Z])/g, " $1")
-                                    .replace(/^./, (str) => str.toUpperCase())
-                                    .replace("Hp", "HP")
-                                    .trim();
+                              // Xử lý consumables: { "health_500_fixed": 1 } hoặc mảng cũ
+                              if (statKey === "consumables") {
+                                let items = [];
 
-                                  // Giá trị (luôn có dấu + nếu dương)
-                                  const valueText =
-                                    item.value > 0
-                                      ? `+${item.value}`
-                                      : `${item.value}`;
-
-                                  // Màu theo loại
-                                  const isHeal =
-                                    item.id.toLowerCase().includes("heal") ||
-                                    item.id.toLowerCase().includes("potion");
-                                  const valueColor = isHeal
-                                    ? "text-green-400"
-                                    : "text-red-400";
-
-                                  return (
-                                    <p
-                                      key={`${item.id}-${idx}`}
-                                      className={`text-xs font-medium ${valueColor}`}
-                                    >
-                                      {Math.abs(item.value)} {name}:{" "}
-                                      <span className="text-green-400">
-                                        +{item.quantity}
-                                      </span>
-                                    </p>
+                                if (
+                                  statValue &&
+                                  typeof statValue === "object" &&
+                                  !Array.isArray(statValue)
+                                ) {
+                                  // Dạng object: { "health_500_fixed": 1 }
+                                  items = Object.entries(statValue).map(
+                                    ([id, quantity]) => ({ id, quantity })
                                   );
-                                });
+                                } else if (Array.isArray(statValue)) {
+                                  // Dạng mảng cũ (nếu còn dùng)
+                                  items = statValue.map((item) =>
+                                    typeof item === "string"
+                                      ? { id: item, quantity: 1 }
+                                      : item
+                                  );
+                                } else if (typeof statValue === "string") {
+                                  items = [{ id: statValue, quantity: 1 }];
+                                }
+
+                                return items
+                                  .map((item, idx) => {
+                                    const id = item.id;
+                                    const quantity = item.quantity ?? 1;
+
+                                    // Parse id: health_500_fixed → ["health", "500", "fixed"]
+                                    const parts = id.split("_");
+                                    if (parts.length < 3) return null;
+
+                                    const typeRaw = parts[0];
+                                    const value = parts[1];
+                                    const mode = parts[2]; // "fixed" hoặc "percent"
+
+                                    const type =
+                                      typeRaw.charAt(0).toUpperCase() +
+                                      typeRaw.slice(1); // "Health"
+                                    const isPercent = mode === "percent";
+                                    const displayValue = isPercent
+                                      ? `${value}%`
+                                      : value;
+
+                                    const name = `${type} ${displayValue} Potion`;
+
+                                    return (
+                                      <p
+                                        key={`${id}-${idx}`}
+                                        className="text-xs font-medium text-green-400"
+                                      >
+                                        {name}:{" "}
+                                        <span className="text-green-300">
+                                          +{quantity}
+                                        </span>
+                                      </p>
+                                    );
+                                  })
+                                  .filter(Boolean);
                               }
 
                               // Xử lý stat thông thường

@@ -35,7 +35,7 @@ export const CHARACTER_STATS = {
     default: {
       luck: 4,
       specials: [{ specialId: 6, currentCooldown: 0 }],
-      consumables: [{ id: "healPotion", value: 500, quantity: 1 }],
+      consumables: { "health_500_fixed": 1 },
     },
   },
   alberon: {
