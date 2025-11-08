@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { statIcons } from "../constants/statIcons";
+import { statIcons } from "../constants/stats";
 
 const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
   const [isHealthBarHovered, setIsHealthBarHovered] = useState(false);
@@ -172,7 +172,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
       </div>
 
       {/* Khu vực cố định cho Buffs & Debuffs */}
-      <div className="min-h-8 px-1 flex items-start flex-wrap gap-1">
+      <div className="px-1 flex items-start flex-wrap gap-1">
         {hasAnyEffect ? (
           <>
             {/* Buffs (xanh lá) */}

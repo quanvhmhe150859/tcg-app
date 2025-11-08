@@ -1,5 +1,5 @@
 import React from "react";
-import { statIcons } from "../constants/statIcons"; // 🔹 Import stat icons
+import { statIcons } from "../constants/stats"; // 🔹 Import stat icons
 
 const ShopPanel = ({
   shopOptions,

@@ -14,6 +14,7 @@ import SpriteAnimation from "./animations/SpriteAnimation";
 
 import { SPECIALS } from "./constants/specials";
 import { getSpecialIconPath } from "./configs/specialConfig";
+import { getConsumableIconPath } from "./configs/consumableConfig";
 
 const BattleGame = () => {
   const navigate = useNavigate();
@@ -58,9 +59,6 @@ const BattleGame = () => {
   const [boughtOptions, setBoughtOptions] = useState([]);
   const [showRareStats, setShowRareStats] = useState(false);
   const [showNormalStats, setShowNormalStats] = useState(false);
-
-  const getConsumableIconPath = (id) =>
-    `/consumables/${id.replace(/([A-Z])/g, "_$1").toLowerCase()}.png`;
 
   useEffect(() => {
     const isDesktop = window.innerWidth >= 768;
@@ -307,13 +305,11 @@ const BattleGame = () => {
                         : ""
                     }
                   `}
-                  title={`${specialData.name}${isPassive ? " (Passive)" : ""}
-                  ${specialData.effect}
-                  ${
-                    isPassive
-                      ? ""
-                      : `Cooldown: ${special.currentCooldown}/${specialData.cooldown}`
-                  }`}
+                  title={`${specialData.name}${
+                    isPassive ? " (Passive)" : ""
+                  }\n${specialData.effect}\nCooldown: ${
+                    special.currentCooldown
+                  }/${specialData.cooldown}`}
                 >
                   <img
                     src={getSpecialIconPath(specialData.image)}
@@ -367,17 +363,15 @@ const BattleGame = () => {
                         if (
                           hasQuantity &&
                           !gameOver &&
-                          !showUpgradeOptions &&
-                          !showShop
+                          type != "Revive"
                         ) {
                           handleUseConsumable(id);
                         }
                       }}
                       disabled={
                         !hasQuantity ||
-                        gameOver ||
-                        showUpgradeOptions ||
-                        showShop
+                        gameOver || 
+                        type == "Revive"
                       }
                       className={`
                         relative w-14 h-10 sm:w-16 sm:h-12
@@ -389,7 +383,7 @@ const BattleGame = () => {
                             : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
                         }
                         ${
-                          gameOver || showUpgradeOptions || showShop
+                          gameOver || type == "Revive"
                             ? "!cursor-not-allowed"
                             : ""
                         }

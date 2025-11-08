@@ -260,28 +260,21 @@ const useGameLogic = ({
 
     setPlayer((prev) => {
       const currentTurnLogs = [];
-      let newPlayer = { ...prev };
 
-      // === DÙNG CHUNG updatePlayerAndLog CHO CẢ POTION VÀ STAT ===
-      const updated = updatePlayerAndLog(
+      // DÙNG updatePlayerAndLog ĐỂ XỬ LÝ TẤT CẢ (bao gồm trừ tiền)
+      const updatedPlayer = updatePlayerAndLog(
         prev,
         {
           ...option,
-          // Ghi đè: potion sẽ được xử lý trong hàm
           key: option.key === "potion" ? "consumable" : option.key,
         },
         currentTurnLogs,
         "purchase",
-        true
+        true // ← isPurchase = true → sẽ tự trừ tiền bên trong
       );
 
-      newPlayer = {
-        ...updated,
-        gold: updated.gold - option.price, // Trừ vàng (cả potion và stat)
-      };
-
       updateTurnLogs(currentTurnLogs);
-      return newPlayer;
+      return updatedPlayer; // ← KHÔNG CẦN TRỪ TIỀN NỮA!
     });
 
     setBoughtOptions((prev) => [...prev, index]);
@@ -575,7 +568,66 @@ const useGameLogic = ({
     }
   };
 
+  /**
+   * Xử lý hồi sinh tự động khi player chết và có vật phẩm revive
+   * @param {Object} newPlayer - Player state
+   * @param {Object} newEnemy - Enemy state
+   * @param {Array} currentTurnLogs - Logs hiện tại
+   * @returns {Object} { revived: boolean, newPlayer }
+   */
+  const handleRevive = (newPlayer, newEnemy, currentTurnLogs) => {
+    const consumables = newPlayer.consumables || {};
+    let revived = false;
+    let revivedPlayer = { ...newPlayer };
+
+    // Duyệt qua các vật phẩm revive theo thứ tự ưu tiên (nếu có nhiều)
+    for (const [key, quantity] of Object.entries(consumables)) {
+      if (quantity <= 0 || !key.startsWith("revive_")) continue;
+
+      const [, rawValue, mode] = key.split("_");
+      const value = parseInt(rawValue, 10);
+      const isPercent = mode === "percent";
+
+      // Giảm 1 vật phẩm
+      const newConsumables = { ...consumables };
+      newConsumables[key] -= 1;
+      if (newConsumables[key] <= 0) {
+        delete newConsumables[key];
+      }
+
+      // Tính lượng máu hồi
+      const healAmount = isPercent
+        ? Math.floor((newPlayer.maxHealth * value) / 100)
+        : value;
+
+      const newHealth = Math.min(newPlayer.maxHealth, healAmount);
+
+      // Cập nhật player
+      revivedPlayer = {
+        ...newPlayer,
+        currentHealth: newHealth,
+        consumables: newConsumables,
+      };
+
+      // Ghi log
+      const itemName = isPercent
+        ? `Revive (${value}% HP)`
+        : `Revive (${value} HP)`;
+      addLog(
+        `Player used ${itemName}! Revived with ${healAmount} HP!`,
+        "revive",
+        currentTurnLogs
+      );
+
+      revived = true;
+      break; // Chỉ dùng 1 lần revive mỗi lần chết
+    }
+
+    return { revived, newPlayer: revivedPlayer };
+  };
+
   const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
+    // 1. Kiểm tra enemy chết → level up
     if (newEnemy.currentHealth <= 0) {
       const goldGained = Math.floor(
         newEnemy.maxHealth +
@@ -606,10 +658,27 @@ const useGameLogic = ({
 
       return { isOver: false, levelUp: true };
     }
+
+    // 2. Kiểm tra player chết → thử revive
     if (newPlayer.currentHealth <= 0) {
-      addLog("Player defeated!", "gameOver", currentTurnLogs);
-      return { isOver: true, levelUp: false };
+      const { revived, newPlayer: revivedPlayer } = handleRevive(
+        newPlayer,
+        newEnemy,
+        currentTurnLogs
+      );
+
+      if (revived) {
+        // Player được hồi sinh → tiếp tục trận đấu
+        // Cập nhật newPlayer để enemy vẫn có thể đánh tiếp nếu còn sống
+        Object.assign(newPlayer, revivedPlayer);
+        return { isOver: false, levelUp: false };
+      } else {
+        // Không có revive → game over
+        addLog("Player defeated!", "gameOver", currentTurnLogs);
+        return { isOver: true, levelUp: false };
+      }
     }
+
     return { isOver: false, levelUp: false };
   };
 

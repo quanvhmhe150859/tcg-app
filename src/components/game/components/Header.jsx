@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { statIcons } from "../constants/statIcons";
+import { statIcons } from "../constants/stats";
 
 const Header = ({ level }) => {
   const [openTips, setOpenTips] = useState(false);

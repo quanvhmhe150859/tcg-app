@@ -1,4 +1,4 @@
-import { CHARACTER_STATS } from "../constants/characterStats";
+import { CHARACTER_STATS } from "../constants/characters";
 
 export const resetEffects = (entity) => {
   return {
@@ -39,6 +39,7 @@ export const initPlayer = (characterKey) => {
       barrier: 0,
       cooldownReduction: 0,
     },
+    consumables: {},
     buffs: [],
     debuffs: [],
   };
@@ -79,7 +80,7 @@ export const initPlayer = (characterKey) => {
     gold: basePlayer.gold + (characterStats.gold || 0),
 
     specials: characterStats.specials || basePlayer.specials,
-    consumables: characterStats.consumables || baseCharacter.consumables,
+    consumables: { ...characterStats.consumables },
     rareStats: {
       ...basePlayer.rareStats,
       burn: basePlayer.rareStats.burn + (characterStats.rareStats?.burn || 0),
@@ -108,7 +109,7 @@ export const initPlayer = (characterKey) => {
 
   return {
     ...updatedPlayer,
-    currentHealth: updatedPlayer.currentHealth, // Ensure currentHealth matches updated maxHealth
+    currentHealth: updatedPlayer.maxHealth, // Ensure currentHealth matches updated maxHealth
     effects: resetEffects(updatedPlayer),
   };
 };
@@ -162,7 +163,7 @@ export const initEnemy = (level) => {
 
 export const generateUpgradeOptions = (player) => {
   // Tính xác suất potion xuất hiện: 50% + (luck * 10)%
-  const potionChance = 0.5 + player.luck * 0.1;
+  const potionChance = 0.1 + player.luck * 0.1;
   const includePotion = Math.random() < potionChance;
 
   const stats = [
@@ -252,13 +253,22 @@ export const generateUpgradeOptions = (player) => {
 
   // Chỉ thêm potion nếu thỏa điều kiện xác suất
   if (includePotion) {
-    stats.push({
-      key: "potion",
-      name: "Health 500 Potion",
-      potionId: "health_500_fixed",
-      basePrice: 500,
-      format: () => "+1",
-    });
+    stats.push(
+      {
+        key: "potion",
+        name: "🧋 Health 500 Potion",
+        potionId: "health_500_fixed",
+        basePrice: 500,
+        format: () => "+1",
+      },
+      {
+        key: "potion",
+        name: "🧃 Revive 500 Potion",
+        potionId: "revive_500_fixed",
+        basePrice: 1000,
+        format: () => "+1",
+      }
+    );
   }
 
   // Trộn ngẫu nhiên và lấy 3 phần tử

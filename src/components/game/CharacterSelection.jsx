@@ -373,6 +373,11 @@ const CharacterSelection = () => {
                                 e.target.style.display = "none";
                                 // e.target.nextSibling.textContent = "Skill";
                               }}
+                              title={`${special.name}${
+                                special.usingType === "auto" ? " (Passive)" : ""
+                              }\n${special.effect}\nCooldown: ${
+                                special.cooldown
+                              }`}
                             />
                             <p className="text-xs font-semibold text-cyan-300 truncate w-full text-center drop-shadow-[0_0_1px_black]">
                               {special.name}
