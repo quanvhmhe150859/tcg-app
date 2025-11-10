@@ -15,7 +15,7 @@ export const limitHealth = (entity) => {
 const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
   // Xử lý buffs
   if (entity.buffs && entity.buffs.length > 0) {
-    entity.buffs = entity.buffs.filter(buff => {
+    entity.buffs = entity.buffs.filter((buff) => {
       buff.duration -= 1;
 
       if (buff.duration < 0) {
@@ -30,10 +30,25 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
               currentTurnLogs
             );
             break;
-            case "Armor":
+          case "Armor":
             entity.armor = Math.floor(entity.armor / (1 + buff.value));
             addLog(
               `${entityName}'s armor boost has expired!`,
+              "buffExpire",
+              currentTurnLogs
+            );
+            break;
+          case "Dodge":
+            entity.dodge = entity.dodge - buff.value;
+            addLog(
+              `${entityName}'s dodge boost has expired!`,
+              "buffExpire",
+              currentTurnLogs
+            );
+            break;
+          case "Immune":
+            addLog(
+              `${entityName}'s immune boost has expired!`,
               "buffExpire",
               currentTurnLogs
             );
@@ -47,17 +62,46 @@ const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
 
   // Xử lý debuffs
   if (entity.debuffs && entity.debuffs.length > 0) {
-    entity.debuffs = entity.debuffs.filter(debuff => {
+    entity.debuffs = entity.debuffs.filter((debuff) => {
       debuff.duration -= 1;
 
       if (debuff.duration < 0) {
         // Hủy debuff khi hết thời gian
         switch (debuff.name) {
           case "Attack":
-            entity.minAttack = Math.floor(entity.minAttack / (1 - debuff.value));
-            entity.maxAttack = Math.floor(entity.maxAttack / (1 - debuff.value));
+            entity.minAttack = Math.floor(
+              entity.minAttack / (1 - debuff.value)
+            );
+            entity.maxAttack = Math.floor(
+              entity.maxAttack / (1 - debuff.value)
+            );
             addLog(
               `${entityName}'s attack debuff has expired!`,
+              "debuffExpire",
+              currentTurnLogs
+            );
+            break;
+          case "Armor":
+            entity.armor = Math.floor(entity.armor / (1 - buff.value));
+            addLog(
+              `${entityName}'s armor debuff has expired!`,
+              "debuffExpire",
+              currentTurnLogs
+            );
+            break;
+          case "Death Mark":
+            addLog(
+              `${entityName}'s death mark debuff has expired!`,
+              "debuffExpire",
+              currentTurnLogs
+            );
+            break;
+          case "Berserk":
+            entity.effects.isStuned = true;
+            entity.currentHealth = Math.floor(entity.currentHealth * 0.8);
+            console.log(entity.currentHealth);
+            addLog(
+              `${entityName}'s berserk debuff has expired!`,
               "debuffExpire",
               currentTurnLogs
             );
@@ -117,6 +161,8 @@ export const receiveDamage = (
     }
   }
 
+  if (hasDebuff(entity, "Death Mark"))
+    finalDamage = Math.floor(finalDamage * 1.5);
   // Trừ sát thương vào máu
   entity.currentHealth = Math.max(0, entity.currentHealth - finalDamage);
 
@@ -183,12 +229,7 @@ const applyArmor = (defender, preArmorDamage) => {
   return Math.floor(preArmorDamage * (100 / (100 + defender.armor)));
 };
 
-const applyThorn = (
-  attacker,
-  defender,
-  attackerName,
-  currentTurnLogs
-) => {
+const applyThorn = (attacker, defender, attackerName, currentTurnLogs) => {
   if (defender.rareStats.thorn > 0) {
     return receiveDamage(
       attacker,
@@ -223,13 +264,11 @@ const applyLifeSteal = (
   return false;
 };
 
-const applyStun = (
-  attacker,
-  defender,
-  attackerName,
-  currentTurnLogs
-) => {
-  if (Math.random() < attacker.rareStats.stunChance) {
+const applyStun = (attacker, defender, attackerName, currentTurnLogs) => {
+  if (
+    Math.random() < attacker.rareStats.stunChance &&
+    !hasBuff(defender, "Immune")
+  ) {
     defender.effects.isStuned = true;
     addLog(
       `${attackerName === "Player" ? "Enemy" : "Player"} is stunned!`,
@@ -242,19 +281,19 @@ const applyStun = (
 };
 
 const applyBurnEffect = (attacker, defender) => {
-  if (attacker.rareStats.burn > 0 && attacker.effects.isBurnAttack) {
+  if (attacker.rareStats.burn > 0 && defender.effects.isBurnAttacked) {
     defender.effects.burnDot += attacker.rareStats.burn;
-    attacker.effects.isBurnAttack = false;
+    defender.effects.isBurnAttacked = false;
     return true;
   }
   return false;
 };
 
 const applyPoisonEffect = (attacker, defender) => {
-  if (attacker.rareStats.poison > 0 && attacker.effects.isPoisonAttack) {
+  if (attacker.rareStats.poison > 0 && defender.effects.isPoisonAttacked) {
     defender.effects.poisonBase += attacker.rareStats.poison;
     defender.effects.poisonDot += attacker.rareStats.poison;
-    attacker.effects.isPoisonAttack = false;
+    defender.effects.isPoisonAttacked = false;
     return true;
   }
   return false;
@@ -374,8 +413,16 @@ const attackPhase = (
   return true;
 };
 
+function hasBuff(entity, buffName) {
+  return entity.buffs?.some((buff) => buff.name === buffName);
+}
+
+function hasDebuff(entity, debuffName) {
+  return entity.debuffs?.some((debuff) => debuff.name === debuffName);
+}
+
 const applyBurn = (entity, entityName, currentTurnLogs) => {
-  if (entity.effects.burnDot > 0) {
+  if (entity.effects.burnDot > 0 && !hasBuff(entity, "Immune")) {
     return receiveDamage(
       entity,
       entity.effects.burnDot,
@@ -388,7 +435,7 @@ const applyBurn = (entity, entityName, currentTurnLogs) => {
 };
 
 const applyPoison = (entity, entityName, currentTurnLogs) => {
-  if (entity.effects.poisonDot > 0) {
+  if (entity.effects.poisonDot > 0 && !hasBuff(entity, "Immune")) {
     const damage = entity.effects.poisonDot;
     const result = receiveDamage(
       entity,

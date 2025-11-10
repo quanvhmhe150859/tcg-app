@@ -79,7 +79,7 @@ export const statIcons = {
     maxValue: null,
     desc: "Currency used to buy upgrades or items.",
   },
-  "Cooldown": {
+  Cooldown: {
     icon: "⏰",
     label: "Cooldown Reduction",
     type: "flat",
@@ -96,7 +96,7 @@ export const statIcons = {
     desc: "Deals fixed damage at the end of each turn.",
   },
   Poison: {
-    icon: "☠️",
+    icon: "💀",
     label: "Poison",
     type: "flat",
     stackable: true,
@@ -150,5 +150,30 @@ export const statIcons = {
     stackable: false,
     maxValue: 999,
     desc: "Negates incoming attacks and is restored every battle.",
+  },
+  Immune: {
+    icon: "😷",
+    label: "Immune",
+    type: "flat",
+    stackable: false,
+    maxValue: null,
+    desc: "Grants immunity to all negative status effects.",
+  },
+  "Death Mark": {
+    icon: "😵",
+    label: "Death Mark",
+    type: "flat",
+    stackable: false,
+    maxValue: null,
+    desc: "Increases all incoming damage by 50%.",
+  },
+
+  Berserk: {
+    icon: "😡",
+    label: "Berserk",
+    type: "flat",
+    stackable: false,
+    maxValue: null,
+    desc: "When effect ends, stunned and loses 20% current health.",
   },
 };

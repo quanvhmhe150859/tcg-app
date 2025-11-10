@@ -2,9 +2,9 @@ import { CHARACTER_STATS } from "../constants/characters";
 
 export const resetEffects = (entity) => {
   return {
-    isBurnAttack: true,
+    isBurnAttacked: true,
     burnDot: 0,
-    isPoisonAttack: true,
+    isPoisonAttacked: true,
     poisonBase: 0,
     poisonDot: 0,
     isStuned: false,

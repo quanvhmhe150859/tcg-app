@@ -159,7 +159,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
 
       {/* Health Bar */}
       <div
-        className="p-1 relative z-10"
+        className="p-1 relative z-300"
         onMouseEnter={() => setIsHealthBarHovered(true)}
         onMouseLeave={() => setIsHealthBarHovered(false)}
       >

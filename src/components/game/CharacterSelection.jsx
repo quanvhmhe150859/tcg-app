@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_SELECT_CHARACTER_CONFIGS } from "./configs/spriteConfig";
-import { CHARACTER_STATS } from "./constants/characterStats";
+import { CHARACTER_STATS } from "./constants/characters";
 import { SPECIALS } from "./constants/specials";
 import { getSpecialIconPath } from "./configs/specialConfig";
 import "../styles/CardItem.css";

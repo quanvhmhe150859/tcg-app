@@ -2,14 +2,10 @@
 import { addLog } from "./utils";
 import { SPECIALS } from "../constants/specials";
 import { receiveDamage, checkHealth, limitHealth } from "./gameLogic";
+import { resetEffects } from "./initializers";
 
 // Hàm xử lý special riêng biệt
-export const applySpecial = (
-  specialId,
-  player,
-  enemy,
-  currentTurnLogs
-) => {
+export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
   const specialData = SPECIALS.find((s) => s.id === specialId);
   if (!specialData) {
     addLog(`Unknown special ID: ${specialId}`, "error", currentTurnLogs);
@@ -73,7 +69,6 @@ export const applySpecial = (
       player.buffs.push({ name: "Attack", value: buffValue, duration: 3 });
       player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
       player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
-      addLog(`Player's attack increased!`, "buff", currentTurnLogs);
       break;
     }
 
@@ -82,7 +77,16 @@ export const applySpecial = (
       const buffValue = specialData.power;
       player.buffs.push({ name: "Armor", value: buffValue, duration: 2 });
       player.armor = Math.floor(player.armor * (1 + buffValue));
-      addLog(`Player's armor increased!`, "buff", currentTurnLogs);
+      break;
+    }
+
+    case 8: {
+      const buffValue = specialData.power;
+      player.buffs.push({ name: "Attack", value: buffValue, duration: 1 });
+      player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
+      player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
+      player.buffs.push({ name: "Dodge", value: buffValue, duration: 1 });
+      player.dodge = player.dodge + buffValue;
       break;
     }
 
@@ -95,6 +99,19 @@ export const applySpecial = (
       enemy.minAttack = Math.floor(enemy.minAttack * (1 - debuffValue));
       enemy.maxAttack = Math.floor(enemy.maxAttack * (1 - debuffValue));
       addLog(`Enemy's attack decreased!`, "debuff", currentTurnLogs);
+      break;
+    }
+
+    case 10: {
+      player.effects = resetEffects(player);
+      player.currentHealth = player.maxHealth;
+      player.debuffs.push({ name: "Armor", value: 0.25, duration: 5 });
+      player.armor = Math.floor(player.armor * (1 - 0.25));
+      break;
+    }
+
+    case 11: {
+      enemy.debuffs.push({ name: "Death Mark", value: null, duration: 3 });
       break;
     }
 
@@ -116,7 +133,28 @@ export const applySpecial = (
       enemy.currentHealth = Math.max(0, enemy.currentHealth - drainHP);
       player.currentHealth += drainHP;
       limitHealth(player);
-      addLog(`Player drains ${drainHP} HP from enemy!`, "lifesteal", currentTurnLogs);
+      addLog(
+        `Player drains ${drainHP} HP from enemy!`,
+        "lifesteal",
+        currentTurnLogs
+      );
+      break;
+    }
+
+    case 14: {
+      const buffValue = specialData.power;
+      player.buffs.push({ name: "Immune", value: buffValue, duration: 3 });
+      player.buffs.push({ name: "Armor", value: buffValue, duration: 2 });
+      player.armor = Math.floor(player.armor * (1 + buffValue));
+      break;
+    }
+
+    case 15: {
+      const buffValue = specialData.power;
+      player.buffs.push({ name: "Attack", value: buffValue, duration: 1 });
+      player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
+      player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
+      player.debuffs.push({ name: "Berserk", value: buffValue, duration: 1 });
       break;
     }
 
@@ -133,8 +171,26 @@ export const applySpecial = (
       break;
     }
 
+    case 17: {
+      const healAmount = Math.floor(player.maxHealth * specialData.power);
+      player.currentHealth = Math.min(
+        player.currentHealth + healAmount,
+        player.maxHealth
+      );
+      addLog(`Player heals for ${healAmount} HP!`, "heal", currentTurnLogs);
+      player.effects.burnDot = 0;
+      player.effects.poisonBase = 0;
+      player.effects.poisonDot = 0;
+      player.effects.isStuned = false;
+      break;
+    }
+
     default:
-      addLog(`Special "${specialData.name}" is not implemented yet!`, "error", currentTurnLogs);
+      addLog(
+        `Special "${specialData.name}" is not implemented yet!`,
+        "error",
+        currentTurnLogs
+      );
   }
 
   // Kiểm tra enemy còn sống không sau special

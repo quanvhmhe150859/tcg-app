@@ -300,7 +300,11 @@ const BattleGame = () => {
                         : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
                     }
                     ${
-                      gameOver || showUpgradeOptions || showShop || isAuto
+                      gameOver ||
+                      showUpgradeOptions ||
+                      showShop ||
+                      isAuto ||
+                      isPassive
                         ? "!cursor-not-allowed"
                         : ""
                     }
@@ -360,19 +364,11 @@ const BattleGame = () => {
                     <button
                       key={`consumable-${id}`}
                       onClick={() => {
-                        if (
-                          hasQuantity &&
-                          !gameOver &&
-                          type != "Revive"
-                        ) {
+                        if (hasQuantity && !gameOver && type != "Revive") {
                           handleUseConsumable(id);
                         }
                       }}
-                      disabled={
-                        !hasQuantity ||
-                        gameOver || 
-                        type == "Revive"
-                      }
+                      disabled={!hasQuantity || gameOver || type == "Revive"}
                       className={`
                         relative w-14 h-10 sm:w-16 sm:h-12
                         rounded-lg border-2 overflow-hidden
