@@ -10,9 +10,9 @@ const CardItemPokemonModal = ({ isOpen, onClose, card, isApiFailed }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <img className="hires-image pokemon" src={isApiFailed ? card.cardImage.largeUrl : hiresUrl} alt={card.name} />
-        <button className="close-button" onClick={onClose}>
+        {/* <button className="close-button" onClick={onClose}>
           ✖
-        </button>
+        </button> */}
       </div>
     </div>
   );

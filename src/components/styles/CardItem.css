@@ -111,7 +111,8 @@
 
 .modal-content {
   position: relative;
-  max-width: 90%;
+  /* max-width: 90%; */
+  max-width: 60%;
   max-height: 90%;
 }
 
@@ -121,12 +122,12 @@
 }
 
 .hires-image.pokemon {
-  width: 70%;
+  /* width: 70%; */
   border-radius: 2rem;
 }
 
 .hires-image.yugioh {
-  width: 60%;
+  /* width: 60%; */
   border-radius: 1rem;
 }
 

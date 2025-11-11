@@ -71,35 +71,66 @@ const Homepage = () => {
               button.label === "Gacha" && setIsGachaClicked(!isGachaClicked)
             }
           >
-            {button.label === "Gacha" && isGachaClicked ? (
-              <div className="flex flex-row space-x-2 sm:flex-col sm:space-x-0 sm:space-y-2 h-[24vh] sm:h-[70vh] sm:w-[20vw]">
-                {gachaSubButtons.map((subButton) => (
-                  <Link
-                    key={subButton.label}
-                    to={subButton.path}
-                    className="flex-1 text-white rounded-lg transition-all duration-300 transform hover:scale-105 text-2xl font-semibold flex items-center justify-center relative overflow-hidden"
-                    onMouseEnter={() => setHoveredButton(subButton.label)}
-                    onMouseLeave={() => setHoveredButton(null)}
+            {button.label === "Gacha" ? (
+              <div className="relative w-full sm:w-[24vw] h-[24vh] sm:h-[70vh]">
+                {isGachaClicked ? (
+                  <div className="flex flex-row sm:flex-col h-full w-full space-x-2 sm:space-x-0 sm:space-y-2">
+                    {gachaSubButtons.map((subButton) => (
+                      <Link
+                        key={subButton.label}
+                        to={subButton.path}
+                        className="flex-1 text-white rounded-lg transition-all duration-300 transform hover:scale-105 text-xl font-semibold flex items-center justify-center relative overflow-hidden"
+                        onMouseEnter={() => setHoveredButton(subButton.label)}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                          backgroundImage: subButton.backgroundImage,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      >
+                        {hoveredButton === subButton.label && (
+                          <video
+                            className="absolute inset-0 w-full h-full object-cover"
+                            src={subButton.backgroundVideo}
+                            autoPlay
+                            loop
+                            muted
+                          />
+                        )}
+                        <span className="relative z-10 drop-shadow-[0_0_3px_black]">
+                          {subButton.label}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    className={`h-full w-full text-white rounded-lg transition-all duration-300 transform hover:scale-105 text-3xl font-semibold flex items-center justify-center relative overflow-hidden cursor-pointer ${
+                      visibleButtons[index] ? "animate-fadeIn" : "opacity-0"
+                    }`}
                     style={{
-                      backgroundImage: subButton.backgroundImage,
+                      backgroundImage: button.backgroundImage,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                     }}
+                    onMouseEnter={() => setHoveredButton(button.label)}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    onClick={() => setIsGachaClicked(true)}
                   >
-                    {hoveredButton === subButton.label && (
+                    {hoveredButton === button.label && (
                       <video
                         className="absolute inset-0 w-full h-full object-cover"
-                        src={subButton.backgroundVideo}
+                        src={button.backgroundVideo}
                         autoPlay
                         loop
                         muted
                       />
                     )}
-                    <span className="relative z-10 drop-shadow-[0_0_3px_black] text-xl">
-                      {subButton.label}
+                    <span className="relative z-10 drop-shadow-[0_0_3px_black]">
+                      {button.label}
                     </span>
-                  </Link>
-                ))}
+                  </div>
+                )}
               </div>
             ) : (
               <Link

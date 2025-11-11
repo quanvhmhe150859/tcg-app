@@ -10,9 +10,9 @@ const CardItemYugiohModal = ({ isOpen, onClose, card, isApiFailed }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <img src={isApiFailed ? card.imageUrl : bigImageUrl} alt={card.name} className="hires-image yugioh" />
-        <button className="close-button" onClick={onClose}>
+        {/* <button className="close-button" onClick={onClose}>
           ✖
-        </button>
+        </button> */}
       </div>
     </div>
   );

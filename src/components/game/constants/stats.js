@@ -79,14 +79,6 @@ export const statIcons = {
     maxValue: null,
     desc: "Currency used to buy upgrades or items.",
   },
-  Cooldown: {
-    icon: "⏰",
-    label: "Cooldown Reduction",
-    type: "flat",
-    stackable: false,
-    maxValue: 99,
-    desc: "Reduces the cooldown time of special abilities.",
-  },
   Burn: {
     icon: "🔥",
     label: "Burn",
@@ -151,29 +143,12 @@ export const statIcons = {
     maxValue: 999,
     desc: "Negates incoming attacks and is restored every battle.",
   },
-  Immune: {
-    icon: "😷",
-    label: "Immune",
+  Cooldown: {
+    icon: "⏰",
+    label: "Cooldown Reduction",
     type: "flat",
     stackable: false,
-    maxValue: null,
-    desc: "Grants immunity to all negative status effects.",
-  },
-  "Death Mark": {
-    icon: "😵",
-    label: "Death Mark",
-    type: "flat",
-    stackable: false,
-    maxValue: null,
-    desc: "Increases all incoming damage by 50%.",
-  },
-
-  Berserk: {
-    icon: "😡",
-    label: "Berserk",
-    type: "flat",
-    stackable: false,
-    maxValue: null,
-    desc: "When effect ends, stunned and loses 20% current health.",
+    maxValue: 99,
+    desc: "Reduces the cooldown time of special abilities.",
   },
 };
