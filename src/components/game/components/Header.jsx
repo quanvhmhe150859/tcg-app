@@ -65,7 +65,7 @@ const Header = ({ level }) => {
               {/* === MOBILE: Hiển thị danh sách icon === */}
               {isMobile ? (
                 <div className="space-y-4">
-                  <h2 className="text-xl font-bold text-center mb-3">Thông tin</h2>
+                  <h2 className="text-xl font-bold text-center mb-3">Information</h2>
 
                   {/* Danh sách icon */}
                   <div className="flex flex-wrap gap-2 justify-center">

@@ -2,8 +2,8 @@ export const SPECIALS = [
   {
     id: 1,
     name: "Flame Burst",
-    effect:
-      "Gây 450% sát thương tấn công và đốt cháy kẻ địch (mất 4.5% HP mỗi lượt).",
+    effect: (power) =>
+      `Deals ${power * 100}% ATK damage and burns the target (loses ${power}% HP per turn).`,
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
@@ -13,8 +13,8 @@ export const SPECIALS = [
   {
     id: 2,
     name: "Aqua Shield",
-    effect:
-      "Tạo lá chắn nước hấp thụ sát thương bằng 10% HP tối đa.",
+    effect: (power) =>
+      `Creates a water shield absorbing damage equal to ${power * 100}% of max HP.`,
     cooldown: 5,
     cooldownType: "turn",
     usingType: "auto",
@@ -24,8 +24,8 @@ export const SPECIALS = [
   {
     id: 3,
     name: "Thunder Strike",
-    effect:
-      "Tấn công mục tiêu với 130% sát thương và có 40% làm tê liệt 1 lượt.",
+    effect: (power) =>
+      `Deals ${power * 100}% ATK damage with a 40% chance to stun for 1 turn.`,
     cooldown: 3,
     cooldownType: "level",
     usingType: "manual",
@@ -35,7 +35,7 @@ export const SPECIALS = [
   {
     id: 4,
     name: "Healing Light",
-    effect: "Hồi phục 30% HP cho bản thân hoặc đồng minh.",
+    effect: (power) => `Heals ${power * 100}% HP for self or an ally.`,
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
@@ -45,8 +45,8 @@ export const SPECIALS = [
   {
     id: 5,
     name: "Poison Cloud",
-    effect:
-      "Tạo đám độc gây 10% HP sát thương mỗi lượt trong 4 lượt cho toàn bộ kẻ địch.",
+    effect: (power) =>
+      `Poisons all enemies, dealing ${power * 100}% HP as damage per turn for 4 turns.`,
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
@@ -56,7 +56,8 @@ export const SPECIALS = [
   {
     id: 6,
     name: "Battle Roar",
-    effect: "Tăng 25% tấn công cho toàn đội trong 3 lượt.",
+    effect: (power) =>
+      `Increases team attack by ${power * 100}% for 3 turns.`,
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
@@ -66,7 +67,8 @@ export const SPECIALS = [
   {
     id: 7,
     name: "Stone Skin",
-    effect: "Giảm 40% sát thương nhận vào trong 2 lượt.",
+    effect: (power) =>
+      `Increases armor by ${power * 100}% for 2 turns.`,
     cooldown: 4,
     cooldownType: "turn",
     usingType: "manual",
@@ -76,7 +78,8 @@ export const SPECIALS = [
   {
     id: 8,
     name: "Shadow Step",
-    effect: "Tăng 20% né tránh và tăng 20% tấn công ở lượt sau.",
+    effect: (power) =>
+      `Increases evasion and attack by ${power * 100}% for the next turn.`,
     cooldown: 3,
     cooldownType: "turn",
     usingType: "manual",
@@ -86,8 +89,8 @@ export const SPECIALS = [
   {
     id: 9,
     name: "Frost Nova",
-    effect:
-      "Gây 30% sát thương cho tất cả kẻ địch và làm chậm 30% tốc độ trong 2 lượt.",
+    effect: (power) =>
+      `Deals ${power * 100}% damage to all enemies and slows them by ${power * 100}% for 2 turns.`,
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
@@ -97,7 +100,8 @@ export const SPECIALS = [
   {
     id: 10,
     name: "Divine Blessing",
-    effect: "Trở lại trạng thái ban đầu và giảm 25% phòng thủ trong 5 lượt.",
+    effect: () =>
+      `Restores the user's state but reduces defense by 25% for 5 turns.`,
     cooldown: 25,
     cooldownType: "turn",
     usingType: "manual",
@@ -107,7 +111,7 @@ export const SPECIALS = [
   {
     id: 11,
     name: "Death Mark",
-    effect: "Đánh dấu mục tiêu: nhận thêm 50% sát thương trong 3 lượt.",
+    effect: () => `Marks the target, increasing damage taken by 50% for 3 turns.`,
     cooldown: 12,
     cooldownType: "turn",
     usingType: "manual",
@@ -117,8 +121,8 @@ export const SPECIALS = [
   {
     id: 12,
     name: "Blazing Tornado",
-    effect:
-      "Tạo lốc lửa tấn công toàn bộ kẻ địch với 120% sát thương và có 30% cơ hội đốt cháy 2 lượt.",
+    effect: (power) =>
+      `Deals ${power * 100}% ATK damage to all enemies with a 30% chance to burn for 2 turns.`,
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
@@ -128,8 +132,8 @@ export const SPECIALS = [
   {
     id: 13,
     name: "Spirit Drain",
-    effect:
-      "Hút 20% HP từ mục tiêu, chuyển thành máu cho bản thân.",
+    effect: (power) =>
+      `Drains ${power * 100}% HP from the target and restores it to the user.`,
     cooldown: 5,
     cooldownType: "turn",
     usingType: "manual",
@@ -139,7 +143,8 @@ export const SPECIALS = [
   {
     id: 14,
     name: "Iron Will",
-    effect: "Miễn nhiễm hiệu ứng xấu trong 2 lượt và tăng 15% phòng thủ.",
+    effect: (power) =>
+      `Grants immunity to debuffs for 2 turns and increases defense by ${power * 100}%.`,
     cooldown: 6,
     cooldownType: "turn",
     usingType: "auto",
@@ -149,8 +154,8 @@ export const SPECIALS = [
   {
     id: 15,
     name: "Berserk",
-    effect:
-      "Tăng 300% sức mạnh trong 1 lượt, sau đó giảm 20% HP và choáng do phản chấn.",
+    effect: (power) =>
+      `Increases power by ${power * 100}% for 1 turn. When it ends, stunned and loses 20% current HP.`,
     cooldown: 9,
     cooldownType: "turn",
     usingType: "manual",
@@ -160,8 +165,8 @@ export const SPECIALS = [
   {
     id: 16,
     name: "Venom Fang",
-    effect:
-      "Cắn độc gây 80% sát thương và 20% cơ hội khiến mục tiêu bị trúng độc 3 lượt.",
+    effect: (power) =>
+      `Deals ${power * 100}% ATK damage with a 20% chance to poison the target for 3 turns.`,
     cooldown: 3,
     cooldownType: "turn",
     usingType: "manual",
@@ -171,7 +176,8 @@ export const SPECIALS = [
   {
     id: 17,
     name: "Celestial Heal",
-    effect: "Hồi 30% HP cho toàn đội và loại bỏ tất cả hiệu ứng xấu.",
+    effect: (power) =>
+      `Heals all allies by ${power * 100}% HP and removes all debuffs.`,
     cooldown: 20,
     cooldownType: "turn",
     usingType: "manual",

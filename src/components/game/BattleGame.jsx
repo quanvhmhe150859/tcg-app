@@ -309,11 +309,17 @@ const BattleGame = () => {
                         : ""
                     }
                   `}
-                  title={`${specialData.name}${
-                    isPassive ? " (Passive)" : ""
-                  }\n${specialData.effect}\nCooldown: ${
-                    special.currentCooldown
-                  }/${specialData.cooldown}`}
+                  title={
+                    `${specialData.name}${isPassive ? " (Passive)" : ""}\n` +
+                    `${
+                      typeof specialData.effect === "function"
+                        ? specialData.effect(specialData.power)
+                        : specialData.effect
+                    }\n` +
+                    `Cooldown: ${special?.currentCooldown ?? 0}/${
+                      specialData.cooldown
+                    }`
+                  }
                 >
                   <img
                     src={getSpecialIconPath(specialData.image)}

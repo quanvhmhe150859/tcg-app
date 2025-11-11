@@ -1,8 +1,111 @@
-// specialsLogic.js
 import { addLog } from "./utils";
 import { SPECIALS } from "../constants/specials";
 import { receiveDamage, checkHealth, limitHealth } from "./gameLogic";
 import { resetEffects } from "./initializers";
+
+/**
+ * Áp dụng buff cho entity (player hoặc enemy)
+ */
+export const applyBuff = (
+  entity,
+  name,
+  value,
+  duration,
+  currentTurnLogs = null
+) => {
+  // Thêm buff vào danh sách
+  entity.buffs.push({ name, value, duration });
+
+  // Áp dụng hiệu ứng ngay lập tức
+  switch (name) {
+    case "Attack":
+      entity.minAttack = Math.floor(entity.minAttack * (1 + value));
+      entity.maxAttack = Math.floor(entity.maxAttack * (1 + value));
+      if (currentTurnLogs)
+        addLog(
+          `Attack increased by ${Math.round(value * 100)}%!`,
+          "buff",
+          currentTurnLogs
+        );
+      break;
+
+    case "Armor":
+      entity.armor = Math.floor(entity.armor * (1 + value));
+      if (currentTurnLogs)
+        addLog(
+          `Armor increased by ${Math.round(value * 100)}%!`,
+          "buff",
+          currentTurnLogs
+        );
+      break;
+
+    case "Dodge":
+      entity.dodge += value;
+      if (currentTurnLogs)
+        addLog(`Dodge chance increased!`, "buff", currentTurnLogs);
+      break;
+
+    case "Immune":
+      // Có thể đánh dấu immune ở đâu đó nếu cần
+      if (currentTurnLogs) addLog(`Gained immunity!`, "buff", currentTurnLogs);
+      break;
+
+    default:
+      if (currentTurnLogs)
+        addLog(`${name} buff applied!`, "buff", currentTurnLogs);
+  }
+};
+
+/**
+ * Áp dụng debuff cho entity
+ */
+export const applyDebuff = (
+  entity,
+  name,
+  value,
+  duration,
+  currentTurnLogs = null
+) => {
+  entity.debuffs.push({ name, value, duration });
+
+  switch (name) {
+    case "Attack":
+      entity.minAttack = Math.floor(entity.minAttack * (1 - value));
+      entity.maxAttack = Math.floor(entity.maxAttack * (1 - value));
+      if (currentTurnLogs)
+        addLog(
+          `Enemy's attack decreased by ${Math.round(value * 100)}%!`,
+          "debuff",
+          currentTurnLogs
+        );
+      break;
+
+    case "Armor":
+      entity.armor = Math.floor(entity.armor * (1 - value));
+      if (currentTurnLogs)
+        addLog(
+          `Armor reduced by ${Math.round(value * 100)}%!`,
+          "debuff",
+          currentTurnLogs
+        );
+      break;
+
+    case "Death Mark":
+      if (currentTurnLogs)
+        addLog(`Enemy is marked for death!`, "debuff", currentTurnLogs);
+      break;
+
+    case "Berserk":
+      // Berserk có thể là trạng thái đặc biệt (tăng sát thương nhưng giảm phòng thủ?)
+      if (currentTurnLogs)
+        addLog(`Entered Berserk state!`, "debuff", currentTurnLogs);
+      break;
+
+    default:
+      if (currentTurnLogs)
+        addLog(`${name} debuff applied!`, "debuff", currentTurnLogs);
+  }
+};
 
 // Hàm xử lý special riêng biệt
 export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
@@ -65,28 +168,19 @@ export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
 
     // 6. Battle Roar
     case 6: {
-      const buffValue = specialData.power;
-      player.buffs.push({ name: "Attack", value: buffValue, duration: 3 });
-      player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
-      player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
+      applyBuff(player, "Attack", specialData.power, 3, currentTurnLogs);
       break;
     }
 
     // 7. Stone Skin
     case 7: {
-      const buffValue = specialData.power;
-      player.buffs.push({ name: "Armor", value: buffValue, duration: 2 });
-      player.armor = Math.floor(player.armor * (1 + buffValue));
+      applyBuff(player, "Armor", specialData.power, 2, currentTurnLogs);
       break;
     }
 
     case 8: {
-      const buffValue = specialData.power;
-      player.buffs.push({ name: "Attack", value: buffValue, duration: 1 });
-      player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
-      player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
-      player.buffs.push({ name: "Dodge", value: buffValue, duration: 1 });
-      player.dodge = player.dodge + buffValue;
+      applyBuff(player, "Attack", specialData.power, 1, currentTurnLogs);
+      applyBuff(player, "Dodge", specialData.power, 1, currentTurnLogs);
       break;
     }
 
@@ -94,24 +188,19 @@ export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
     case 9: {
       const frostDamage = Math.floor(player.minAttack * specialData.power);
       receiveDamage(enemy, frostDamage, "Enemy", "attack", currentTurnLogs);
-      const debuffValue = specialData.power;
-      enemy.debuffs.push({ name: "Attack", value: debuffValue, duration: 2 });
-      enemy.minAttack = Math.floor(enemy.minAttack * (1 - debuffValue));
-      enemy.maxAttack = Math.floor(enemy.maxAttack * (1 - debuffValue));
-      addLog(`Enemy's attack decreased!`, "debuff", currentTurnLogs);
+      applyDebuff(enemy, "Attack", specialData.power, 2, currentTurnLogs);
       break;
     }
 
     case 10: {
       player.effects = resetEffects(player);
       player.currentHealth = player.maxHealth;
-      player.debuffs.push({ name: "Armor", value: 0.25, duration: 5 });
-      player.armor = Math.floor(player.armor * (1 - 0.25));
+      applyDebuff(player, "Armor", 0.25, 5, currentTurnLogs);
       break;
     }
 
     case 11: {
-      enemy.debuffs.push({ name: "Death Mark", value: null, duration: 3 });
+      applyDebuff(enemy, "Death Mark", null, 3, currentTurnLogs);
       break;
     }
 
@@ -142,19 +231,14 @@ export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
     }
 
     case 14: {
-      const buffValue = specialData.power;
-      player.buffs.push({ name: "Immune", value: buffValue, duration: 3 });
-      player.buffs.push({ name: "Armor", value: buffValue, duration: 2 });
-      player.armor = Math.floor(player.armor * (1 + buffValue));
+      applyBuff(player, "Immune", specialData.power, 3, currentTurnLogs);
+      applyBuff(player, "Armor", specialData.power, 2, currentTurnLogs);
       break;
     }
 
     case 15: {
-      const buffValue = specialData.power;
-      player.buffs.push({ name: "Attack", value: buffValue, duration: 1 });
-      player.minAttack = Math.floor(player.minAttack * (1 + buffValue));
-      player.maxAttack = Math.floor(player.maxAttack * (1 + buffValue));
-      player.debuffs.push({ name: "Berserk", value: buffValue, duration: 1 });
+      applyBuff(player, "Attack", specialData.power, 1, currentTurnLogs);
+      applyDebuff(player, "Berserk", specialData.power, 1, currentTurnLogs);
       break;
     }
 
