@@ -1,3 +1,4 @@
+// SpriteSheetPlayer.jsx
 import React, {
   useState,
   useEffect,
@@ -9,7 +10,10 @@ import { loadCharacter } from "../lib/characterLoader";
 import SpriteSheetPlayerCore from "./SpriteSheetPlayerCore";
 
 const SpriteSheetPlayer = forwardRef(
-  ({ characterName, defaultAction = "idle", flipped = false }, ref) => {
+  (
+    { characterName, defaultAction = "idle", flipped = false, size = 128 },
+    ref
+  ) => {
     const [characterData, setCharacterData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,14 +27,12 @@ const SpriteSheetPlayer = forwardRef(
       loadCharacter(characterName)
         .then((data) => {
           if (mounted) {
-            console.log("✅ Loaded character:", characterName, data); // Debug
             setCharacterData(data);
             setLoading(false);
           }
         })
         .catch((err) => {
           if (mounted) {
-            console.error("❌ Load character error:", err);
             setError(err.message);
             setLoading(false);
           }
@@ -41,14 +43,11 @@ const SpriteSheetPlayer = forwardRef(
       };
     }, [characterName]);
 
-    // 🔥 FORWARD REF - ĐÃ FIX
-    // SpriteSheetPlayer.jsx
-    // Chỉ cần update useImperativeHandle
     useImperativeHandle(
       ref,
       () => ({
         playAction: (action) => coreRef.current?.playAction(action),
-        toggleAutoAttack: () => coreRef.current?.toggleAutoAttack(), // 🔥 Tên mới
+        toggleAutoAttack: () => coreRef.current?.toggleAutoAttack(),
         stopAutoAttack: () => coreRef.current?.stopAutoAttack(),
         getState: () => coreRef.current?.getState?.() || {},
       }),
@@ -73,6 +72,11 @@ const SpriteSheetPlayer = forwardRef(
           Không tìm thấy dữ liệu
         </div>
       );
+
+    // Kích thước khung hiển thị (giống SpriteAnimation)
+    const displaySize = size; // 128px
+    const innerSize = 240; // Kích thước nội dung thực (giống SpriteAnimation)
+    const scale = displaySize / innerSize; // 128 / 240 ≈ 0.533
 
     return (
       <SpriteSheetPlayerCore

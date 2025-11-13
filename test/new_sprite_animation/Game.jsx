@@ -55,7 +55,7 @@ const Game = () => {
             <div className="text-2xl font-bold text-white drop-shadow-lg">👤 PLAYER</div>
             <SpriteSheetPlayer
               ref={playerRef}
-              characterName="abby"
+              characterName="demon"
               defaultAction="idle"
               flipped={false}
             />
