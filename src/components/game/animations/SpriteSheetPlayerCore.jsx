@@ -85,13 +85,16 @@ const SpriteSheetPlayerCore = forwardRef(
     // DEATH & IDLE LOGIC
     useEffect(() => {
       if (health === 0 && characterData?.death) {
+        // CHẾT → death animation
         setCurrentAction("death");
         setIsPlaying(true);
         setIsAttackLooping(false);
-      } else if (health > 0) {
-        // Hồi máu → về idle
+      } else if (health > 0 && currentAction === "death") {
+        // HỒI MÁU + ĐANG DEATH → VỀ IDLE
         setCurrentAction("idle");
+        setIsPlaying(true);
       }
+      // ❌ BỎ: else if (health > 0) → KHÔNG FORCE IDLE NỮA!
     }, [health, characterData, currentAction]);
 
     // // 🔥 LOGIC MOVING THEO DISTANCE (nếu distance > 0)

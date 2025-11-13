@@ -229,6 +229,13 @@ const BattleGame = () => {
               distance={distance}
               health={player.currentHealth}
             />
+            {/* <SpriteSheetPlayer
+              characterName={playerCharacter}
+              flipped={false}
+              ref={playerSpriteRef}
+              distance={distance}
+              health={player.currentHealth}
+            /> */}
             <SpriteAnimation
               name={enemyCharacter}
               flip={false}
