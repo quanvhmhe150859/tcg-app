@@ -81,7 +81,7 @@ export default function App() {
             <Route path="/yugioh-owned" element={<OwnedYugiohCards />} />
             <Route path="/character-selection" element={<CharacterSelection />} />
             <Route path="/character-selection-v2" element={<CharacterSelectionV2 />} />
-            <Route path="/game" element={<Game />} />
+            <Route path="/game" element={<BattleGame />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/image-generator" element={<ImageGenerator />} />
             <Route path="/sprite-sheet-animation" element={<SpriteSheetUploaderAndPlayer />} />

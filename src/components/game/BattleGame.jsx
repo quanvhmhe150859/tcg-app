@@ -11,6 +11,7 @@ import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 import SpriteAnimation from "./animations/SpriteAnimation";
+import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
 
 import { SPECIALS } from "./constants/specials";
 import { getSpecialIconPath } from "./configs/specialConfig";
@@ -235,6 +236,13 @@ const BattleGame = () => {
               distance={distance}
               health={enemy.currentHealth}
             />
+            {/* <SpriteSheetPlayer
+              characterName={enemyCharacter}
+              flipped={true}
+              ref={enemySpriteRef}
+              distance={distance}
+              health={enemy.currentHealth}
+            /> */}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

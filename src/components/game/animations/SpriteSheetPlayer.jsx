@@ -7,24 +7,80 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { loadCharacter } from "../lib/characterLoader";
+import { AVAILABLE_CHARACTERS } from "../lib/characters";
 import SpriteSheetPlayerCore from "./SpriteSheetPlayerCore";
 
 const SpriteSheetPlayer = forwardRef(
   (
-    { characterName, defaultAction = "idle", flipped = false, size = 128 },
+    {
+      characterName,
+      defaultAction = "idle",
+      flipped = false,
+      distance,
+      health = 1,
+      ...rest
+    },
     ref
   ) => {
     const [characterData, setCharacterData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedName, setSelectedName] = useState(null);
     const coreRef = useRef(null);
 
+    // Lưu trạng thái health trước đó
+    const prevHealthRef = useRef(health);
+
+    const isRandom = characterName === "random";
+    const finalCharacterName = isRandom ? selectedName : characterName;
+
+    // RANDOM KHI KHỞI TẠO
+    useEffect(() => {
+      if (isRandom && !selectedName) {
+        const newName =
+          AVAILABLE_CHARACTERS[
+            Math.floor(Math.random() * AVAILABLE_CHARACTERS.length)
+          ];
+        setSelectedName(newName);
+      }
+    }, [isRandom, selectedName]);
+
+    // CHỈ RANDOM KHI HỒI MÁU (từ 0 → > 0)
+    useEffect(() => {
+      const prevHealth = prevHealthRef.current;
+      const currentHealth = health;
+
+      if (isRandom && prevHealth === 0 && currentHealth > 0) {
+        // Hồi sinh → chọn nhân vật mới
+        const newName =
+          AVAILABLE_CHARACTERS[
+            Math.floor(Math.random() * AVAILABLE_CHARACTERS.length)
+          ];
+        setSelectedName(newName);
+      }
+
+      prevHealthRef.current = currentHealth;
+    }, [health, isRandom]);
+
+    // RESET KHI KHÔNG DÙNG RANDOM
+    useEffect(() => {
+      if (!isRandom) {
+        setSelectedName(null);
+      }
+    }, [isRandom]);
+
+    // LOAD CHARACTER
     useEffect(() => {
       let mounted = true;
+      if (!finalCharacterName) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
-      loadCharacter(characterName)
+      loadCharacter(finalCharacterName)
         .then((data) => {
           if (mounted) {
             setCharacterData(data);
@@ -41,8 +97,9 @@ const SpriteSheetPlayer = forwardRef(
       return () => {
         mounted = false;
       };
-    }, [characterName]);
+    }, [finalCharacterName]);
 
+    // FORWARD REF
     useImperativeHandle(
       ref,
       () => ({
@@ -50,6 +107,8 @@ const SpriteSheetPlayer = forwardRef(
         toggleAutoAttack: () => coreRef.current?.toggleAutoAttack(),
         stopAutoAttack: () => coreRef.current?.stopAutoAttack(),
         getState: () => coreRef.current?.getState?.() || {},
+        // FORWARD getElement()
+        getElement: () => coreRef.current?.getElement?.(),
       }),
       []
     );
@@ -57,26 +116,15 @@ const SpriteSheetPlayer = forwardRef(
     if (loading)
       return (
         <div className="p-6 text-center text-gray-600 animate-pulse">
-          Đang tải <strong>{characterName}</strong>...
+          Đang tải...
         </div>
       );
     if (error)
-      return (
-        <div className="p-6 text-center text-red-600 bg-red-50 rounded-lg">
-          Lỗi: {error}
-        </div>
-      );
+      return <div className="p-6 text-center text-red-600">Lỗi: {error}</div>;
     if (!characterData)
       return (
-        <div className="p-6 text-center text-gray-600">
-          Không tìm thấy dữ liệu
-        </div>
+        <div className="p-6 text-center text-gray-600">Không có dữ liệu</div>
       );
-
-    // Kích thước khung hiển thị (giống SpriteAnimation)
-    const displaySize = size; // 128px
-    const innerSize = 240; // Kích thước nội dung thực (giống SpriteAnimation)
-    const scale = displaySize / innerSize; // 128 / 240 ≈ 0.533
 
     return (
       <SpriteSheetPlayerCore
@@ -84,6 +132,9 @@ const SpriteSheetPlayer = forwardRef(
         characterData={characterData}
         defaultAction={defaultAction}
         flipped={flipped}
+        distance={distance}
+        health={health}
+        characterName={finalCharacterName}
       />
     );
   }

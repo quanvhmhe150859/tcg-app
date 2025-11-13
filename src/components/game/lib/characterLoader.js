@@ -17,8 +17,8 @@ export const loadCharacter = async (name) => {
     characterCache.set(name, data);
     return data;
   } catch (err) {
-    console.error(`[CharacterLoader] Không tìm thấy: ${name}.json`, err);
-    throw new Error(`Nhân vật "${name}" không tồn tại`);
+    // console.error(`[CharacterLoader] Không tìm thấy: ${name}.json`, err);
+    // throw new Error(`Nhân vật "${name}" không tồn tại`);
   }
 };
 
