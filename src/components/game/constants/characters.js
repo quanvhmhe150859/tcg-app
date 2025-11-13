@@ -128,4 +128,16 @@ export const CHARACTER_STATS = {
       specials: [{ specialId: 17, currentCooldown: 0 }],
     },
   },
+  abby: {
+    default: {
+      maxHealth: -600,
+      armor: 6,
+      minAttack: 6,
+      maxAttack: 6,
+      critChance: 0.06,
+      critDamage: 0.6,
+      lifeSteal: 0.06,
+      specials: [{ specialId: 17, currentCooldown: 0 }],
+    },
+  },
 };

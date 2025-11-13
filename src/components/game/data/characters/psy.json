@@ -1,0 +1,38 @@
+{
+  "idle": {
+    "image": "/sprites/dazw/psy/idle.png",
+    "frameCount": 4,
+    "columns": 2,
+    "frameWidth": 72,
+    "frameHeight": 72,
+    "speed": 200,
+    "loop": true
+  },
+  "melee": {
+    "image": "/sprites/dazw/psy/melee.png",
+    "frameCount": 7,
+    "columns": 3,
+    "frameWidth": 72,
+    "frameHeight": 72,
+    "speed": 100,
+    "loop": true
+  },
+  "special": {
+    "image": "/sprites/dazw/psy/special.png",
+    "frameCount": 25,
+    "columns": 5,
+    "frameWidth": 72,
+    "frameHeight": 72,
+    "speed": 120,
+    "loop": false
+  },
+  "death": {
+    "image": "/sprites/dazw/psy/death.png",
+    "frameCount": 9,
+    "columns": 3,
+    "frameWidth": 124,
+    "frameHeight": 72,
+    "speed": 150,
+    "loop": false
+  }
+}

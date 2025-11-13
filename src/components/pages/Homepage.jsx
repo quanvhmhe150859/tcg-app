@@ -8,9 +8,21 @@ const Homepage = () => {
   const [isGachaClicked, setIsGachaClicked] = useState(false);
   const [visibleButtons, setVisibleButtons] = useState([false, false, false]);
   const [hoveredButton, setHoveredButton] = useState(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
-    // Hiển thị từng nút lần lượt khi trang tải
+    const checkDevice = () => {
+      const mq = window.matchMedia("(pointer: coarse)");
+      setIsTouchDevice(mq.matches);
+    };
+
+    checkDevice();
+    const mq = window.matchMedia("(pointer: coarse)");
+    mq.addEventListener("change", checkDevice);
+    return () => mq.removeEventListener("change", checkDevice);
+  }, []);
+
+  useEffect(() => {
     const timers = [
       setTimeout(() => setVisibleButtons([true, false, false]), 0),
       setTimeout(() => setVisibleButtons([true, true, false]), 250),
@@ -55,6 +67,21 @@ const Homepage = () => {
     },
   ];
 
+  // Hàm render video (dùng chung)
+  const renderVideo = (videoSrc, label) => {
+    const shouldPlay = isTouchDevice || hoveredButton === label;
+    return shouldPlay ? (
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src={videoSrc}
+        autoPlay
+        loop
+        muted
+        playsInline // Quan trọng cho mobile
+      />
+    ) : null;
+  };
+
   return (
     <div className="flex flex-col items-center">
       <img
@@ -88,14 +115,9 @@ const Homepage = () => {
                           backgroundPosition: "center",
                         }}
                       >
-                        {hoveredButton === subButton.label && (
-                          <video
-                            className="absolute inset-0 w-full h-full object-cover"
-                            src={subButton.backgroundVideo}
-                            autoPlay
-                            loop
-                            muted
-                          />
+                        {renderVideo(
+                          subButton.backgroundVideo,
+                          subButton.label
                         )}
                         <span className="relative z-10 drop-shadow-[0_0_3px_black]">
                           {subButton.label}
@@ -117,15 +139,7 @@ const Homepage = () => {
                     onMouseLeave={() => setHoveredButton(null)}
                     onClick={() => setIsGachaClicked(true)}
                   >
-                    {hoveredButton === button.label && (
-                      <video
-                        className="absolute inset-0 w-full h-full object-cover"
-                        src={button.backgroundVideo}
-                        autoPlay
-                        loop
-                        muted
-                      />
-                    )}
+                    {renderVideo(button.backgroundVideo, button.label)}
                     <span className="relative z-10 drop-shadow-[0_0_3px_black]">
                       {button.label}
                     </span>
@@ -146,15 +160,7 @@ const Homepage = () => {
                 onMouseEnter={() => setHoveredButton(button.label)}
                 onMouseLeave={() => setHoveredButton(null)}
               >
-                {hoveredButton === button.label && (
-                  <video
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src={button.backgroundVideo}
-                    autoPlay
-                    loop
-                    muted
-                  />
-                )}
+                {renderVideo(button.backgroundVideo, button.label)}
                 <span className="relative z-10 drop-shadow-[0_0_3px_black] text-3xl">
                   {button.label}
                 </span>
@@ -167,7 +173,7 @@ const Homepage = () => {
   );
 };
 
-// CSS cho animation được thêm trực tiếp vào component
+// CSS animation
 const style = document.createElement("style");
 style.textContent = `
     @keyframes fadeIn {

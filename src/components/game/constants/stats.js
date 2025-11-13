@@ -88,7 +88,7 @@ export const statIcons = {
     desc: "Deals fixed damage at the end of each turn.",
   },
   Poison: {
-    icon: "💀",
+    icon: "☠️",
     label: "Poison",
     type: "flat",
     stackable: true,

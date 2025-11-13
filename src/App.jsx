@@ -21,12 +21,14 @@ const RandomCardsYugioh = lazy(() => import("./components/yugioh/RandomCardsYugi
 const ListCardsYugioh = lazy(() => import("./components/yugioh/ListCardsYugioh"));
 const OwnedYugiohCards = lazy(() => import("./components/yugioh/OwnedYugiohCards"));
 const CharacterSelection = lazy(() => import("./components/game/CharacterSelection"));
+const CharacterSelectionV2 = lazy(() => import("./components/game/CharacterSelectionV2"));
 const BattleGame = lazy(() => import("./components/game/BattleGame"));
 const Chatbot = lazy(() => import("./components/bot/Chatbot"));
 const ImageGenerator = lazy(() => import("./components/bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
 const Homepage = lazy(() => import("./components/pages/Homepage"));
 const NotFound = lazy(() => import("./components/pages/NotFound"));
+const Game = lazy(() => import("../test/new_sprite_animation/Game"));
 
 // === FaviconUpdater giữ nguyên ===
 function setFavicon(iconUrl) {
@@ -78,7 +80,8 @@ export default function App() {
             <Route path="/yugioh-ls" element={<ListCardsYugioh />} />
             <Route path="/yugioh-owned" element={<OwnedYugiohCards />} />
             <Route path="/character-selection" element={<CharacterSelection />} />
-            <Route path="/game" element={<BattleGame />} />
+            <Route path="/character-selection-v2" element={<CharacterSelectionV2 />} />
+            <Route path="/game" element={<Game />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/image-generator" element={<ImageGenerator />} />
             <Route path="/sprite-sheet-animation" element={<SpriteSheetUploaderAndPlayer />} />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { statIcons } from "../constants/stats";
+import { effectIcons } from "../constants/effects";
 
 const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
   const [isHealthBarHovered, setIsHealthBarHovered] = useState(false);
@@ -73,7 +74,7 @@ const StatsPanel = ({ entity, name, showNormalStats, showRareStats }) => {
 
   // Render Buff/Debuff (w-6 h-6)
   const renderEffect = (effect, isBuff = false) => {
-    const icon = statIcons[effect.name]?.icon || "Question";
+    const icon = statIcons[effect.name]?.icon || effectIcons[effect.name]?.icon || "Question";
     const isDamage = effect.isDamage === true;
     const duration =
       effect.duration !== undefined && effect.duration !== null

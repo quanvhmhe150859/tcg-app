@@ -1,0 +1,38 @@
+{
+  "idle": {
+    "image": "/sprites/dazw/abby/idle.png",
+    "frameCount": 4,
+    "columns": 2,
+    "frameWidth": 72,
+    "frameHeight": 72,
+    "speed": 200,
+    "loop": true
+  },
+  "melee": {
+    "image": "/sprites/dazw/abby/melee.png",
+    "frameCount": 6,
+    "columns": 3,
+    "frameWidth": 92,
+    "frameHeight": 72,
+    "speed": 100,
+    "loop": true
+  },
+  "special": {
+    "image": "/sprites/dazw/abby/special.png",
+    "frameCount": 18,
+    "columns": 5,
+    "frameWidth": 72,
+    "frameHeight": 152,
+    "speed": 120,
+    "loop": false
+  },
+  "death": {
+    "image": "/sprites/dazw/abby/death.png",
+    "frameCount": 10,
+    "columns": 4,
+    "frameWidth": 124,
+    "frameHeight": 72,
+    "speed": 150,
+    "loop": false
+  }
+}

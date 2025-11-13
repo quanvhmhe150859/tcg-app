@@ -119,14 +119,14 @@ export const initEnemy = (level) => {
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = (isBoss ? 1 : 0) + (level > 30 ? 2 : 1);
-  const health = Math.floor(9 * scale * baseFactor * bossMultiplier);
+  const health = Math.floor(10 * scale * baseFactor * bossMultiplier);
   const enemy = {
     maxHealth: health,
     currentHealth: health,
     regeneration: Math.floor(0.1 * scale * baseFactor * bossMultiplier),
     armor: Math.floor(0.4 * scale * baseFactor * bossMultiplier),
-    minAttack: Math.floor(0.7 * scale * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(2 * scale * baseFactor * bossMultiplier),
+    minAttack: Math.floor(0.9 * scale * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(2.2 * scale * baseFactor * bossMultiplier),
     critChance: 0.005 * scale * baseFactor,
     critDamage: 1 + 0.05 * scale * baseFactor,
     lifeSteal: 0.003 * scale * baseFactor,

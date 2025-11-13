@@ -15,8 +15,7 @@
     "frameWidth": 96,
     "frameHeight": 96,
     "speed": 100,
-    "loop": true,
-    "flip": false
+    "loop": true
   },
   "special": {
     "image": "/sprites/dazw/demon/special.png",
