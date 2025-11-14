@@ -6,7 +6,6 @@ import React, {
   forwardRef,
 } from "react";
 
-import SpriteSheetPlayer from "./SpriteSheetPlayer";
 import SpriteSheetDemo from "./SpriteSheetDemo";
 
 const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
@@ -326,11 +325,6 @@ const SpriteSheetUploaderAndPlayer = forwardRef((props, ref) => {
     <div className="p-4 border border-gray-300 rounded-md max-w-3xl mx-auto">
       <div className="rounded-md bg-game-animate">
         {/* <SpriteSheetDemo /> */}
-        <SpriteSheetPlayer
-          characterName={"demon"}
-          defaultAction="idle"
-          flipped={false} // Có thể ghi đè toàn bộ
-        />
       </div>
 
       <h2 className="text-lg font-bold mb-4">

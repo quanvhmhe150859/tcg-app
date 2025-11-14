@@ -99,15 +99,16 @@ const SpriteSheetPlayer = forwardRef(
       };
     }, [finalCharacterName]);
 
-    // FORWARD REF
+    // SpriteSheetPlayer.jsx
     useImperativeHandle(
       ref,
       () => ({
         playAction: (action) => coreRef.current?.playAction(action),
+
+        // CHỈ FORWARD, KHÔNG THÊM LOGIC
         toggleAutoAttack: () => coreRef.current?.toggleAutoAttack(),
-        stopAutoAttack: () => coreRef.current?.stopAutoAttack(),
+
         getState: () => coreRef.current?.getState?.() || {},
-        // FORWARD getElement()
         getElement: () => coreRef.current?.getElement?.(),
       }),
       []

@@ -160,10 +160,13 @@ const BattleGame = () => {
   const enhancedHandleAttack = () => {
     handleAutoTurn();
     if (playerSpriteRef.current && player.currentHealth > 0) {
-      playerSpriteRef.current.handlePlayOnce();
+      // playerSpriteRef.current.handlePlayOnce();
+      playerSpriteRef.current.playAction("melee");
+
     }
     if (enemySpriteRef.current && enemy.currentHealth > 0) {
-      enemySpriteRef.current.handlePlayOnce();
+      // enemySpriteRef.current.handlePlayOnce();
+      enemySpriteRef.current.playAction("melee");
     }
   };
 
@@ -171,10 +174,12 @@ const BattleGame = () => {
   const enhancedToggleAuto = () => {
     toggleAuto();
     if (playerSpriteRef.current) {
-      playerSpriteRef.current.handleToggleLoop();
+      // playerSpriteRef.current.handleToggleLoop();
+      playerSpriteRef.current.toggleAutoAttack();
     }
     if (enemySpriteRef.current) {
-      enemySpriteRef.current.handleToggleLoop();
+      // enemySpriteRef.current.handleToggleLoop();
+      enemySpriteRef.current.toggleAutoAttack();
     }
   };
 
@@ -222,34 +227,34 @@ const BattleGame = () => {
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
         <div className="flex-1">
           <div className="rounded-md bg-game-animate">
-            <SpriteAnimation
+            {/* <SpriteAnimation
               name={playerCharacter}
               flip={true}
               ref={playerSpriteRef}
               distance={distance}
               health={player.currentHealth}
-            />
-            {/* <SpriteSheetPlayer
+            /> */}
+            <SpriteSheetPlayer
               characterName={playerCharacter}
               flipped={false}
               ref={playerSpriteRef}
               distance={distance}
               health={player.currentHealth}
-            /> */}
-            <SpriteAnimation
+            />
+            {/* <SpriteAnimation
               name={enemyCharacter}
               flip={false}
               ref={enemySpriteRef}
               distance={distance}
               health={enemy.currentHealth}
-            />
-            {/* <SpriteSheetPlayer
+            /> */}
+            <SpriteSheetPlayer
               characterName={enemyCharacter}
               flipped={true}
               ref={enemySpriteRef}
               distance={distance}
               health={enemy.currentHealth}
-            /> */}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -88,7 +88,7 @@ const SpriteSheetPlayerCore = forwardRef(
         // CHẾT → death animation
         setCurrentAction("death");
         setIsPlaying(true);
-        setIsAttackLooping(false);
+        // setIsAttackLooping(false);
       } else if (health > 0 && currentAction === "death") {
         // HỒI MÁU + ĐANG DEATH → VỀ IDLE
         setCurrentAction("idle");
@@ -152,7 +152,7 @@ const SpriteSheetPlayerCore = forwardRef(
       setCurrentFrame(0);
       setIsPlaying(true);
       if (currentAction === "death") {
-        setIsAttackLooping(false);
+        // setIsAttackLooping(false);
       }
     }, [currentAction]);
 
@@ -261,27 +261,28 @@ const SpriteSheetPlayerCore = forwardRef(
       translateX,
     ]);
 
-    // API
+    // SpriteSheetPlayerCore.jsx
     useImperativeHandle(
       ref,
       () => ({
         playAction: (action) =>
           characterData[action] && setCurrentAction(action),
+
+        // TỰ ĐẢO TRẠNG THÁI - KHÔNG CẦN enabled
         toggleAutoAttack: () => {
           const newState = !isAttackLooping;
           setIsAttackLooping(newState);
-          if (newState) setCurrentAction("melee");
-          else if (currentAction === "melee") setCurrentAction("idle");
+          if (newState) {
+            setCurrentAction("melee");
+          } else if (currentAction === "melee") {
+            setCurrentAction("idle");
+          }
         },
-        stopAutoAttack: () => {
-          setIsAttackLooping(false);
-          if (currentAction === "melee") setCurrentAction("idle");
-        },
+
         getState: () => ({
           action: currentAction,
           autoAttack: isAttackLooping,
         }),
-        // THÊM: getElement() → trả về container
         getElement: () => containerRef.current,
       }),
       [currentAction, isAttackLooping, characterData]

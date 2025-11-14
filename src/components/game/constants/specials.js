@@ -50,7 +50,7 @@ export const SPECIALS = [
     cooldown: 6,
     cooldownType: "turn",
     usingType: "manual",
-    power: 0.1,
+    power: 0.05,
     image: "poison_cloud.png",
   },
   {

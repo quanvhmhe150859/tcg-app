@@ -159,7 +159,7 @@ export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
 
     // 5. Poison Cloud
     case 5: {
-      const poisonAmount = enemy.maxHealth * specialData.power;
+      const poisonAmount = Math.floor(enemy.maxHealth * specialData.power);
       enemy.effects.poisonBase += poisonAmount;
       enemy.effects.poisonDot += poisonAmount;
       addLog(`Enemy is poisoned!`, "poison", currentTurnLogs);
