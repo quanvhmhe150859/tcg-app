@@ -128,6 +128,17 @@ export const CHARACTER_STATS = {
       specials: [{ specialId: 17, currentCooldown: 0 }],
     },
   },
+  demon: {
+    default: {
+      maxHealth: 600,
+      armor: 6,
+      minAttack: 6,
+      maxAttack: 6,
+      critChance: 0.06,
+      critDamage: 0.6,
+      specials: [{ specialId: 16, currentCooldown: 0 }],
+    },
+  },
   abby: {
     default: {
       maxHealth: -600,
@@ -138,6 +149,40 @@ export const CHARACTER_STATS = {
       critDamage: 0.6,
       lifeSteal: 0.06,
       specials: [{ specialId: 17, currentCooldown: 0 }],
+    },
+  },
+  big_blue: {
+    default: {
+      maxHealth: -300,
+      armor: 6,
+      minAttack: 3,
+      maxAttack: 3,
+      critChance: 0.06,
+      critDamage: 0.6,
+      lifeSteal: 0.06,
+      specials: [{ specialId: 15, currentCooldown: 0 }],
+    },
+  },
+  insectoid: {
+    default: {
+      maxHealth: -800,
+      armor: 6,
+      minAttack: 10,
+      maxAttack: 10,
+      critChance: 0.06,
+      critDamage: 0.6,
+      lifeSteal: 0.06,
+      specials: [{ specialId: 14, currentCooldown: 0 }],
+    },
+  },
+  psy: {
+    default: {
+      maxHealth: -600,
+      minAttack: 10,
+      maxAttack: 10,
+      critDamage: 1,
+      lifeSteal: 0.12,
+      specials: [{ specialId: 13, currentCooldown: 0 }],
     },
   },
 };
