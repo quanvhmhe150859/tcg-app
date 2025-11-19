@@ -10,12 +10,9 @@ import GameControls from "./components/GameControls";
 import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
+import SkillsAndItemsPanel from "./components/SkillsAndItemsPanel";
 import SpriteAnimation from "./animations/SpriteAnimation";
 import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
-
-import { SPECIALS } from "./constants/specials";
-import { getSpecialIconPath } from "./configs/specialConfig";
-import { getConsumableIconPath } from "./configs/consumableConfig";
 
 const BattleGame = () => {
   const navigate = useNavigate();
@@ -162,7 +159,6 @@ const BattleGame = () => {
     if (playerSpriteRef.current && player.currentHealth > 0) {
       playerSpriteRef.current.handlePlayOnce();
       // playerSpriteRef.current.playAction("melee");
-
     }
     if (enemySpriteRef.current && enemy.currentHealth > 0) {
       enemySpriteRef.current.handlePlayOnce();
@@ -220,7 +216,7 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-7xl md:min-h-[825px] mx-auto rounded-lg bg-game">
+    <div className="p-4 max-w-7xl md:min-h-[870px] mx-auto rounded-lg bg-game">
       <Header level={level} />
 
       <div className="flex flex-col md:flex-row md:gap-4">
@@ -281,162 +277,15 @@ const BattleGame = () => {
             <p className="text-green-500">Luck: {player.luck} 🍀</p>
             <p className="text-yellow-500">Gold: {player.gold} 💰</p>
           </div>
-          {/* ==================== SPECIAL + CONSUMABLES (CÙNG DÒNG) ==================== */}
-          <p className="font-semibold mt-4 mb-1 border-t border-gray-500 pt-2">
-            Skills & Items
-          </p>
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {/* --- Special Skills --- */}
-            {player.specials?.map((special, index) => {
-              const specialData = SPECIALS.find(
-                (s) => s.id === special.specialId
-              );
-              if (!specialData) return null;
-
-              const isOnCooldown = special.currentCooldown > 0;
-              const isPassive = specialData.usingType === "auto";
-
-              return (
-                <button
-                  key={`special-${index}`}
-                  onClick={() => !isPassive && handleSpecial(special.specialId)}
-                  disabled={
-                    isOnCooldown ||
-                    gameOver ||
-                    showUpgradeOptions ||
-                    showShop ||
-                    isAuto ||
-                    isPassive
-                  }
-                  className={`
-                    relative w-14 h-10 sm:w-16 sm:h-12
-                    rounded-lg border-2 overflow-hidden
-                    transition-all duration-200
-                    ${
-                      isOnCooldown
-                        ? "opacity-50 grayscale border-gray-500 !cursor-not-allowed"
-                        : isPassive
-                        ? "border-purple-400 opacity-80"
-                        : "border-yellow-400 hover:scale-110 hover:border-yellow-300 shadow-lg"
-                    }
-                    ${
-                      gameOver ||
-                      showUpgradeOptions ||
-                      showShop ||
-                      isAuto ||
-                      isPassive
-                        ? "!cursor-not-allowed"
-                        : ""
-                    }
-                  `}
-                  title={
-                    `${specialData.name}${isPassive ? " (Passive)" : ""}\n` +
-                    `${
-                      typeof specialData.effect === "function"
-                        ? specialData.effect(specialData.power)
-                        : specialData.effect
-                    }\n` +
-                    `Cooldown: ${special?.currentCooldown ?? 0}/${
-                      specialData.cooldown
-                    }`
-                  }
-                >
-                  <img
-                    src={getSpecialIconPath(specialData.image)}
-                    alt={specialData.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = "/default.jpg";
-                    }}
-                  />
-                  {isOnCooldown && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 text-white text-xs font-bold">
-                      {special.currentCooldown}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-
-            {/* --- Consumables --- */}
-            {(() => {
-              const consumables = player.consumables;
-
-              // Chỉ xử lý nếu consumables là object (không phải mảng)
-              if (
-                !consumables ||
-                typeof consumables !== "object" ||
-                Array.isArray(consumables)
-              ) {
-                return null; // hoặc return <div className="text-gray-500 text-xs">No items</div>;
-              }
-
-              return Object.entries(consumables)
-                .map(([id, quantity], index) => {
-                  const hasQuantity = quantity > 0;
-
-                  // Parse tên: health_500_fixed → "Health 500 Potion"
-                  const parts = id.split("_");
-                  if (parts.length < 3) return null;
-
-                  const type =
-                    parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-                  const value = parts[1];
-                  const mode = parts[2];
-                  const displayValue = mode === "percent" ? `${value}%` : value;
-                  const itemName = `${type} ${displayValue} Potion`;
-
-                  return (
-                    <button
-                      key={`consumable-${id}`}
-                      onClick={() => {
-                        if (hasQuantity && !gameOver && type != "Revive") {
-                          handleUseConsumable(id);
-                        }
-                      }}
-                      disabled={!hasQuantity || gameOver || type == "Revive"}
-                      className={`
-                        relative w-14 h-10 sm:w-16 sm:h-12
-                        rounded-lg border-2 overflow-hidden
-                        transition-all duration-200
-                        ${
-                          !hasQuantity
-                            ? "opacity-30 grayscale border-gray-600"
-                            : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
-                        }
-                        ${
-                          gameOver || type == "Revive"
-                            ? "!cursor-not-allowed"
-                            : ""
-                        }
-                      `}
-                      title={itemName}
-                    >
-                      <img
-                        src={getConsumableIconPath(id)}
-                        alt={id}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = "/default.jpg";
-                        }}
-                      />
-
-                      {/* Số lượng */}
-                      {hasQuantity ? (
-                        <div className="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 rounded-tl">
-                          {quantity}
-                        </div>
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 text-white text-xs font-bold">
-                          0
-                        </div>
-                      )}
-                    </button>
-                  );
-                })
-                .filter(Boolean);
-            })()}
-          </div>
+          <SkillsAndItemsPanel
+            player={player}
+            gameOver={gameOver}
+            isAuto={isAuto}
+            showUpgradeOptions={showUpgradeOptions}
+            showShop={showShop}
+            handleSpecial={handleSpecial}
+            handleUseConsumable={handleUseConsumable}
+          />
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}

@@ -13,8 +13,8 @@ import {
 } from "../logic/gameLogic";
 import { addLog } from "../logic/utils";
 import { useNavigate } from "react-router-dom";
-
 import { SPECIALS } from "../constants/specials";
+import { UPGRADE_STRATEGY, SHOP_STRATEGY } from "../configs/upgradeStrategies";
 
 // Các thuộc tính cần hiển thị dưới dạng phần trăm
 const PERCENTAGE_KEYS = [
@@ -249,7 +249,7 @@ const useGameLogic = ({
       setUpgradeOptions(
         isBossDefeated
           ? generateRareUpgradeOptions(player)
-          : generateUpgradeOptions(player)
+          : generateUpgradeOptions(player, UPGRADE_STRATEGY)
       );
       setShowUpgradeOptions(true);
     }
@@ -296,7 +296,7 @@ const useGameLogic = ({
       updateTurnLogs(currentTurnLogs);
       return newPlayer;
     });
-    setShopOptions(generateUpgradeOptions(player));
+    setShopOptions(generateUpgradeOptions(player, SHOP_STRATEGY));
     increaseRerollPrice();
   };
 
@@ -351,7 +351,7 @@ const useGameLogic = ({
 
     if (level % 10 === 9) {
       setShowShop(true);
-      setShopOptions(generateUpgradeOptions(player));
+      setShopOptions(generateUpgradeOptions(player, SHOP_STRATEGY));
       resetShopState();
     }
   };

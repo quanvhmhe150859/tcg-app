@@ -225,3 +225,6 @@ button:hover {
   border-radius: 100%;
 }
 
+.option-list-spacing button{
+  padding: 0.5rem 0rem;
+}

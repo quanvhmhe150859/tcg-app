@@ -115,7 +115,7 @@ export const initPlayer = (characterKey) => {
 };
 
 export const initEnemy = (level) => {
-  const scale = Math.pow(level, 1.1);
+  const scale = Math.pow(level, 1.4);
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = (isBoss ? 1 : 0) + (level > 30 ? 2 : 1);
@@ -161,10 +161,10 @@ export const initEnemy = (level) => {
   };
 };
 
-export const generateUpgradeOptions = (player) => {
+export const generateUpgradeOptions = (player, strategy) => {
   // Tính xác suất potion xuất hiện: 50% + (luck * 10)%
   const potionChance = 0.1 + player.luck * 0.1;
-  const includePotion = Math.random() < potionChance;
+  const includePotion = strategy.includePotion && Math.random() < potionChance;
 
   const stats = [
     {
@@ -272,7 +272,7 @@ export const generateUpgradeOptions = (player) => {
   }
 
   // Trộn ngẫu nhiên và lấy 3 phần tử
-  const shuffled = stats.sort(() => Math.random() - 0.5).slice(0, 3);
+  const shuffled = stats.sort(() => Math.random() - 0.5).slice(0, strategy.optionCount);
 
   return shuffled.map((stat) => {
     let value, price, format;

@@ -7,7 +7,7 @@ const UpgradePanel = ({ isRareUpgrade, upgradeOptions, handleUpgrade }) => {
       <h2 className="font-semibold">
         {isRareUpgrade ? "Choose a Rare Upgrade:" : "Choose an Upgrade:"}
       </h2>
-      <div className="space-y-2">
+      <div className="option-list-spacing space-y-2">
         {upgradeOptions.map((option, index) => {
           let icon = "";
           // Xử lý icon giống hệt ShopPanel

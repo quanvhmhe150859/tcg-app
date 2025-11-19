@@ -13,7 +13,7 @@ const ShopPanel = ({
   return (
     <div>
       <h2 className="font-semibold mt-4 mb-2">Shop:</h2>
-      <div className="space-y-2">
+      <div className="option-list-spacing space-y-2">
         {shopOptions.map((option, index) => {
           let icon = "";
           // Lấy icon nếu có trong statIcons, nếu không thì bỏ trống
