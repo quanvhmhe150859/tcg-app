@@ -13,9 +13,9 @@ import SpriteSheetPlayerCore from "./SpriteSheetPlayerCore";
 const SpriteSheetPlayer = forwardRef(
   (
     {
-      characterName,
+      name,
       defaultAction = "idle",
-      flipped = false,
+      flip = false,
       distance,
       health = 1,
       ...rest
@@ -31,8 +31,8 @@ const SpriteSheetPlayer = forwardRef(
     // Lưu trạng thái health trước đó
     const prevHealthRef = useRef(health);
 
-    const isRandom = characterName === "random";
-    const finalCharacterName = isRandom ? selectedName : characterName;
+    const isRandom = name === "random";
+    const finalCharacterName = isRandom ? selectedName : name;
 
     // RANDOM KHI KHỞI TẠO
     useEffect(() => {
@@ -132,7 +132,7 @@ const SpriteSheetPlayer = forwardRef(
         ref={coreRef}
         characterData={characterData}
         defaultAction={defaultAction}
-        flipped={flipped}
+        flipped={flip}
         distance={distance}
         health={health}
         characterName={finalCharacterName}

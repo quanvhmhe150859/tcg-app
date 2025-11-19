@@ -11,6 +11,8 @@ import Header from "./components/Header";
 import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 import SkillsAndItemsPanel from "./components/SkillsAndItemsPanel";
+import InventoryPanel from "./components/InventoryPanel";
+import EquipmentPanel from "./components/EquipmentPanel";
 import SpriteAnimation from "./animations/SpriteAnimation";
 import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
 
@@ -231,8 +233,8 @@ const BattleGame = () => {
               health={player.currentHealth}
             />
             {/* <SpriteSheetPlayer
-              characterName={playerCharacter}
-              flipped={false}
+              name={playerCharacter}
+              flip={false}
               ref={playerSpriteRef}
               distance={distance}
               health={player.currentHealth}
@@ -245,8 +247,8 @@ const BattleGame = () => {
               health={enemy.currentHealth}
             />
             {/* <SpriteSheetPlayer
-              characterName={enemyCharacter}
-              flipped={true}
+              name={enemyCharacter}
+              flip={true}
               ref={enemySpriteRef}
               distance={distance}
               health={enemy.currentHealth}
@@ -285,6 +287,30 @@ const BattleGame = () => {
             showShop={showShop}
             handleSpecial={handleSpecial}
             handleUseConsumable={handleUseConsumable}
+          />
+          <InventoryPanel
+            player={player}
+            onEquipItem={(item, slot) => {
+              setPlayer((prev) => ({
+                ...prev,
+                equipment: { ...prev.equipment, [slot]: item },
+                inventory: prev.inventory.filter((i) => i.id !== item.id),
+              }));
+            }}
+            onDestroyItem={(item) => {
+              setPlayer((prev) => ({
+                ...prev,
+                inventory: prev.inventory.filter((i) => i.id !== item.id),
+              }));
+            }}
+          />
+          <EquipmentPanel
+            player={player}
+            onEquipClick={(slot) => {
+              // Tạm thời chỉ log, sau này mở inventory hoặc tooltip chi tiết
+              console.log("Clicked equipment slot:", slot);
+              // Có thể mở modal chọn trang bị ở đây
+            }}
           />
         </div>
 

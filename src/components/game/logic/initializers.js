@@ -28,6 +28,18 @@ export const initPlayer = (characterKey) => {
     dodge: 0.01,
     luck: 0,
     gold: 0,
+    equipment: {
+      weapon1: null,
+      weapon2: null,
+      helmet: null,
+      armor: null,
+      gloves: null,
+      belt: null,
+      boots: null,
+      necklace: null,
+      ring1: null,
+      ring2: null,
+    },
     rareStats: {
       burn: 0,
       poison: 0,
@@ -272,7 +284,9 @@ export const generateUpgradeOptions = (player, strategy) => {
   }
 
   // Trộn ngẫu nhiên và lấy 3 phần tử
-  const shuffled = stats.sort(() => Math.random() - 0.5).slice(0, strategy.optionCount);
+  const shuffled = stats
+    .sort(() => Math.random() - 0.5)
+    .slice(0, strategy.optionCount);
 
   return shuffled.map((stat) => {
     let value, price, format;
