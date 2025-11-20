@@ -189,7 +189,7 @@ const generateRandomEquipment = (playerLevel = 1) => {
   for (let i = 0; i < statCount; i++) {
     const stat =
       possibleStats[Math.floor(Math.random() * possibleStats.length)];
-    const baseValue = playerLevel * 10;
+    const baseValue = playerLevel;
     const multiplier = {
       common: 1,
       uncommon: 1.5,
@@ -870,12 +870,36 @@ const useGameLogic = ({
       );
       addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
 
-      const dropChance = 0.1 + 0.1 * (newPlayer.luck || 0);
+      // === THAY ĐOẠN NÀY TRONG checkGameOver ===
+      const dropChance = 1 + 0.1 * (newPlayer.luck || 0);
       if (Math.random() < dropChance) {
         const droppedItem = generateRandomEquipment(level + 1);
-        newPlayer.inventory = [...(newPlayer.inventory || []), droppedItem];
+
+        // Đảm bảo inventory luôn tồn tại
+        let currentInventory = newPlayer.inventory || [];
+
+        const MAX_INVENTORY = 10;
+
+        if (currentInventory.length >= MAX_INVENTORY) {
+          // LẤY ITEM Ở CUỐI MẢNG (cũ nhất trong hiển thị) ĐỂ HỦY
+          const destroyedItem = currentInventory[currentInventory.length - 1];
+
+          addLog(
+            `Inventory full! Destroyed oldest: ${destroyedItem.name} (${destroyedItem.rarity})`,
+            "equipment",
+            currentTurnLogs
+          );
+
+          // Xóa item cuối cùng
+          currentInventory = currentInventory.slice(0, -1);
+        }
+
+        // THÊM ITEM MỚI VÀO ĐẦU MẢNG → hiện đầu tiên trong inventory
+        currentInventory.unshift(droppedItem);
+        newPlayer.inventory = currentInventory;
+
         addLog(
-          `Legendary drop! Found: ${droppedItem.name} (${droppedItem.rarity})`,
+          `Found: ${droppedItem.name} (${droppedItem.rarity})`,
           "equipment",
           currentTurnLogs
         );
@@ -907,6 +931,137 @@ const useGameLogic = ({
     return { isOver: false, levelUp: false };
   };
 
+  /**
+   * Trang bị một item từ inventory vào slot tương ứng
+   * Khi replace: HỦY LUÔN ITEM CŨ (không trả về túi)
+   */
+  const handleEquipItem = (item, slot) => {
+    if (!item || !item.slot || !item.stats) return;
+
+    setPlayer((prev) => {
+      const currentTurnLogs = [];
+      const newPlayer = {
+        ...prev,
+        equipment: { ...prev.equipment },
+        inventory: [...(prev.inventory || [])],
+        rareStats: { ...prev.rareStats },
+      };
+
+      const currentlyEquipped = newPlayer.equipment[slot];
+
+      // === 1. Nếu có item cũ → TRỪ STATS + HỦY LUÔN (không trả về túi) ===
+      if (currentlyEquipped && currentlyEquipped.id !== item.id) {
+        Object.entries(currentlyEquipped.stats).forEach(([stat, value]) => {
+          const adjustedValue = PERCENTAGE_KEYS.includes(stat) ? value / 100 : value;
+          if (stat in newPlayer) newPlayer[stat] -= adjustedValue;
+          else if (stat in newPlayer.rareStats)
+            newPlayer.rareStats[stat] -= adjustedValue;
+        });
+
+        addLog(
+          `Destroyed old ${currentlyEquipped.name} (${
+            currentlyEquipped.rarity
+          }) from ${getSlotDisplayName(slot)}`,
+          "equipment",
+          currentTurnLogs
+        );
+        // Không push về inventory → bị hủy vĩnh viễn
+      }
+
+      // === 2. Kiểm tra slot hợp lệ (weapon/ring linh hoạt) ===
+      const normalizedItemSlot = item.slot.replace(/1|2$/, "");
+      const normalizedTargetSlot = slot.replace(/1|2$/, "");
+      const isDualSlot =
+        normalizedItemSlot === "weapon" || normalizedItemSlot === "ring";
+
+      if (!isDualSlot && item.slot !== slot) {
+        addLog(
+          `Cannot equip ${item.name} to ${getSlotDisplayName(slot)}!`,
+          "error",
+          currentTurnLogs
+        );
+        updateTurnLogs(currentTurnLogs);
+        return prev;
+      }
+
+      // === 3. Cộng stats item mới ===
+      Object.entries(item.stats).forEach(([stat, value]) => {
+        const adjustedValue = PERCENTAGE_KEYS.includes(stat) ? value / 100 : value;
+        if (stat in newPlayer) newPlayer[stat] += adjustedValue;
+        else if (stat in newPlayer.rareStats)
+          newPlayer.rareStats[stat] += adjustedValue;
+      });
+
+      // === 4. Cập nhật equipment + xóa khỏi inventory ===
+      newPlayer.equipment[slot] = item;
+      newPlayer.inventory = newPlayer.inventory.filter((i) => i.id !== item.id);
+
+      // === 5. Log hành động ===
+      const action = currentlyEquipped ? "replaced" : "equipped";
+      addLog(
+        `Player ${action} ${item.name} (${item.rarity}) to ${getSlotDisplayName(
+          slot
+        )}!`,
+        "equipment",
+        currentTurnLogs
+      );
+
+      // Log chi tiết stats
+      // Object.entries(item.stats).forEach(([stat, value]) => {
+      //   const formatted = PERCENTAGE_KEYS.includes(stat) ? `${value}%` : value;
+      //   addLog(
+      //     `+ ${formatStatName(stat)} ${formatted}`,
+      //     "stat",
+      //     currentTurnLogs
+      //   );
+      // });
+
+      updateTurnLogs(currentTurnLogs);
+      return newPlayer;
+    });
+  };
+
+  /**
+   * Hủy item trong inventory - KHÔNG HIỆN CONFIRM NỮA
+   * Hủy ngay lập tức, không hỏi lại
+   */
+  const handleDestroyItem = (item) => {
+    setPlayer((prev) => {
+      const currentTurnLogs = [];
+
+      const newPlayer = {
+        ...prev,
+        inventory: prev.inventory.filter((i) => i.id !== item.id),
+      };
+
+      addLog(
+        `Destroyed ${item.name} (${item.rarity})`,
+        "equipment",
+        currentTurnLogs
+      );
+
+      updateTurnLogs(currentTurnLogs);
+      return newPlayer;
+    });
+  };
+
+  // Hàm phụ trợ hiển thị tên slot đẹp (dùng chung)
+  const getSlotDisplayName = (slot) => {
+    const names = {
+      weapon1: "Weapon 1",
+      weapon2: "Weapon 2",
+      helmet: "Helmet",
+      armor: "Armor",
+      gloves: "Gloves",
+      belt: "Belt",
+      boots: "Boots",
+      necklace: "Necklace",
+      ring1: "Ring 1",
+      ring2: "Ring 2",
+    };
+    return names[slot] || slot;
+  };
+
   return {
     handlePurchase,
     handleReroll,
@@ -919,6 +1074,9 @@ const useGameLogic = ({
     handleUseConsumable,
     toggleAuto,
     resetGame,
+
+    handleEquipItem,
+    handleDestroyItem,
   };
 };
 

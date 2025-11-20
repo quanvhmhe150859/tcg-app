@@ -200,7 +200,7 @@ export const generateUpgradeOptions = (player, strategy) => {
       key: "regeneration",
       name: "Regeneration",
       basePrice: 10,
-      min: player.level - 6 <= 0 ? 1 : (player.level - 6) / 2,
+      min: ((player.level - 6) /2) <= 0 ? 1 : (player.level - 6) / 2,
       max: (player.level + 0) / 2 + player.luck,
       format: (val) => `+${val}`,
     },

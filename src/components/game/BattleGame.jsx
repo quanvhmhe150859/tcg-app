@@ -77,10 +77,12 @@ const BattleGame = () => {
     handleExitShop,
     handleUpgrade,
     handleEndRun,
-    handleAttack,
+    // handleAttack,
     handleSpecial,
     handleAutoTurn,
     handleUseConsumable,
+    handleEquipItem,
+    handleDestroyItem,
     toggleAuto,
     resetGame,
   } = useGameLogic({
@@ -223,7 +225,7 @@ const BattleGame = () => {
 
       <div className="flex flex-col md:flex-row md:gap-4">
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
-        <div className="flex-1">
+        <div className="flex-1 w-1/2">
           <div className="rounded-md bg-game-animate">
             <SpriteAnimation
               name={playerCharacter}
@@ -290,19 +292,8 @@ const BattleGame = () => {
           />
           <InventoryPanel
             player={player}
-            onEquipItem={(item, slot) => {
-              setPlayer((prev) => ({
-                ...prev,
-                equipment: { ...prev.equipment, [slot]: item },
-                inventory: prev.inventory.filter((i) => i.id !== item.id),
-              }));
-            }}
-            onDestroyItem={(item) => {
-              setPlayer((prev) => ({
-                ...prev,
-                inventory: prev.inventory.filter((i) => i.id !== item.id),
-              }));
-            }}
+            onEquipItem={handleEquipItem}
+            onDestroyItem={handleDestroyItem}
           />
           <EquipmentPanel
             player={player}
@@ -315,7 +306,7 @@ const BattleGame = () => {
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
-        <div className="flex-1 flex flex-col md:flex-col">
+        <div className="flex-1 w-1/2 flex flex-col md:flex-col">
           <div className="order-2 md:order-1 mt-4 md:mt-0">
             <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
           </div>

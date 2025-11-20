@@ -13,105 +13,106 @@ export const limitHealth = (entity) => {
 
 // Hàm giảm duration của buffs/debuffs và khôi phục stats khi hết thời gian
 const applyBuffDebuffDecay = (entity, entityName, currentTurnLogs) => {
-  // Xử lý buffs
-  if (entity.buffs && entity.buffs.length > 0) {
-    entity.buffs = entity.buffs.filter((buff) => {
-      buff.duration -= 1;
+  if (!entity.buffs) entity.buffs = [];
+  if (!entity.debuffs) entity.debuffs = [];
 
-      if (buff.duration < 0) {
-        // Hủy hiệu ứng khi hết thời gian
-        switch (buff.name) {
-          case "Attack":
-            entity.minAttack = Math.floor(entity.minAttack / (1 + buff.value));
-            entity.maxAttack = Math.floor(entity.maxAttack / (1 + buff.value));
-            addLog(
-              `${entityName}'s attack boost has expired!`,
-              "buffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Armor":
-            entity.armor = Math.floor(entity.armor / (1 + buff.value));
-            addLog(
-              `${entityName}'s armor boost has expired!`,
-              "buffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Dodge":
-            entity.dodge = entity.dodge - buff.value;
-            addLog(
-              `${entityName}'s dodge boost has expired!`,
-              "buffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Immune":
-            addLog(
-              `${entityName}'s immune boost has expired!`,
-              "buffExpire",
-              currentTurnLogs
-            );
-            break;
-        }
-        return false; // Xóa buff
+  // === XỬ LÝ BUFFS (giữ nguyên như trước) ===
+  entity.buffs = entity.buffs.filter((buff) => {
+    buff.duration -= 1;
+    if (buff.duration < 0) {
+      switch (buff.name) {
+        case "Attack":
+          entity.minAttack = Math.max(1, entity.minAttack - buff.appliedMin);
+          entity.maxAttack = Math.max(1, entity.maxAttack - buff.appliedMax);
+          addLog(
+            `${entityName}'s attack boost has expired!`,
+            "buffExpire",
+            currentTurnLogs
+          );
+          break;
+        case "Armor":
+          entity.armor = Math.max(0, (entity.armor || 0) - buff.appliedMin);
+          addLog(
+            `${entityName}'s armor boost has expired!`,
+            "buffExpire",
+            currentTurnLogs
+          );
+          break;
+        case "Dodge":
+          entity.dodge = Math.max(0, (entity.dodge || 0) - buff.appliedMin);
+          addLog(
+            `${entityName}'s dodge boost has expired!`,
+            "buffExpire",
+            currentTurnLogs
+          );
+          break;
+        case "Immune":
+          addLog(
+            `${entityName}'s immunity has expired!`,
+            "buffExpire",
+            currentTurnLogs
+          );
+          break;
       }
-      return true; // Giữ buff
-    });
-  }
+      return false;
+    }
+    return true;
+  });
 
-  // Xử lý debuffs
-  if (entity.debuffs && entity.debuffs.length > 0) {
-    entity.debuffs = entity.debuffs.filter((debuff) => {
-      debuff.duration -= 1;
+  // === XỬ LÝ DEBUFFS – TRẢ LẠI CHÍNH XÁC KHI HẾT ===
+  entity.debuffs = entity.debuffs.filter((debuff) => {
+    debuff.duration -= 1;
 
-      if (debuff.duration < 0) {
-        // Hủy debuff khi hết thời gian
-        switch (debuff.name) {
-          case "Attack":
-            entity.minAttack = Math.floor(
-              entity.minAttack / (1 - debuff.value)
-            );
-            entity.maxAttack = Math.floor(
-              entity.maxAttack / (1 - debuff.value)
-            );
-            addLog(
-              `${entityName}'s attack debuff has expired!`,
-              "debuffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Armor":
-            entity.armor = Math.floor(entity.armor / (1 - buff.value));
-            addLog(
-              `${entityName}'s armor debuff has expired!`,
-              "debuffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Death Mark":
-            addLog(
-              `${entityName}'s death mark debuff has expired!`,
-              "debuffExpire",
-              currentTurnLogs
-            );
-            break;
-          case "Berserk":
-            entity.effects.isStuned = true;
-            entity.currentHealth = Math.floor(entity.currentHealth * 0.8);
-            console.log(entity.currentHealth);
-            addLog(
-              `${entityName}'s berserk debuff has expired!`,
-              "debuffExpire",
-              currentTurnLogs
-            );
-            break;
-        }
-        return false;
+    if (debuff.duration < 0) {
+      switch (debuff.name) {
+        case "Attack":
+          entity.minAttack += debuff.appliedMin;
+          entity.maxAttack += debuff.appliedMax;
+          addLog(
+            `${entityName}'s attack debuff has expired!`,
+            "debuffExpire",
+            currentTurnLogs
+          );
+          break;
+
+        case "Armor":
+          entity.armor = (entity.armor || 0) + debuff.appliedMin;
+          addLog(
+            `${entityName}'s armor debuff has expired!`,
+            "debuffExpire",
+            currentTurnLogs
+          );
+          break;
+
+        case "Death Mark":
+          addLog(
+            `${entityName}'s death mark has expired!`,
+            "debuffExpire",
+            currentTurnLogs
+          );
+          break;
+
+        case "Berserk":
+          entity.effects.isStuned = true;
+          entity.currentHealth = Math.floor(entity.currentHealth * 0.8);
+          addLog(
+            `${entityName}'s berserk state ended!`,
+            "debuffExpire",
+            currentTurnLogs
+          );
+          break;
+
+        default:
+          addLog(
+            `${debuff.name} debuff expired!`,
+            "debuffExpire",
+            currentTurnLogs
+          );
       }
-      return true;
-    });
-  }
+      return false; // xóa debuff
+    }
+    return true; // giữ debuff
+  });
 };
 
 // Hàm nhận sát thương chung

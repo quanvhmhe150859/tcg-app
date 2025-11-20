@@ -9,44 +9,65 @@ import { resetEffects } from "./initializers";
 export const applyBuff = (
   entity,
   name,
-  value,
+  value, // value là decimal: 0.3 = +30%
   duration,
   currentTurnLogs = null
 ) => {
-  // Thêm buff vào danh sách
-  entity.buffs.push({ name, value, duration });
+  let appliedMin = 0;
+  let appliedMax = 0;
 
-  // Áp dụng hiệu ứng ngay lập tức
   switch (name) {
     case "Attack":
-      entity.minAttack = Math.floor(entity.minAttack * (1 + value));
-      entity.maxAttack = Math.floor(entity.maxAttack * (1 + value));
-      if (currentTurnLogs)
-        addLog(
-          `Attack increased by ${Math.round(value * 100)}%!`,
-          "buff",
-          currentTurnLogs
-        );
+      {
+        const oldMin = entity.minAttack || entity.attack || 0;
+        const oldMax = entity.maxAttack || entity.attack || 0;
+
+        entity.minAttack = Math.floor(oldMin * (1 + value));
+        entity.maxAttack = Math.floor(oldMax * (1 + value));
+
+        appliedMin = entity.minAttack - oldMin;
+        appliedMax = entity.maxAttack - oldMax;
+
+        if (currentTurnLogs) {
+          addLog(
+            `Attack +${Math.round(value * 100)}% !`,
+            "buff",
+            currentTurnLogs
+          );
+        }
+      }
       break;
 
     case "Armor":
-      entity.armor = Math.floor(entity.armor * (1 + value));
-      if (currentTurnLogs)
-        addLog(
-          `Armor increased by ${Math.round(value * 100)}%!`,
-          "buff",
-          currentTurnLogs
-        );
+      {
+        const oldArmor = entity.armor || 0;
+        entity.armor = Math.floor(oldArmor * (1 + value));
+        appliedMin = appliedMax = entity.armor - oldArmor; // armor dùng chung
+        if (currentTurnLogs)
+          addLog(
+            `Armor +${Math.round(value * 100)}% !`,
+            "buff",
+            currentTurnLogs
+          );
+      }
       break;
 
     case "Dodge":
-      entity.dodge += value;
-      if (currentTurnLogs)
-        addLog(`Dodge chance increased!`, "buff", currentTurnLogs);
+      {
+        const oldDodge = entity.dodge || 0;
+        entity.dodge = oldDodge + value;
+        appliedMin = appliedMax = value; // dodge là % cố định
+        if (currentTurnLogs)
+          addLog(
+            `Dodge chance +${Math.round(value * 100)}%!`,
+            "buff",
+            currentTurnLogs
+          );
+      }
       break;
 
     case "Immune":
-      // Có thể đánh dấu immune ở đâu đó nếu cần
+      appliedMin = appliedMax = 1;
       if (currentTurnLogs) addLog(`Gained immunity!`, "buff", currentTurnLogs);
       break;
 
@@ -54,6 +75,15 @@ export const applyBuff = (
       if (currentTurnLogs)
         addLog(`${name} buff applied!`, "buff", currentTurnLogs);
   }
+
+  // Lưu cả 2 giá trị đã tăng cho min và max
+  entity.buffs.push({
+    name,
+    value, // % gốc để hiển thị
+    appliedMin, // ← chính xác cho minAttack
+    appliedMax, // ← chính xác cho maxAttack
+    duration,
+  });
 };
 
 /**
@@ -62,41 +92,67 @@ export const applyBuff = (
 export const applyDebuff = (
   entity,
   name,
-  value,
+  value, // value là decimal: 0.3 = -30%
   duration,
   currentTurnLogs = null
 ) => {
-  entity.debuffs.push({ name, value, duration });
+  let appliedMin = 0;
+  let appliedMax = 0;
 
   switch (name) {
     case "Attack":
-      entity.minAttack = Math.floor(entity.minAttack * (1 - value));
-      entity.maxAttack = Math.floor(entity.maxAttack * (1 - value));
-      if (currentTurnLogs)
-        addLog(
-          `Enemy's attack decreased by ${Math.round(value * 100)}%!`,
-          "debuff",
-          currentTurnLogs
-        );
+      {
+        const oldMin = entity.minAttack || entity.attack || 0;
+        const oldMax = entity.maxAttack || entity.attack || 0;
+
+        entity.minAttack = Math.floor(oldMin * (1 - value));
+        entity.maxAttack = Math.floor(oldMax * (1 - value));
+
+        appliedMin = oldMin - entity.minAttack; // lưu lại bao nhiêu đã bị giảm
+        appliedMax = oldMax - entity.maxAttack;
+
+        if (currentTurnLogs) {
+          addLog(
+            `Attack -${Math.round(value * 100)}% (${oldMin}-${oldMax} → ${
+              entity.minAttack
+            }-${entity.maxAttack})!`,
+            "debuff",
+            currentTurnLogs
+          );
+        }
+      }
       break;
 
     case "Armor":
-      entity.armor = Math.floor(entity.armor * (1 - value));
+      {
+        const oldArmor = entity.armor || 0;
+        entity.armor = Math.floor(oldArmor * (1 - value));
+        appliedMin = appliedMax = oldArmor - entity.armor;
+
+        if (currentTurnLogs) {
+          addLog(
+            `Armor -${Math.round(value * 100)}% (${oldArmor} → ${
+              entity.armor
+            })!`,
+            "debuff",
+            currentTurnLogs
+          );
+        }
+      }
+      break;
+
+    case "Death Mark":
+      appliedMin = appliedMax = 1; // chỉ đánh dấu
       if (currentTurnLogs)
         addLog(
-          `Armor reduced by ${Math.round(value * 100)}%!`,
+          `Marked for death! (+50% damage taken)`,
           "debuff",
           currentTurnLogs
         );
       break;
 
-    case "Death Mark":
-      if (currentTurnLogs)
-        addLog(`Enemy is marked for death!`, "debuff", currentTurnLogs);
-      break;
-
     case "Berserk":
-      // Berserk có thể là trạng thái đặc biệt (tăng sát thương nhưng giảm phòng thủ?)
+      // Ví dụ: Berserk tăng attack nhưng giảm armor → xử lý riêng nếu cần
       if (currentTurnLogs)
         addLog(`Entered Berserk state!`, "debuff", currentTurnLogs);
       break;
@@ -105,6 +161,15 @@ export const applyDebuff = (
       if (currentTurnLogs)
         addLog(`${name} debuff applied!`, "debuff", currentTurnLogs);
   }
+
+  // Lưu vào debuffs
+  entity.debuffs.push({
+    name,
+    value, // % gốc để hiển thị
+    appliedMin, // giá trị thực tế đã giảm ở min
+    appliedMax, // giá trị thực tế đã giảm ở max
+    duration,
+  });
 };
 
 // Hàm xử lý special riêng biệt

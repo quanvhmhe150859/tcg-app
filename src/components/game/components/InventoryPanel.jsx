@@ -56,7 +56,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (inventoryItems.length === 0) return null;
+  // if (inventoryItems.length === 0) return null;
 
   const getRarityBorder = (rarity = "common") => {
     const map = {
@@ -113,32 +113,40 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   };
 
   return (
-    <>
+    <div>
       <p className="font-semibold mt-6 mb-2 border-t border-gray-500 pt-3">
-        Inventory ({inventoryItems.length})
+        Inventory ({inventoryItems.length}/10)
       </p>
 
-      <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-gray-600">
-        <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-          {inventoryItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={(e) => handleItemClick(e, item)}
-              className={`
-                relative w-14 h-10 sm:w-16 sm:h-12 rounded-lg border-4 overflow-hidden
-                transition-all duration-300 shadow-lg hover:scale-110 hover:z-10
-                ${getRarityBorder(item.rarity)}
-              `}
-              title={item.name}
-            >
-              <img
-                src={item.icon}
-                alt={item.name}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
+      <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-gray-600 h-[98px]">
+        {inventoryItems.length === 0 ? (
+          <div className="text-center text-gray-500 italic py-6">
+            Inventory is empty
+          </div>
+        ) : (
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <div className="flex gap-3 py-2 min-w-max">
+              {inventoryItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={(e) => handleItemClick(e, item)}
+                  className={`
+                  relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden
+                  transition-all duration-300 shadow-lg hover:z-10
+                  ${getRarityBorder(item.rarity)}
+                `}
+                  title={item.name}
+                >
+                  <img
+                    src={item.icon}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Context Menu - Dọc, đẹp, chuẩn Windows */}
@@ -168,7 +176,9 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                     className="flex justify-between text-gray-300"
                   >
                     <span className="capitalize">{formatStatName(stat)}</span>
-                    <span className="text-green-400 font-medium">{formatStatValue(stat, value)}</span>
+                    <span className="text-green-400 font-medium">
+                      {formatStatValue(stat, value)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -209,23 +219,17 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           <div className="border-t border-gray-800 pt-2 mt-2">
             <button
               onClick={() => {
-                if (
-                  window.confirm(
-                    `Permanently destroy ${contextMenu.item.name}?`
-                  )
-                ) {
-                  onDestroyItem?.(contextMenu.item);
-                  setContextMenu(null);
-                }
+                onDestroyItem?.(contextMenu.item);
+                setContextMenu(null);
               }}
-              className="w-full px-5 py-2.5 text-left text-red-400 hover:bg-red-900 hover:text-white transition"
+              className="w-full px-5 py-2.5 text-left text-red-400 hover:bg-red-900 hover:text-white transition font-semibold"
             >
               Destroy Item
             </button>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
