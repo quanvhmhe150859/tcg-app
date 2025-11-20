@@ -16,6 +16,220 @@ import { useNavigate } from "react-router-dom";
 import { SPECIALS } from "../constants/specials";
 import { UPGRADE_STRATEGY, SHOP_STRATEGY } from "../configs/upgradeStrategies";
 
+// === THÊM VÀO ĐẦU FILE (sau các import) ===
+
+const EQUIPMENT_RARITIES = [
+  { name: "common", weight: 50, color: "gray" },
+  { name: "uncommon", weight: 30, color: "green" },
+  { name: "rare", weight: 15, color: "blue" },
+  { name: "epic", weight: 4, color: "purple" },
+  { name: "legendary", weight: 1, color: "orange" },
+];
+
+const EQUIPMENT_PREFIXES = [
+  "Flaming",
+  "Frozen",
+  "Thunder",
+  "Shadow",
+  "Blood",
+  "Holy",
+  "Void",
+  "Ancient",
+  "Cursed",
+  "Eternal",
+  "Berserker",
+  "Titan",
+  "Dragon",
+  "Phantom",
+  "Celestial",
+  "Demonic",
+  "Radiant",
+  "Corrupted",
+];
+
+const EQUIPMENT_SUFFIXES = [
+  "of Power",
+  "of Destruction",
+  "of the Gods",
+  "of Chaos",
+  "of Eternity",
+  "of Doom",
+  "of Glory",
+  "of Rage",
+  "of the Phoenix",
+  "of the Void",
+  "of Legends",
+  "of the Damned",
+];
+
+const SLOT_TYPES = [
+  "weapon1",
+  "weapon2",
+  "helmet",
+  "armor",
+  "gloves",
+  "belt",
+  "boots",
+  "necklace",
+  "ring1",
+  "ring2",
+];
+
+// Danh sách icon placeholder (bạn có thể thay bằng ảnh thật)
+const ICON_POOL = {
+  weapon: [
+    "/eq/weapons/Item__00.png",
+    "/eq/weapons/Item__01.png",
+    "/eq/weapons/Item__02.png",
+    "/eq/weapons/Item__03.png",
+    "/eq/weapons/Item__04.png",
+    "/eq/weapons/Item__05.png",
+    "/eq/weapons/Item__06.png",
+    "/eq/weapons/Item__07.png",
+    "/eq/weapons/Item__08.png",
+    "/eq/weapons/Item__09.png",
+  ],
+  helmet: [
+    "/eq/helmet/Item__44.png",
+    "/eq/helmet/Item__45.png",
+    "/eq/helmet/Item__46.png",
+    "/eq/helmet/Item__47.png",
+  ],
+  armor: [
+    "/eq/armor/Item__56.png",
+    "/eq/armor/Item__57.png",
+    "/eq/armor/Item__58.png",
+    "/eq/armor/Item__59.png",
+  ],
+  gloves: [
+    "/eq/gloves/Item__60.png",
+    "/eq/gloves/Item__61.png",
+    "/eq/gloves/Item__62.png",
+    "/eq/gloves/Item__63.png",
+  ],
+  belt: ["/eq/belt1.png", "/eq/belt2.png", "/eq/belt3.png"],
+  boots: [
+    "/eq/boots/Item__48.png",
+    "/eq/boots/Item__49.png",
+    "/eq/boots/Item__50.png",
+    "/eq/boots/Item__51.png",
+  ],
+  necklace: [
+    "/eq/necklace/Item__32.png",
+    "/eq/necklace/Item__33.png",
+    "/eq/necklace/Item__34.png",
+    "/eq/necklace/Item__35.png",
+  ],
+  ring: [
+    "/eq/ring/Item__40.png",
+    "/eq/ring/Item__41.png",
+    "/eq/ring/Item__42.png",
+    "/eq/ring/Item__43.png",
+  ],
+};
+
+// Hàm tạo trang bị ngẫu nhiên
+const generateRandomEquipment = (playerLevel = 1) => {
+  // Chọn rarity theo trọng số
+  const totalWeight = EQUIPMENT_RARITIES.reduce((sum, r) => sum + r.weight, 0);
+  let roll = Math.random() * totalWeight;
+  let rarity = EQUIPMENT_RARITIES[0];
+  for (const r of EQUIPMENT_RARITIES) {
+    roll -= r.weight;
+    if (roll <= 0) {
+      rarity = r;
+      break;
+    }
+  }
+
+  const slot = SLOT_TYPES[Math.floor(Math.random() * SLOT_TYPES.length)];
+  const isWeapon = slot.includes("weapon");
+  const isRing = slot.includes("ring");
+
+  // Tạo tên đẹp
+  const prefix =
+    EQUIPMENT_PREFIXES[Math.floor(Math.random() * EQUIPMENT_PREFIXES.length)];
+  const suffix =
+    Math.random() > 0.6
+      ? EQUIPMENT_SUFFIXES[
+          Math.floor(Math.random() * EQUIPMENT_SUFFIXES.length)
+        ]
+      : "";
+  const baseName = {
+    weapon1: "Sword",
+    weapon2: "Shield",
+    helmet: "Helmet",
+    armor: "Armor",
+    gloves: "Gauntlets",
+    belt: "Belt",
+    boots: "Boots",
+    necklace: "Amulet",
+    ring1: "Ring",
+    ring2: "Ring",
+  }[slot];
+
+  const name = `${prefix} ${baseName} ${suffix}`.trim();
+
+  // Tạo stats dựa trên rarity và level
+  const statCount =
+    rarity.name === "legendary"
+      ? 4
+      : rarity.name === "epic"
+      ? 3
+      : rarity.name === "rare"
+      ? 2
+      : 1;
+  const stats = {};
+  const possibleStats = isWeapon
+    ? ["minAttack", "maxAttack", "critChance", "critDamage", "lifeSteal"]
+    : isRing
+    ? ["critChance", "critDamage", "luck"]
+    : ["armor", "maxHealth", "dodge", "thorn", "regeneration", "lifeSteal"];
+
+  for (let i = 0; i < statCount; i++) {
+    const stat =
+      possibleStats[Math.floor(Math.random() * possibleStats.length)];
+    const baseValue = playerLevel * 10;
+    const multiplier = {
+      common: 1,
+      uncommon: 1.5,
+      rare: 2.2,
+      epic: 3.5,
+      legendary: 6,
+    }[rarity.name];
+    const value = Math.floor(
+      baseValue * multiplier * (0.8 + Math.random() * 0.6)
+    );
+    stats[stat] = (stats[stat] || 0) + value;
+  }
+
+  return {
+    id: `eq_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+    name,
+    icon: (() => {
+      if (slot.includes("weapon")) {
+        return ICON_POOL.weapon[
+          Math.floor(Math.random() * ICON_POOL.weapon.length)
+        ];
+      }
+      if (slot.includes("ring")) {
+        return ICON_POOL.ring[
+          Math.floor(Math.random() * ICON_POOL.ring.length)
+        ];
+      }
+      const key = slot.replace(/1|2$/, ""); // helmet, armor, ...
+      return (
+        ICON_POOL[key]?.[
+          Math.floor(Math.random() * (ICON_POOL[key]?.length || 1))
+        ] || "/eq/default.png"
+      );
+    })(),
+    slot,
+    rarity: rarity.name,
+    stats,
+  };
+};
+
 // Các thuộc tính cần hiển thị dưới dạng phần trăm
 const PERCENTAGE_KEYS = [
   "critChance",
@@ -655,6 +869,17 @@ const useGameLogic = ({
         currentTurnLogs
       );
       addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
+
+      const dropChance = 0.1 + 0.1 * (newPlayer.luck || 0);
+      if (Math.random() < dropChance) {
+        const droppedItem = generateRandomEquipment(level + 1);
+        newPlayer.inventory = [...(newPlayer.inventory || []), droppedItem];
+        addLog(
+          `Legendary drop! Found: ${droppedItem.name} (${droppedItem.rarity})`,
+          "equipment",
+          currentTurnLogs
+        );
+      }
 
       return { isOver: false, levelUp: true };
     }

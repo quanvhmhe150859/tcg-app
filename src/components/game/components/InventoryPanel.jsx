@@ -1,6 +1,35 @@
 // src/components/battle/InventoryPanel.jsx
 import React, { useState, useRef, useEffect } from "react";
 
+const formatStatName = (stat) => {
+  const statNameMap = {
+    minAttack: "Min Attack",
+    maxAttack: "Max Attack",
+    critChance: "Crit Chance",
+    critDamage: "Crit Damage",
+    lifeSteal: "Life Steal",
+    maxHealth: "Max Health",
+    regeneration: "Regeneration",
+    dodge: "Dodge Chance",
+    thorn: "Thorn",
+    luck: "Luck",
+    armor: "Armor",
+  };
+
+  return (
+    statNameMap[stat] ||
+    stat.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())
+  );
+};
+
+const formatStatValue = (stat, value) => {
+  const percentStats = ["critChance", "dodge", "lifeSteal", "critDamage"];
+  if (percentStats.includes(stat)) {
+    return `${value}%`;
+  }
+  return `+${value}`;
+};
+
 const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const [contextMenu, setContextMenu] = useState(null); // { item, x, y }
   const menuRef = useRef(null);
@@ -59,17 +88,18 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
   // Xác định các slot có thể equip (dành cho weapon & ring)
   const getAvailableSlots = (item) => {
-    const slotKey = item.slot.replace(/1|2$/, ""); // "weapon1" → "weapon", "ring2" → "ring"
-    const possibleSlots = {
+    const slotKey = item.slot.replace(/1|2$/, ""); // weapon1 → weapon, ring2 → ring
+    const dualSlots = {
       weapon: ["weapon1", "weapon2"],
       ring: ["ring1", "ring2"],
     };
 
-    if (possibleSlots[slotKey]) {
-      return possibleSlots[slotKey];
+    if (dualSlots[slotKey]) {
+      return dualSlots[slotKey]; // luôn trả về cả 2 slot nếu là weapon/ring
     }
-    // Các slot đơn: helmet, armor,...
-    return player.equipment?.[item.slot] ? [] : [item.slot];
+
+    // Các slot đơn (helmet, armor, v.v.) → luôn cho phép replace
+    return [item.slot];
   };
 
   const handleItemClick = (e, item) => {
@@ -95,7 +125,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
               key={item.id}
               onClick={(e) => handleItemClick(e, item)}
               className={`
-                relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-4 overflow-hidden
+                relative w-14 h-10 sm:w-16 sm:h-12 rounded-lg border-4 overflow-hidden
                 transition-all duration-300 shadow-lg hover:scale-110 hover:z-10
                 ${getRarityBorder(item.rarity)}
               `}
@@ -120,52 +150,70 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         >
           {/* Tên + rarity */}
           <div className="px-5 py-3 border-b border-gray-800">
-            <p className="font-bold text-lg text-white">{contextMenu.item.name}</p>
-            <p className="text-xs text-gray-400 capitalize">{contextMenu.item.rarity || "common"}</p>
+            <p className="font-bold text-lg text-white">
+              {contextMenu.item.name}
+            </p>
+            <p className="text-xs text-gray-400 capitalize">
+              {contextMenu.item.rarity || "common"}
+            </p>
           </div>
 
           {/* Stats */}
-          {contextMenu.item.stats && Object.keys(contextMenu.item.stats).length > 0 && (
-            <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
-              {Object.entries(contextMenu.item.stats).map(([stat, value]) => (
-                <div key={stat} className="flex justify-between text-gray-300">
-                  <span>{stat}</span>
-                  <span className="text-green-400">+{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Nút Equip - 1 hoặc 2 tùy loại */}
-          <div className="py-2">
-            {getAvailableSlots(contextMenu.item).map((slot) => (
-              <button
-                key={slot}
-                onClick={() => {
-                  onEquipItem?.(contextMenu.item, slot);
-                  setContextMenu(null);
-                }}
-                className="w-full px-5 py-2.5 mt-1 text-left text-green-400 hover:bg-green-900 hover:text-white transition flex items-center justify-between"
-              >
-                <span>Equip → {getSlotDisplayName(slot)}</span>
-                {player.equipment?.[slot] && (
-                  <span className="text-xs text-orange-400">(replace)</span>
-                )}
-              </button>
-            ))}
-
-            {getAvailableSlots(contextMenu.item).length === 0 && (
-              <div className="px-5 py-2 text-gray-500 text-sm">
-                Both slots occupied
+          {contextMenu.item.stats &&
+            Object.keys(contextMenu.item.stats).length > 0 && (
+              <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
+                {Object.entries(contextMenu.item.stats).map(([stat, value]) => (
+                  <div
+                    key={stat}
+                    className="flex justify-between text-gray-300"
+                  >
+                    <span className="capitalize">{formatStatName(stat)}</span>
+                    <span className="text-green-400 font-medium">{formatStatValue(stat, value)}</span>
+                  </div>
+                ))}
               </div>
             )}
+
+          {/* Nút Equip - 1 hoặc 2 tùy loại */}
+          {/* Nút Equip - Luôn cho phép replace */}
+          <div className="py-2 border-b border-gray-800 space-y-2">
+            {getAvailableSlots(contextMenu.item).map((slot) => {
+              const equippedItem = player.equipment?.[slot];
+              const slotName = getSlotDisplayName(slot);
+
+              return (
+                <button
+                  key={slot}
+                  onClick={() => {
+                    onEquipItem?.(contextMenu.item, slot);
+                    setContextMenu(null);
+                  }}
+                  className="w-full px-5 py-2.5 text-left text-green-400 hover:bg-green-900 hover:text-white transition flex items-center justify-between font-semibold group"
+                >
+                  <span>
+                    {equippedItem
+                      ? `Replace ${slotName}`
+                      : `Equip to ${slotName}`}
+                  </span>
+                  {equippedItem && (
+                    <span className="text-xs text-orange-400 opacity-90">
+                      ← {equippedItem.name}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Destroy */}
           <div className="border-t border-gray-800 pt-2 mt-2">
             <button
               onClick={() => {
-                if (window.confirm(`Permanently destroy ${contextMenu.item.name}?`)) {
+                if (
+                  window.confirm(
+                    `Permanently destroy ${contextMenu.item.name}?`
+                  )
+                ) {
                   onDestroyItem?.(contextMenu.item);
                   setContextMenu(null);
                 }

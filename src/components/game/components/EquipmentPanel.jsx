@@ -152,7 +152,7 @@ const EquipSlot = ({ slot, getEquipIcon, getTooltip, onEquipClick }) => {
     <button
       onClick={() => onEquipClick?.(slot)}
       className={`
-        relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 overflow-hidden
+        relative w-14 h-10 sm:w-16 sm:h-12 rounded-lg border-2 overflow-hidden
         transition-all duration-200 flex items-center justify-center
         ${
           hasItem
