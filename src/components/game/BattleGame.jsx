@@ -225,7 +225,7 @@ const BattleGame = () => {
 
       <div className="flex flex-col md:flex-row md:gap-4">
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
-        <div className="flex-1 md:w-1/2">
+        <div className="flex-1 md:w-1/3">
           <div className="rounded-md bg-game-animate">
             <SpriteAnimation
               name={playerCharacter}

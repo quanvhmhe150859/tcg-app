@@ -43,18 +43,16 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const equippedIds = new Set(
     Object.values(player?.equipment || {})
       .filter(Boolean)
-      .map(eq => eq.id)
+      .map((eq) => eq.id)
   );
 
   const inventoryItems = (player?.inventory || []).filter(
-    item => item.slot && item.icon && !equippedIds.has(item.id)
+    (item) => item.slot && item.icon && !equippedIds.has(item.id)
   );
 
   useEffect(() => {
-    const handleClickOutside = e => {
-      if (
-        (menuRef.current && !menuRef.current.contains(e.target))
-      ) {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
         setContextMenu(null);
         setCalculatedDiffPanels(null);
       }
@@ -117,7 +115,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
       const oldStats = equippedItem.stats || {};
 
       const diffs = Object.keys({ ...oldStats, ...newStats })
-        .map(stat => {
+        .map((stat) => {
           const oldVal = oldStats[stat] ?? 0;
           const newVal = newStats[stat] ?? 0;
           const diff = newVal - oldVal;
@@ -136,7 +134,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     setCalculatedDiffPanels(tempPanels.length > 0 ? tempPanels : null);
   };
 
-    // Vị trí bảng so sánh: CỐ ĐỊNH bên phải + xếp DỌC (bảng 2 dưới bảng 1)
+  // Vị trí bảng so sánh: CỐ ĐỊNH bên phải + xếp DỌC (bảng 2 dưới bảng 1)
   useEffect(() => {
     if (!contextMenu || !calculatedDiffPanels || !menuRef.current) return;
 
@@ -144,13 +142,13 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     const menuRight = menuRect.right;
     const menuTop = menuRect.top;
 
-    const GAP_H = 16;   // cách menu 16px
-    const GAP_V = 12;   // cách nhau giữa các bảng
+    const GAP_H = 16; // cách menu 16px
+    const GAP_V = 12; // cách nhau giữa các bảng
 
     const finalPanels = calculatedDiffPanels.map((panel, index) => ({
       ...panel,
-      x: menuRight + GAP_H,                           // luôn bên phải
-      y: menuTop + index * (190 + GAP_V),             // bảng 2 xuống dưới bảng 1 (190px là chiều cao trung bình)
+      x: menuRight + GAP_H, // luôn bên phải
+      y: menuTop + index * (190 + GAP_V), // bảng 2 xuống dưới bảng 1 (190px là chiều cao trung bình)
       flipped: false,
     }));
 
@@ -200,9 +198,20 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           style={{ top: contextMenu.y, left: contextMenu.x }}
         >
           <div className="px-5 py-3 border-b border-gray-800">
-            <p className="font-bold text-lg text-white">
-              {contextMenu.item.name}
-            </p>
+            <div className="flex justify-between items-start">
+              <p className="font-bold text-lg text-white pr-8">
+                {contextMenu.item.name}
+              </p>
+            </div>
+
+            {/* HIỂN THỊ CẤP ĐỘ TRANG BỊ */}
+            <div className="mt-2 flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-2 font-semibold">
+                <span className="text-gray-200">
+                  Lv.{contextMenu.item.itemLevel}
+                </span>
+              </div>
+            </div>
           </div>
 
           {contextMenu.item.stats &&
@@ -267,30 +276,33 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
       )}
 
       {/* Nhiều bảng so sánh - Khoảng cách chuẩn 16px */}
-      {calculatedDiffPanels && calculatedDiffPanels.map((panel, idx) => (
-        <div
-          key={idx}
-          className="fixed z-50 bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 min-w-64 shadow-2xl pointer-events-none"
-          style={{
-            top: panel.y,
-            left: panel.x,
-          }}
-        >
-          <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
-            vs {getSlotDisplayName(panel.slot)}
+      {calculatedDiffPanels &&
+        calculatedDiffPanels.map((panel, idx) => (
+          <div
+            key={idx}
+            className="fixed z-50 bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 min-w-64 shadow-2xl pointer-events-none"
+            style={{
+              top: panel.y,
+              left: panel.x,
+            }}
+          >
+            <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
+              vs {getSlotDisplayName(panel.slot)}
+            </div>
+            <div className="space-y-2 text-sm font-medium">
+              {panel.diffs.map(({ stat, diff }) => (
+                <div key={stat} className="flex justify-between items-center">
+                  <span className="text-gray-400">{formatStatName(stat)}</span>
+                  <span
+                    className={diff > 0 ? "text-green-400" : "text-red-400"}
+                  >
+                    {formatDiff(stat, diff)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="space-y-2 text-sm font-medium">
-            {panel.diffs.map(({ stat, diff }) => (
-              <div key={stat} className="flex justify-between items-center">
-                <span className="text-gray-400">{formatStatName(stat)}</span>
-                <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
-                  {formatDiff(stat, diff)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 };
