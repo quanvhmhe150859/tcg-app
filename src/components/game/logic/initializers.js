@@ -128,7 +128,7 @@ export const initPlayer = (characterKey) => {
 };
 
 export const initEnemy = (level) => {
-  const scale = Math.pow(level, 1.4);
+  const scale = Math.pow(level, 1.3);
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = (isBoss ? 1 : 0) + (level > 30 ? 2 : 1);
@@ -138,8 +138,8 @@ export const initEnemy = (level) => {
     currentHealth: health,
     regeneration: Math.floor(0.1 * scale * baseFactor * bossMultiplier),
     armor: Math.floor(0.4 * scale * baseFactor * bossMultiplier),
-    minAttack: Math.floor(0.9 * scale * baseFactor * bossMultiplier),
-    maxAttack: Math.floor(2.2 * scale * baseFactor * bossMultiplier),
+    minAttack: Math.floor(0.8 * scale * baseFactor * bossMultiplier),
+    maxAttack: Math.floor(2.0 * scale * baseFactor * bossMultiplier),
     critChance: 0.005 * scale * baseFactor,
     critDamage: 1 + 0.05 * scale * baseFactor,
     lifeSteal: 0.003 * scale * baseFactor,

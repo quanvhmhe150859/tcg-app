@@ -107,7 +107,7 @@ const ICON_POOL = {
     "/eq/gloves/Item__62.png",
     "/eq/gloves/Item__63.png",
   ],
-  belt: ["/eq/belt1.png", "/eq/belt2.png", "/eq/belt3.png"],
+  belt: ["/eq/belt/Item__40.png", "/eq/belt/Item__41.png"],
   boots: [
     "/eq/boots/Item__48.png",
     "/eq/boots/Item__49.png",
@@ -128,9 +128,9 @@ const ICON_POOL = {
   ],
 };
 
-// Hàm tạo trang bị ngẫu nhiên
+// Hàm tạo trang bị ngẫu nhiên - PHIÊN BẢN CÂN BẰNG + DỄ CHỈNH
 const generateRandomEquipment = (playerLevel = 1) => {
-  // Chọn rarity theo trọng số
+  // === 1. Chọn rarity ===
   const totalWeight = EQUIPMENT_RARITIES.reduce((sum, r) => sum + r.weight, 0);
   let roll = Math.random() * totalWeight;
   let rarity = EQUIPMENT_RARITIES[0];
@@ -146,7 +146,7 @@ const generateRandomEquipment = (playerLevel = 1) => {
   const isWeapon = slot.includes("weapon");
   const isRing = slot.includes("ring");
 
-  // Tạo tên đẹp
+  // === 2. Tên trang bị ===
   const prefix =
     EQUIPMENT_PREFIXES[Math.floor(Math.random() * EQUIPMENT_PREFIXES.length)];
   const suffix =
@@ -167,10 +167,58 @@ const generateRandomEquipment = (playerLevel = 1) => {
     ring1: "Ring",
     ring2: "Ring",
   }[slot];
-
   const name = `${prefix} ${baseName} ${suffix}`.trim();
 
-  // Tạo stats dựa trên rarity và level
+  // === 3. CẤU HÌNH STAT - CHỈ CẦN SỬA Ở ĐÂY LÀ XONG! ===
+  const STAT_CONFIG = {
+    // Stat phòng thủ & sinh tồn
+    maxHealth: {
+      base: 20,
+      rand: 0.7,
+      slots: ["armor", "helmet", "gloves", "belt", "boots", "necklace"],
+    },
+    armor: {
+      base: 4,
+      rand: 0.6,
+      slots: ["armor", "helmet", "gloves", "boots"],
+    },
+    regeneration: {
+      base: 1.5,
+      rand: 0.7,
+      slots: ["armor", "helmet", "belt", "necklace"],
+    },
+
+    // Stat tấn công
+    minAttack: { base: 0.5, rand: 0.6, slots: ["weapon"] },
+    maxAttack: { base: 1.5, rand: 0.6, slots: ["weapon"] },
+
+    // Stat phần trăm (nhưng vẫn ra số nguyên)
+    critChance: {
+      base: 0.15,
+      rand: 0.5,
+      slots: ["weapon", "ring", "gloves", "necklace"],
+    },
+    critDamage: { base: 9, rand: 0.55, slots: ["weapon", "ring", "helmet"] },
+    dodge: { base: 0.2, rand: 0.7, slots: ["boots", "belt", "gloves"] },
+    thorn: { base: 0.18, rand: 0.7, slots: ["armor", "shield"] },
+    lifeSteal: {
+      base: 0.22,
+      rand: 0.8,
+      slots: ["weapon", "necklace", "armor"],
+    },
+    luck: { base: 0.3, rand: 0.7, slots: ["ring", "necklace"] },
+  };
+
+  // Multiplier theo độ hiếm
+  const rarityMultiplier = {
+    common: 0.5,
+    uncommon: 1.0,
+    rare: 1.8,
+    epic: 3.2,
+    legendary: 5.5,
+  }[rarity.name];
+
+  // Số lượng stats theo rarity
   const statCount =
     rarity.name === "legendary"
       ? 4
@@ -179,45 +227,53 @@ const generateRandomEquipment = (playerLevel = 1) => {
       : rarity.name === "rare"
       ? 2
       : 1;
+
+  // === 4. Tự động lấy danh sách stats phù hợp với slot ===
+  const currentSlotKey = slot.replace(/1|2$/, ""); // weapon1 → weapon, ring2 → ring, ...
+  const possibleStats = Object.keys(STAT_CONFIG).filter((stat) =>
+    STAT_CONFIG[stat].slots.some(
+      (s) => currentSlotKey.includes(s) || s.includes(currentSlotKey)
+    )
+  );
+
+  // === 5. Tạo stats (số nguyên, không trùng quá nhiều) ===
   const stats = {};
-  const possibleStats = isWeapon
-    ? ["minAttack", "maxAttack", "critChance", "critDamage", "lifeSteal"]
-    : isRing
-    ? ["critChance", "critDamage", "luck"]
-    : ["armor", "maxHealth", "dodge", "thorn", "regeneration", "lifeSteal"];
+  const used = new Set();
 
   for (let i = 0; i < statCount; i++) {
-    const stat =
-      possibleStats[Math.floor(Math.random() * possibleStats.length)];
-    const baseValue = playerLevel;
-    const multiplier = {
-      common: 1,
-      uncommon: 1.5,
-      rare: 2.2,
-      epic: 3.5,
-      legendary: 6,
-    }[rarity.name];
-    const value = Math.floor(
-      baseValue * multiplier * (0.8 + Math.random() * 0.6)
-    );
+    // Ưu tiên stat chưa dùng
+    const available = possibleStats.filter((s) => !used.has(s));
+    const pool = available.length > 0 ? available : possibleStats;
+    const stat = pool[Math.floor(Math.random() * pool.length)];
+    used.add(stat);
+
+    const cfg = STAT_CONFIG[stat];
+    let value =
+      playerLevel *
+      cfg.base *
+      rarityMultiplier *
+      (1 - cfg.rand / 2 + Math.random() * cfg.rand);
+
+    value = Math.round(value); // ép số nguyên
+    value = Math.max(1, value); // không bao giờ = 0
+
     stats[stat] = (stats[stat] || 0) + value;
   }
 
+  // === 6. Trả về kết quả ===
   return {
     id: `eq_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
     name,
     icon: (() => {
-      if (slot.includes("weapon")) {
+      if (slot.includes("weapon"))
         return ICON_POOL.weapon[
           Math.floor(Math.random() * ICON_POOL.weapon.length)
         ];
-      }
-      if (slot.includes("ring")) {
+      if (slot.includes("ring"))
         return ICON_POOL.ring[
           Math.floor(Math.random() * ICON_POOL.ring.length)
         ];
-      }
-      const key = slot.replace(/1|2$/, ""); // helmet, armor, ...
+      const key = slot.replace(/1|2$/, "");
       return (
         ICON_POOL[key]?.[
           Math.floor(Math.random() * (ICON_POOL[key]?.length || 1))
@@ -952,7 +1008,9 @@ const useGameLogic = ({
       // === 1. Nếu có item cũ → TRỪ STATS + HỦY LUÔN (không trả về túi) ===
       if (currentlyEquipped && currentlyEquipped.id !== item.id) {
         Object.entries(currentlyEquipped.stats).forEach(([stat, value]) => {
-          const adjustedValue = PERCENTAGE_KEYS.includes(stat) ? value / 100 : value;
+          const adjustedValue = PERCENTAGE_KEYS.includes(stat)
+            ? value / 100
+            : value;
           if (stat in newPlayer) newPlayer[stat] -= adjustedValue;
           else if (stat in newPlayer.rareStats)
             newPlayer.rareStats[stat] -= adjustedValue;
@@ -986,7 +1044,9 @@ const useGameLogic = ({
 
       // === 3. Cộng stats item mới ===
       Object.entries(item.stats).forEach(([stat, value]) => {
-        const adjustedValue = PERCENTAGE_KEYS.includes(stat) ? value / 100 : value;
+        const adjustedValue = PERCENTAGE_KEYS.includes(stat)
+          ? value / 100
+          : value;
         if (stat in newPlayer) newPlayer[stat] += adjustedValue;
         else if (stat in newPlayer.rareStats)
           newPlayer.rareStats[stat] += adjustedValue;

@@ -225,7 +225,7 @@ const BattleGame = () => {
 
       <div className="flex flex-col md:flex-row md:gap-4">
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
-        <div className="flex-1 w-1/2">
+        <div className="flex-1 md:w-1/2">
           <div className="rounded-md bg-game-animate">
             <SpriteAnimation
               name={playerCharacter}
@@ -306,7 +306,7 @@ const BattleGame = () => {
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
-        <div className="flex-1 w-1/2 flex flex-col md:flex-col">
+        <div className="flex-1 md:w-1/2 flex flex-col md:flex-col">
           <div className="order-2 md:order-1 mt-4 md:mt-0">
             <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
           </div>
