@@ -15,30 +15,20 @@ const formatStatName = (stat) => {
     luck: "Luck",
     armor: "Armor",
   };
-  return (
-    map[stat] ||
-    stat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())
-  );
+  return map[stat] || stat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
 };
 
-// Format đúng: chỉ thêm % khi cần, không thừa dấu +
 const formatDiff = (stat, diff) => {
-  const percentStats = [
-    "critChance",
-    "dodge",
-    "lifeSteal",
-    "critDamage",
-    "thorn",
-  ];
+  const percentStats = ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"];
   const value = Math.abs(diff);
   const formatted = percentStats.includes(stat) ? `${value}%` : value;
   return diff > 0 ? `+${formatted}` : `-${formatted}`;
 };
 
 const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
-  const [contextMenu, setContextMenu] = useState(null);
-  const [calculatedDiffPanels, setCalculatedDiffPanels] = useState(null); // đổi tên cho rõ
-  const menuRef = useRef(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const wrapperRef = useRef(null);
 
   const equippedIds = new Set(
     Object.values(player?.equipment || {})
@@ -49,17 +39,6 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const inventoryItems = (player?.inventory || []).filter(
     (item) => item.slot && item.icon && !equippedIds.has(item.id)
   );
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setContextMenu(null);
-        setCalculatedDiffPanels(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const getRarityBackground = (rarity = "common") => {
     const map = {
@@ -74,16 +53,10 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
   const getSlotDisplayName = (slot) => {
     const map = {
-      weapon1: "Weapon 1",
-      weapon2: "Weapon 2",
-      helmet: "Helmet",
-      armor: "Armor",
-      gloves: "Gloves",
-      belt: "Belt",
-      boots: "Boots",
-      necklace: "Necklace",
-      ring1: "Ring 1",
-      ring2: "Ring 2",
+      weapon1: "Weapon 1", weapon2: "Weapon 2",
+      helmet: "Helmet", armor: "Armor", gloves: "Gloves",
+      belt: "Belt", boots: "Boots", necklace: "Necklace",
+      ring1: "Ring 1", ring2: "Ring 2",
     };
     return map[slot] || slot;
   };
@@ -94,69 +67,56 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     return dual[key] || [item.slot];
   };
 
-  const handleItemClick = (e, item) => {
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-
-    const menuX = rect.right + 12;
-    const menuY = rect.top;
-
-    setContextMenu({ item, x: menuX, y: menuY });
-    setCalculatedDiffPanels(null);
-
-    const availableSlots = getAvailableSlots(item);
-    const tempPanels = [];
-
-    availableSlots.forEach((slot) => {
-      const equippedItem = player.equipment?.[slot];
-      if (!equippedItem) return;
+  const calculateDiffs = (item) => {
+    const panels = [];
+    for (const slot of getAvailableSlots(item)) {
+      const equipped = player.equipment?.[slot];
+      if (!equipped) continue;
 
       const newStats = item.stats || {};
-      const oldStats = equippedItem.stats || {};
+      const oldStats = equipped.stats || {};
 
       const diffs = Object.keys({ ...oldStats, ...newStats })
         .map((stat) => {
-          const oldVal = oldStats[stat] ?? 0;
-          const newVal = newStats[stat] ?? 0;
-          const diff = newVal - oldVal;
+          const diff = (newStats[stat] ?? 0) - (oldStats[stat] ?? 0);
           return diff !== 0 ? { stat, diff } : null;
         })
         .filter(Boolean);
 
-      if (diffs.length > 0) {
-        tempPanels.push({
-          diffs,
-          slot,
-        });
-      }
-    });
-
-    setCalculatedDiffPanels(tempPanels.length > 0 ? tempPanels : null);
+      if (diffs.length > 0) panels.push({ slot, diffs });
+    }
+    return panels.length > 0 ? panels : null;
   };
 
-  // Vị trí bảng so sánh: CỐ ĐỊNH bên phải + xếp DỌC (bảng 2 dưới bảng 1)
+  const handleItemClick = (e, item) => {
+    e.stopPropagation();
+    setSelectedItem(selectedItem?.id === item.id ? null : item);
+  };
+
+  const closeMenu = () => setSelectedItem(null);
+
   useEffect(() => {
-    if (!contextMenu || !calculatedDiffPanels || !menuRef.current) return;
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    const menuRect = menuRef.current.getBoundingClientRect();
-    const menuRight = menuRect.right;
-    const menuTop = menuRect.top;
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setSelectedItem(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    const GAP_H = 16; // cách menu 16px
-    const GAP_V = 12; // cách nhau giữa các bảng
-
-    const finalPanels = calculatedDiffPanels.map((panel, index) => ({
-      ...panel,
-      x: menuRight + GAP_H, // luôn bên phải
-      y: menuTop + index * (190 + GAP_V), // bảng 2 xuống dưới bảng 1 (190px là chiều cao trung bình)
-      flipped: false,
-    }));
-
-    setCalculatedDiffPanels(finalPanels);
-  }, [contextMenu]);
+  const diffPanels = selectedItem ? calculateDiffs(selectedItem) : null;
+  const availableSlots = selectedItem ? getAvailableSlots(selectedItem) : [];
 
   return (
-    <div>
+    <div ref={wrapperRef} className="relative">
+
       <p className="font-semibold mt-6 mb-2 border-t border-gray-500 pt-3">
         Inventory ({inventoryItems.length}/10)
       </p>
@@ -168,21 +128,17 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-            <div className="flex gap-3 py-2 min-w-max ml-1">
+            <div className="flex gap-3 py-2 min-w-max ml-1 mr-1">
               {inventoryItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={(e) => handleItemClick(e, item)}
                   className={`relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(
                     item.rarity
-                  )}`}
+                  )} ${selectedItem?.id === item.id ? "ring-4 ring-cyan-400 ring-inset" : ""}`}
                   title={item.name}
                 >
-                  <img
-                    src={item.icon}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={item.icon} alt={item.name} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -190,119 +146,163 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         )}
       </div>
 
-      {/* Context Menu */}
-      {contextMenu && (
-        <div
-          ref={menuRef}
-          className="fixed z-50 bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl py-3 min-w-64"
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-        >
-          <div className="px-5 py-3 border-b border-gray-800">
-            <div className="flex justify-between items-start">
-              <p className="font-bold text-lg text-white pr-8">
-                {contextMenu.item.name}
-              </p>
-            </div>
-
-            {/* HIỂN THỊ CẤP ĐỘ TRANG BỊ */}
-            <div className="mt-2 flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-2 font-semibold">
-                <span className="text-gray-200">
-                  Lv.{contextMenu.item.itemLevel}
-                </span>
+      {/* MOBILE: NÚT EQUIP/REPLACE XẾP DỌC */}
+      {isMobile && selectedItem && (
+        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-1000">
+          {diffPanels?.map((panel, idx) => (
+            <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg pl-4 pr-4 shadow-2xl pointer-events-none animate-in slide-in-from-bottom">
+              <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
+                vs {getSlotDisplayName(panel.slot)}
+              </div>
+              <div className="text-sm font-medium">
+                {panel.diffs.map(({ stat, diff }) => (
+                  <div key={stat} className="flex justify-between">
+                    <span className="text-gray-400">{formatStatName(stat)}</span>
+                    <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
+                      {formatDiff(stat, diff)}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          ))}
 
-          {contextMenu.item.stats &&
-            Object.keys(contextMenu.item.stats).length > 0 && (
-              <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
-                {Object.entries(contextMenu.item.stats).map(([stat, val]) => (
-                  <div
-                    key={stat}
-                    className="flex justify-between text-gray-300"
-                  >
+          <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl animate-in slide-in-from-bottom">
+            <div className="pl-5 pr-5 border-b border-gray-800">
+              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
+              <div className="text-sm text-gray-300">Lv.{selectedItem.itemLevel}</div>
+            </div>
+
+            {selectedItem.stats && Object.keys(selectedItem.stats).length > 0 && (
+              <div className="pl-5 pr-5 text-sm border-b border-gray-800">
+                {Object.entries(selectedItem.stats).map(([stat, val]) => (
+                  <div key={stat} className="flex justify-between text-gray-300">
                     <span>{formatStatName(stat)}</span>
                     <span className="text-green-400 font-medium">
-                      +{val}
-                      {[
-                        "critChance",
-                        "dodge",
-                        "lifeSteal",
-                        "critDamage",
-                        "thorn",
-                        "luck",
-                      ].includes(stat)
-                        ? "%"
-                        : ""}
+                      +{val}{["critChance","dodge","lifeSteal","critDamage","thorn"].includes(stat) ? "%" : ""}
                     </span>
                   </div>
                 ))}
               </div>
             )}
 
-          <div className="py-2 space-y-1">
-            {getAvailableSlots(contextMenu.item).map((slot) => {
-              const equipped = player.equipment?.[slot];
-              return (
-                <button
-                  key={slot}
-                  onClick={() => {
-                    onEquipItem?.(contextMenu.item, slot);
-                    setContextMenu(null);
-                    setCalculatedDiffPanels(null);
-                  }}
-                  className="w-full px-5 py-2.5 text-left text-green-400 hover:bg-green-900 hover:text-white transition font-semibold"
-                >
-                  {equipped
-                    ? `Replace ${getSlotDisplayName(slot)}`
-                    : `Equip to ${getSlotDisplayName(slot)}`}
-                </button>
-              );
-            })}
-          </div>
+            <div className="p-4 space-y-3">
+              {/* NÚT EQUIP/REPLACE - XẾP DỌC */}
+              {availableSlots.map((slot) => {
+                const equipped = player.equipment?.[slot];
+                return (
+                  <button
+                    key={slot}
+                    onClick={() => {
+                      onEquipItem?.(selectedItem, slot);
+                      setSelectedItem(null);
+                    }}
+                    className="w-full px-6 py-5 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
+                  >
+                    {equipped ? `Replace ${getSlotDisplayName(slot)}` : `Equip to ${getSlotDisplayName(slot)}`}
+                  </button>
+                );
+              })}
 
-          <button
-            onClick={() => {
-              onDestroyItem?.(contextMenu.item);
-              setContextMenu(null);
-              setCalculatedDiffPanels(null);
-            }}
-            className="w-full px-5 py-2.5 text-left text-red-400 hover:bg-red-900 hover:text-white transition font-semibold border-t border-gray-800"
-          >
-            Destroy Item
-          </button>
+              {/* Destroy + Cancel - XẾP NGANG */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    onDestroyItem?.(selectedItem);
+                    setSelectedItem(null);
+                  }}
+                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
+                >
+                  Destroy
+                </button>
+                <button
+                  onClick={closeMenu}
+                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Nhiều bảng so sánh - Khoảng cách chuẩn 16px */}
-      {calculatedDiffPanels &&
-        calculatedDiffPanels.map((panel, idx) => (
-          <div
-            key={idx}
-            className="fixed z-50 bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 min-w-64 shadow-2xl pointer-events-none"
-            style={{
-              top: panel.y,
-              left: panel.x,
-            }}
-          >
-            <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
-              vs {getSlotDisplayName(panel.slot)}
+      {/* DESKTOP: GIỮ NGUYÊN STYLE ĐẸP */}
+      {!isMobile && selectedItem && (
+        <>
+          <div className="absolute z-50 mt-3 mx-4 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl" style={{ top: "100%" }}>
+            <div className="p-5 border-b border-gray-800">
+              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
+              <div className="text-sm text-gray-300">Lv.{selectedItem.itemLevel}</div>
             </div>
-            <div className="space-y-2 text-sm font-medium">
-              {panel.diffs.map(({ stat, diff }) => (
-                <div key={stat} className="flex justify-between items-center">
-                  <span className="text-gray-400">{formatStatName(stat)}</span>
-                  <span
-                    className={diff > 0 ? "text-green-400" : "text-red-400"}
+
+            {selectedItem.stats && Object.keys(selectedItem.stats).length > 0 && (
+              <div className="p-5 space-y-1 text-sm border-b border-gray-800">
+                {Object.entries(selectedItem.stats).map(([stat, val]) => (
+                  <div key={stat} className="flex justify-between text-gray-300">
+                    <span>{formatStatName(stat)}</span>
+                    <span className="text-green-400 font-medium">
+                      +{val}{["critChance","dodge","lifeSteal","critDamage","thorn"].includes(stat) ? "%" : ""}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="p-5 space-y-3">
+              {availableSlots.map((slot) => {
+                const equipped = player.equipment?.[slot];
+                return (
+                  <button
+                    key={slot}
+                    onClick={() => {
+                      onEquipItem?.(selectedItem, slot);
+                      setSelectedItem(null);
+                    }}
+                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform hover:scale-105"
                   >
-                    {formatDiff(stat, diff)}
-                  </span>
+                    {equipped ? `Replace ${getSlotDisplayName(slot)}` : `Equip to ${getSlotDisplayName(slot)}`}
+                  </button>
+                );
+              })}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    onDestroyItem?.(selectedItem);
+                    setSelectedItem(null);
+                  }}
+                  className="flex-1 px-6 py-4 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition transform hover:scale-105"
+                >
+                  Destroy Item
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {diffPanels && (
+            <div className="absolute z-50 space-y-4" style={{ top: "calc(100% + 12px)", left: "100%", marginLeft: "16px", width: "280px" }}>
+              {diffPanels.map((panel, idx) => (
+                <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none">
+                  <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
+                    vs {getSlotDisplayName(panel.slot)}
+                  </div>
+                  <div className="space-y-2 text-sm font-medium">
+                    {panel.diffs.map(({ stat, diff }) => (
+                      <div key={stat} className="flex justify-between">
+                        <span className="text-gray-400">{formatStatName(stat)}</span>
+                        <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
+                          {formatDiff(stat, diff)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        ))}
+          )}
+        </>
+      )}
     </div>
   );
 };

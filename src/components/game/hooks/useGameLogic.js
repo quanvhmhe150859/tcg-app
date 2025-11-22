@@ -146,18 +146,18 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       slots: ["armor", "helmet", "gloves", "boots"],
     },
     regeneration: {
-      base: 1.5,
+      base: 0.5,
       rand: 0.7,
       slots: ["armor", "helmet", "belt", "necklace"],
     },
-    minAttack: { base: 0.5, rand: 0.6, slots: ["weapon"] },
-    maxAttack: { base: 1.5, rand: 0.6, slots: ["weapon"] },
+    minAttack: { base: 0.4, rand: 0.6, slots: ["weapon"] },
+    maxAttack: { base: 1.4, rand: 0.6, slots: ["weapon"] },
     critChance: {
       base: 0.15,
       rand: 0.5,
       slots: ["weapon", "ring", "gloves", "necklace"],
     },
-    critDamage: { base: 9, rand: 0.55, slots: ["weapon", "ring", "helmet"] },
+    critDamage: { base: 5, rand: 0.5, slots: ["weapon", "ring", "helmet"] },
     dodge: { base: 0.2, rand: 0.7, slots: ["boots", "belt", "gloves"] },
     thorn: { base: 0.18, rand: 0.7, slots: ["armor"] },
     lifeSteal: {
@@ -165,23 +165,17 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       rand: 0.8,
       slots: ["weapon", "necklace", "armor"],
     },
-    luck: { base: 0.3, rand: 0.7, slots: ["ring", "necklace"] },
+    luck: { base: 0.05, rand: 0.4, slots: ["ring", "necklace"] },
   };
 
-  // === 1. TÍNH ITEM LEVEL - SIÊU MẠNH VỚI LUCK ===
-  // Cơ chế: luck càng cao → thiên về +level nhiều hơn
-  const luckBonus = playerLuck * 0.15; // luck 40 → +6 expected
-  const baseRoll = Math.random() + luckBonus / 10; // tăng cơ hội roll cao
-
-  // Phân bố lệch về cao (power curve)
-  const levelOffset = Math.floor(
-    -3 + Math.pow(baseRoll, 2) * 10 // 0.0 → -3, 1.0 → ~+8 (nhưng bị clamp)
-  );
-
+  // === 1. ITEM LEVEL + LUCK SIÊU MẠNH (giữ nguyên) ===
+  const luckBonus = playerLuck * 0.15;
+  const baseRoll = Math.random() + luckBonus / 10;
+  const levelOffset = Math.floor(-3 + Math.pow(baseRoll, 2) * 10);
   const rawItemLevel = playerLevel + levelOffset;
-  const itemLevel = Math.max(1, rawItemLevel); // không dưới 1
+  const itemLevel = Math.max(1, rawItemLevel);
 
-  // === 2. TÍNH WEIGHT RARITY SIÊU MẠNH VỚI LUCK (giữ nguyên công thức cũ) ===
+  // === 2. RARITY WEIGHT + LUCK SIÊU MẠNH (giữ nguyên) ===
   const weights = {
     common: 50 * Math.pow(0.85, playerLuck),
     uncommon: 30 * Math.pow(0.9, playerLuck),
@@ -215,7 +209,7 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
 
   const rarityInfo = EQUIPMENT_RARITIES.find((r) => r.name === selectedRarity);
 
-  // === 3. SLOT, NAME, ICON (giữ nguyên) ===
+  // === 3. SLOT, NAME, ICON ===
   const slot = SLOT_TYPES[Math.floor(Math.random() * SLOT_TYPES.length)];
 
   const prefix =
@@ -250,6 +244,7 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     legendary: 5.5,
   }[selectedRarity];
 
+  // Số stat theo rarity – BẮT BUỘC ĐÚNG
   const statCount =
     selectedRarity === "legendary"
       ? 4
@@ -259,36 +254,40 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       ? 2
       : 1;
 
-  const currentSlotKey = slot.replace(/1|2$/, "");
+  // Lấy danh sách stat hợp lệ với slot hiện tại
+  const currentSlotKey = slot.replace(/1|2$/, ""); // weapon1 → weapon, ring2 → ring
   const possibleStats = Object.keys(STAT_CONFIG).filter((stat) =>
     STAT_CONFIG[stat].slots.some(
-      (s) => currentSlotKey.includes(s) || s.includes(currentSlotKey)
+      (s) => s.includes(currentSlotKey) || currentSlotKey.includes(s)
     )
   );
 
+  // Nếu slot không có stat nào hợp lệ (rất hiếm) → fallback toàn bộ
+  const finalPool =
+    possibleStats.length > 0 ? possibleStats : Object.keys(STAT_CONFIG);
+
   const stats = {};
-  const used = new Set();
+
+  // FIX CHÍNH: CHO PHÉP TRÙNG STAT Ở TẤT CẢ CÁC ĐỘ HIẾM
   for (let i = 0; i < statCount; i++) {
-    const available = possibleStats.filter((s) => !used.has(s));
-    const pool = available.length > 0 ? available : possibleStats;
-    if (pool.length === 0) continue;
+    if (finalPool.length === 0) continue;
 
-    const stat = pool[Math.floor(Math.random() * pool.length)];
-    used.add(stat);
-
+    const stat = finalPool[Math.floor(Math.random() * finalPool.length)];
     const cfg = STAT_CONFIG[stat];
-    // Dùng itemLevel thay vì playerLevel để tính stat mạnh hơn nếu đồ vượt cấp
+
     let value =
       itemLevel *
       cfg.base *
       rarityMultiplier *
       (1 - cfg.rand / 2 + Math.random() * cfg.rand);
+
     value = Math.round(value);
     value = Math.max(1, value);
 
-    stats[stat] = (stats[stat] || 0) + value;
+    stats[stat] = (stats[stat] || 0) + value; // cộng dồn nếu trùng
   }
 
+  // Icon
   const getIcon = () => {
     if (slot.includes("weapon"))
       return ICON_POOL.weapon[
@@ -303,14 +302,13 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       : "/eq/default.png";
   };
 
-  // === TRẢ VỀ OBJECT CÓ THÊM itemLevel ===
   return {
     id: `eq_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
     name,
     icon: getIcon(),
     slot,
     rarity: selectedRarity,
-    rarityColor: rarityInfo ? rarityInfo.color : "gray",
+    rarityColor: rarityInfo?.color || "gray",
     stats,
     itemLevel,
   };
@@ -957,7 +955,7 @@ const useGameLogic = ({
       addLog(`Player gained ${goldGained} gold!`, "gold", currentTurnLogs);
 
       // === THAY ĐOẠN NÀY TRONG checkGameOver ===
-      const dropChance = 1 + 0.1 * (newPlayer.luck || 0);
+      const dropChance = 0.25 + 0.1 * (newPlayer.luck || 0);
       if (Math.random() < dropChance) {
         const droppedItem = generateRandomEquipment(
           level + 1,

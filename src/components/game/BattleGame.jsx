@@ -297,11 +297,6 @@ const BattleGame = () => {
           />
           <EquipmentPanel
             player={player}
-            onEquipClick={(slot) => {
-              // Tạm thời chỉ log, sau này mở inventory hoặc tooltip chi tiết
-              console.log("Clicked equipment slot:", slot);
-              // Có thể mở modal chọn trang bị ở đây
-            }}
           />
         </div>
 
