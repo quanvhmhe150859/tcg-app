@@ -168,14 +168,14 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     luck: { base: 0.05, rand: 0.4, slots: ["ring", "necklace"] },
   };
 
-  // === 1. ITEM LEVEL + LUCK SIÊU MẠNH (giữ nguyên) ===
+  // === 1. ITEM LEVEL + LUCK SIÊU MẠNH ===
   const luckBonus = playerLuck * 0.15;
   const baseRoll = Math.random() + luckBonus / 10;
   const levelOffset = Math.floor(-3 + Math.pow(baseRoll, 2) * 10);
   const rawItemLevel = playerLevel + levelOffset;
   const itemLevel = Math.max(1, rawItemLevel);
 
-  // === 2. RARITY WEIGHT + LUCK SIÊU MẠNH (giữ nguyên) ===
+  // === 2. RARITY + LUCK SIÊU MẠNH ===
   const weights = {
     common: 50 * Math.pow(0.85, playerLuck),
     uncommon: 30 * Math.pow(0.9, playerLuck),
@@ -244,7 +244,6 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     legendary: 5.5,
   }[selectedRarity];
 
-  // Số stat theo rarity – BẮT BUỘC ĐÚNG
   const statCount =
     selectedRarity === "legendary"
       ? 4
@@ -254,21 +253,19 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       ? 2
       : 1;
 
-  // Lấy danh sách stat hợp lệ với slot hiện tại
-  const currentSlotKey = slot.replace(/1|2$/, ""); // weapon1 → weapon, ring2 → ring
+  // Lấy danh sách stat hợp lệ với slot
+  const currentSlotKey = slot.replace(/1|2$/, "");
   const possibleStats = Object.keys(STAT_CONFIG).filter((stat) =>
     STAT_CONFIG[stat].slots.some(
       (s) => s.includes(currentSlotKey) || currentSlotKey.includes(s)
     )
   );
-
-  // Nếu slot không có stat nào hợp lệ (rất hiếm) → fallback toàn bộ
   const finalPool =
     possibleStats.length > 0 ? possibleStats : Object.keys(STAT_CONFIG);
 
-  const stats = {};
+  // === MỚI: Tạo affixes (mỗi dòng riêng) + stats tổng hợp ===
+  const affixes = []; // ← Dùng để hiển thị từng dòng
 
-  // FIX CHÍNH: CHO PHÉP TRÙNG STAT Ở TẤT CẢ CÁC ĐỘ HIẾM
   for (let i = 0; i < statCount; i++) {
     if (finalPool.length === 0) continue;
 
@@ -284,10 +281,16 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     value = Math.round(value);
     value = Math.max(1, value);
 
-    stats[stat] = (stats[stat] || 0) + value; // cộng dồn nếu trùng
+    affixes.push({ key: stat, value }); // ← Mỗi dòng riêng biệt
   }
 
-  // Icon
+  // Tính tổng stats để dùng cho gameplay
+  const stats = {};
+  affixes.forEach((affix) => {
+    stats[affix.key] = (stats[affix.key] || 0) + affix.value;
+  });
+
+  // === ICON ===
   const getIcon = () => {
     if (slot.includes("weapon"))
       return ICON_POOL.weapon[
@@ -302,6 +305,7 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       : "/eq/default.png";
   };
 
+  // === RETURN ===
   return {
     id: `eq_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
     name,
@@ -309,7 +313,8 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     slot,
     rarity: selectedRarity,
     rarityColor: rarityInfo?.color || "gray",
-    stats,
+    stats, // ← Tổng stats (dùng để tính toán trong game)
+    affixes, // ← Danh sách từng dòng để hiển thị đẹp
     itemLevel,
   };
 };

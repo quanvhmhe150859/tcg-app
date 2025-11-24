@@ -1,0 +1,876 @@
+<!-- Gemini 3 Pro
+# Plan for Developing a 3D Tower Defense Game with Three.js
+## 1. Introduction
+This document outlines a comprehensive plan for developing a 3D tower defense game inspired by "Rogue Defense: Hybrid Tower TD." The game will be built using web technologies, primarily **HTML5** and **Three.js**, to create an engaging and visually rich experience that runs directly in the browser. The game will feature a single, powerful defender at the bottom of the screen, fending off waves of geometric enemies approaching from the top. The gameplay will incorporate roguelike elements such as permanent upgrades and procedurally generated enemy waves, providing a high degree of replayability.
+## 2. Core Gameplay Mechanics
+The core gameplay revolves around a central defender, which the player controls and upgrades. Unlike traditional tower defense games where players place multiple towers, this game focuses on enhancing a single, powerful unit. The key mechanics are detailed in the table below:
+| Mechanic | Description |
+| :--- | :--- |
+| **Single Defender** | The player controls a single, stationary defender at the bottom of the screen. This defender can be rotated to aim at enemies. |
+| **Weapon System** | The defender can equip multiple weapons, such as lasers, mortars, and pulse beams. Each weapon has a unique attack pattern and can be upgraded. |
+| **Enemy Waves** | Enemies, represented by geometric shapes, will spawn in waves from the top of the screen and move towards the defender. The waves will be procedurally generated to ensure variety. |
+| **Upgrade System** | After clearing a wave, the player can choose from a selection of upgrades for the defender and its weapons. This allows for strategic customization during each playthrough. |
+| **Resource Management** | Defeated enemies drop resources that can be used for in-game upgrades and contribute to a permanent progression system. |
+| **Roguelike Elements** | The game will feature permadeath, where a single loss requires the player to restart. However, a meta-progression system will allow for permanent upgrades that carry over between runs. |
+## 3. Technical Stack
+The game will be developed using modern web technologies to ensure cross-platform compatibility and a smooth user experience. The primary technologies to be used are:
+- **HTML5**: For the basic structure of the game's web page.
+- **CSS3**: For styling the user interface and other HTML elements.
+- **JavaScript (ES6+)**: As the primary programming language for the game logic.
+- **Three.js**: A powerful 3D graphics library for creating and rendering the game's 3D environment, objects, and visual effects.
+## 4. Game Development Plan
+The development process will be broken down into the following phases:
+### Phase 1: Project Setup and Basic Scene
+1. **Initialize Project**: Set up the project structure with `index.html`, a `css` folder for styles, and a `js` folder for the game's source code.
+2. **Integrate Three.js**: Include the Three.js library in the project.
+3. **Create Basic Scene**: Create a basic Three.js scene with a camera, renderer, and a simple background.
+### Phase 2: Defender and Enemy Implementation
+1. **Create Defender**: Model a simple geometric shape for the defender and place it at the bottom of the screen.
+2. **Implement Defender Controls**: Add controls to allow the player to rotate the defender to aim at enemies.
+3. **Create Enemies**: Create a system for spawning geometric enemies (e.g., cubes, spheres) that move from the top to the bottom of the screen.
+### Phase 3: Weapon and Projectile System
+1. **Implement Projectiles**: Create a projectile system that allows the defender to shoot at enemies.
+2. **Develop Weapon Types**: Implement different weapon types (e.g., laser, mortar) with unique projectile behaviors and visual effects.
+3. **Collision Detection**: Implement collision detection between projectiles and enemies.
+### Phase 4: Gameplay Loop and UI
+1. **Wave System**: Develop a wave management system that spawns progressively difficult waves of enemies.
+2. **Health and Score**: Implement a health system for the defender and a scoring system for the player.
+3. **User Interface (UI)**: Create a simple UI to display the player's health, score, and current weapon.
+### Phase 5: Upgrade and Progression System
+1. **Upgrade System**: Implement an upgrade system that allows the player to enhance the defender and its weapons between waves.
+2. **Meta-Progression**: Design and implement a permanent progression system that allows players to unlock new weapons and abilities between games.
+## 5. Visual and Audio Design
+The game will adopt a cyberpunk aesthetic, characterized by dark backgrounds, neon colors, and glowing visual effects.
+- **Visuals**: The defender, enemies, and projectiles will be simple geometric shapes with emissive materials to create a glowing effect. Particle effects will be used for explosions and projectile trails.
+- **Audio**: A synthwave soundtrack will be used to create an immersive, futuristic atmosphere. Sound effects will be added for weapon fire, enemy destruction, and UI interactions.
+## 6. Key Features for a Prototype
+To create a playable prototype, the following features are essential:
+- A functional defender that can aim and shoot.
+- At least one enemy type that moves towards the defender.
+- A basic wave system.
+- A simple health and scoring system.
+- At least one weapon type with corresponding projectiles.
+- Basic visual and audio effects to establish the game's aesthetic. 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Defense Protocol</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap");
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #050505;
+        font-family: "Orbitron", sans-serif;
+        color: white;
+        user-select: none;
+      }
+
+      #ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .hud-top {
+        display: flex;
+        justify-content: space-between;
+        text-shadow: 0 0 10px #00ffff;
+        font-size: 1.2rem;
+      }
+
+      .hud-bottom {
+        text-align: center;
+      }
+
+      .health-bar-container {
+        width: 300px;
+        height: 20px;
+        background: #333;
+        border: 2px solid #555;
+        margin: 0 auto;
+        position: relative;
+        transform: skewX(-20deg);
+      }
+
+      .health-bar-fill {
+        width: 100%;
+        height: 100%;
+        background: #ff0055;
+        box-shadow: 0 0 15px #ff0055;
+        transition: width 0.2s;
+      }
+
+      #start-screen,
+      #upgrade-screen,
+      #game-over-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        pointer-events: auto;
+        z-index: 10;
+      }
+
+      h1 {
+        font-size: 4rem;
+        margin: 0;
+        background: linear-gradient(to bottom, #00ffff, #0088ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      }
+
+      h2 {
+        color: #ff0055;
+        text-shadow: 0 0 10px #ff0055;
+      }
+
+      button {
+        background: transparent;
+        border: 2px solid #00ffff;
+        color: #00ffff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        padding: 15px 40px;
+        margin: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+      }
+
+      button:hover {
+        background: #00ffff;
+        color: #000;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+      }
+
+      .upgrade-grid {
+        display: flex;
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .upgrade-card {
+        background: rgba(0, 20, 40, 0.8);
+        border: 1px solid #0088ff;
+        padding: 20px;
+        width: 200px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .upgrade-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px #0088ff;
+        background: rgba(0, 40, 80, 0.9);
+      }
+
+      .upgrade-card h3 {
+        color: #ffd700;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      .upgrade-card p {
+        font-size: 0.9rem;
+        color: #ccc;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      #stats-display {
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 10px;
+      }
+    </style>
+    <!-- Import Maps for Three.js -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Game Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+      <div class="hud-top">
+        <div id="score-display">SCORE: 0</div>
+        <div id="wave-display">WAVE: 1</div>
+      </div>
+      <div class="hud-bottom">
+        <div class="health-bar-container">
+          <div id="health-bar" class="health-bar-fill"></div>
+        </div>
+        <div id="stats-display">DMG: 10 | SPD: 1.0 | FR: 5.0</div>
+      </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+      <h1>NEON DEFENSE</h1>
+      <p>Defend the core. Survive the waves.</p>
+      <button id="btn-start">Initialize</button>
+    </div>
+
+    <!-- Upgrade Screen -->
+    <div id="upgrade-screen" class="hidden">
+      <h2>SYSTEM UPGRADE</h2>
+      <p>Select an enhancement module</p>
+      <div class="upgrade-grid" id="upgrade-options">
+        <!-- Cards injected via JS -->
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="hidden">
+      <h1>CRITICAL FAILURE</h1>
+      <h2 id="final-score">SCORE: 0</h2>
+      <button id="btn-restart">Reboot System</button>
+    </div>
+
+    <!-- Game Logic -->
+    <script type="module">
+      import * as THREE from "three";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+
+      // --- AUDIO SYSTEM (Synth) ---
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      function playSound(type) {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === "shoot") {
+          osc.type = "square";
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === "hit") {
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.linearRampToValueAtTime(50, now + 0.1);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === "explosion") {
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(100, now);
+          osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === "upgrade") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.linearRampToValueAtTime(880, now + 0.2);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+      }
+
+      // --- GAME CONFIGURATION ---
+      const GAME_CONFIG = {
+        arenaWidth: 60,
+        arenaHeight: 80, // Z axis
+        cameraHeight: 50,
+        spawnZ: -40,
+        defenseZ: 30,
+      };
+
+      let state = {
+        isRunning: false,
+        score: 0,
+        wave: 1,
+        health: 100,
+        maxHealth: 100,
+        stats: {
+          damage: 10,
+          fireRate: 4, // shots per second
+          projectileSpeed: 60,
+          range: 100,
+        },
+        lastShotTime: 0,
+        enemiesKilledInWave: 0,
+        enemiesToSpawn: 10,
+        spawnTimer: 0,
+        waveActive: false,
+      };
+
+      // --- THREE.JS SETUP ---
+      const container = document.getElementById("canvas-container");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050505, 0.015);
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(0, GAME_CONFIG.cameraHeight, 10);
+      camera.lookAt(0, 0, 5);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.toneMapping = THREE.ReinhardToneMapping;
+      container.appendChild(renderer.domElement);
+
+      // --- POST PROCESSING (BLOOM) ---
+      const renderScene = new RenderPass(scene, camera);
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        1.5,
+        0.4,
+        0.85
+      );
+      bloomPass.threshold = 0;
+      bloomPass.strength = 2.0; // Cyberpunk glow intensity
+      bloomPass.radius = 0.5;
+
+      const composer = new EffectComposer(renderer);
+      composer.addPass(renderScene);
+      composer.addPass(bloomPass);
+
+      // --- LIGHTING ---
+      const ambientLight = new THREE.AmbientLight(0x404040);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
+
+      // --- ENVIRONMENT ---
+      // Grid Floor
+      const gridHelper = new THREE.GridHelper(200, 50, 0x00ffff, 0x222222);
+      gridHelper.position.y = -1;
+      scene.add(gridHelper);
+
+      // Floor Plane (invisible, for raycasting)
+      const planeGeometry = new THREE.PlaneGeometry(200, 200);
+      const planeMaterial = new THREE.MeshBasicMaterial({ visible: false });
+      const groundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+      groundPlane.rotation.x = -Math.PI / 2;
+      scene.add(groundPlane);
+
+      // --- GAME OBJECTS ---
+      let defender;
+      const enemies = [];
+      const projectiles = [];
+      const particles = [];
+
+      // Defender Setup
+      function createDefender() {
+        const group = new THREE.Group();
+
+        // Base
+        const baseGeo = new THREE.CylinderGeometry(2, 2.5, 1, 8);
+        const baseMat = new THREE.MeshStandardMaterial({
+          color: 0x222222,
+          emissive: 0x0044aa,
+          roughness: 0.2,
+        });
+        const base = new THREE.Mesh(baseGeo, baseMat);
+        group.add(base);
+
+        // Turret Head (Rotates)
+        const turretGroup = new THREE.Group();
+
+        const bodyGeo = new THREE.BoxGeometry(2, 1.5, 3);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = 1.25;
+        turretGroup.add(body);
+
+        // Barrel
+        const barrelGeo = new THREE.CylinderGeometry(0.4, 0.4, 4);
+        const barrelMat = new THREE.MeshStandardMaterial({
+          color: 0x111111,
+          emissive: 0x00ffff,
+          emissiveIntensity: 0.5,
+        });
+        const barrel = new THREE.Mesh(barrelGeo, barrelMat);
+        barrel.rotation.x = Math.PI / 2;
+        barrel.position.z = -2; // Pointing forward (negative Z in local space initially, but we will lookAt)
+        barrel.position.y = 1.25;
+        turretGroup.add(barrel);
+
+        group.add(turretGroup);
+        group.position.set(0, 0, GAME_CONFIG.defenseZ);
+
+        scene.add(group);
+        return { mesh: group, turret: turretGroup };
+      }
+
+      defender = createDefender();
+
+      // --- INPUT HANDLING ---
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      let targetPoint = new THREE.Vector3();
+
+      window.addEventListener("mousemove", (event) => {
+        if (!state.isRunning) return;
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      });
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // --- GAME LOGIC FUNCTIONS ---
+
+      function updateTurretRotation() {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(groundPlane);
+
+        if (intersects.length > 0) {
+          targetPoint.copy(intersects[0].point);
+          // Clamp rotation so it doesn't spin wildly if mouse is close
+          defender.turret.lookAt(
+            targetPoint.x,
+            defender.turret.position.y,
+            targetPoint.z
+          );
+        }
+      }
+
+      function shoot() {
+        const now = performance.now() / 1000;
+        if (now - state.lastShotTime < 1 / state.stats.fireRate) return;
+
+        state.lastShotTime = now;
+        playSound("shoot");
+
+        // Create Projectile
+        const geometry = new THREE.SphereGeometry(0.3, 8, 8);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+        const projectile = new THREE.Mesh(geometry, material);
+
+        // Start position: end of the barrel
+        // We need to calculate world position of the barrel tip
+        const barrelTip = new THREE.Vector3(0, 1.25, -4);
+        barrelTip.applyMatrix4(defender.turret.matrixWorld);
+
+        projectile.position.copy(barrelTip);
+
+        // Direction
+        const direction = new THREE.Vector3()
+          .subVectors(targetPoint, defender.mesh.position)
+          .normalize();
+        // Flatten direction to XZ plane
+        direction.y = 0;
+        direction.normalize();
+
+        scene.add(projectile);
+        projectiles.push({
+          mesh: projectile,
+          velocity: direction.multiplyScalar(state.stats.projectileSpeed),
+          life: 2.0, // seconds
+        });
+      }
+
+      function createEnemy() {
+        const type = Math.random() > 0.8 ? "tank" : "fast";
+        let geo, mat, speed, health, scale, color;
+
+        if (type === "fast") {
+          geo = new THREE.IcosahedronGeometry(1, 0);
+          color = 0xff0055;
+          speed = 15 + state.wave * 1.5;
+          health = 20 + state.wave * 5;
+          scale = 1;
+        } else {
+          geo = new THREE.BoxGeometry(2, 2, 2);
+          color = 0xffaa00;
+          speed = 8 + state.wave * 0.5;
+          health = 50 + state.wave * 15;
+          scale = 1.5;
+        }
+
+        mat = new THREE.MeshStandardMaterial({
+          color: 0x000000,
+          emissive: color,
+          emissiveIntensity: 0.8,
+          roughness: 0.4,
+        });
+
+        const mesh = new THREE.Mesh(geo, mat);
+        const xPos = (Math.random() - 0.5) * 50;
+        mesh.position.set(xPos, 1, GAME_CONFIG.spawnZ);
+
+        scene.add(mesh);
+        enemies.push({
+          mesh: mesh,
+          type: type,
+          maxHealth: health,
+          health: health,
+          speed: speed,
+          color: color,
+        });
+      }
+
+      function createExplosion(position, color) {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+          const geo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+          const mat = new THREE.MeshBasicMaterial({ color: color });
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.copy(position);
+
+          // Random velocity
+          const vel = new THREE.Vector3(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10 + 5,
+            (Math.random() - 0.5) * 10
+          );
+
+          scene.add(mesh);
+          particles.push({
+            mesh: mesh,
+            velocity: vel,
+            life: 1.0,
+          });
+        }
+      }
+
+      function updateEntities(delta) {
+        // Projectiles
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+          const p = projectiles[i];
+          p.mesh.position.addScaledVector(p.velocity, delta);
+          p.life -= delta;
+
+          if (p.life <= 0) {
+            scene.remove(p.mesh);
+            projectiles.splice(i, 1);
+          }
+        }
+
+        // Enemies
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          const e = enemies[i];
+
+          // Move towards defender
+          const dir = new THREE.Vector3()
+            .subVectors(defender.mesh.position, e.mesh.position)
+            .normalize();
+          e.mesh.position.addScaledVector(dir, e.speed * delta);
+
+          // Rotation effect
+          e.mesh.rotation.x += delta * 2;
+          e.mesh.rotation.z += delta * 2;
+
+          // Check collision with Defender Base
+          const distToBase = e.mesh.position.distanceTo(defender.mesh.position);
+          if (distToBase < 4) {
+            // Hit player
+            takeDamage(10);
+            createExplosion(e.mesh.position, e.color);
+            scene.remove(e.mesh);
+            enemies.splice(i, 1);
+            checkWaveStatus();
+            continue;
+          }
+
+          // Check collision with Projectiles
+          for (let j = projectiles.length - 1; j >= 0; j--) {
+            const p = projectiles[j];
+            const dist = e.mesh.position.distanceTo(p.mesh.position);
+
+            if (dist < 2) {
+              // Hitbox size
+              // Damage Enemy
+              e.health -= state.stats.damage;
+              playSound("hit");
+
+              // Flash effect
+              e.mesh.material.emissiveIntensity = 5;
+              setTimeout(() => {
+                if (e.mesh) e.mesh.material.emissiveIntensity = 0.8;
+              }, 50);
+
+              // Remove projectile
+              scene.remove(p.mesh);
+              projectiles.splice(j, 1);
+
+              if (e.health <= 0) {
+                // Kill Enemy
+                playSound("explosion");
+                createExplosion(e.mesh.position, e.color);
+                scene.remove(e.mesh);
+                enemies.splice(i, 1);
+
+                addScore(e.type === "fast" ? 100 : 250);
+                checkWaveStatus();
+              }
+              break; // Projectile hit something, stop checking other enemies
+            }
+          }
+        }
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.mesh.position.addScaledVector(p.velocity, delta);
+          p.velocity.y -= 20 * delta; // Gravity
+          p.life -= delta;
+          p.mesh.rotation.x += delta * 5;
+          p.mesh.scale.multiplyScalar(0.95); // Shrink
+
+          if (p.life <= 0) {
+            scene.remove(p.mesh);
+            particles.splice(i, 1);
+          }
+        }
+      }
+
+      function takeDamage(amount) {
+        state.health -= amount;
+        if (state.health <= 0) {
+          state.health = 0;
+          gameOver();
+        }
+        updateHUD();
+      }
+
+      function addScore(amount) {
+        state.score += amount;
+        updateHUD();
+      }
+
+      function updateHUD() {
+        document.getElementById(
+          "score-display"
+        ).innerText = `SCORE: ${state.score}`;
+        document.getElementById(
+          "wave-display"
+        ).innerText = `WAVE: ${state.wave}`;
+        document.getElementById("health-bar").style.width = `${
+          (state.health / state.maxHealth) * 100
+        }%`;
+        document.getElementById("stats-display").innerText = `DMG: ${Math.floor(
+          state.stats.damage
+        )} | SPD: ${state.stats.projectileSpeed.toFixed(
+          0
+        )} | RATE: ${state.stats.fireRate.toFixed(1)}`;
+      }
+
+      function checkWaveStatus() {
+        // Check if wave is cleared
+        if (
+          state.enemiesToSpawn <= 0 &&
+          enemies.length === 0 &&
+          state.waveActive
+        ) {
+          state.waveActive = false;
+          setTimeout(showUpgradeScreen, 1000);
+        }
+      }
+
+      function startWave() {
+        state.waveActive = true;
+        state.enemiesToSpawn = 5 + Math.floor(state.wave * 2.5);
+        state.spawnTimer = 0;
+        updateHUD();
+      }
+
+      // --- UPGRADE SYSTEM ---
+      const upgrades = [
+        {
+          id: "dmg",
+          name: "Plasma Charge",
+          desc: "+ Damage",
+          apply: () => (state.stats.damage += 5),
+        },
+        {
+          id: "rate",
+          name: "Cooling System",
+          desc: "+ Fire Rate",
+          apply: () => (state.stats.fireRate += 1),
+        },
+        {
+          id: "spd",
+          name: "Magnetic Coil",
+          desc: "+ Bullet Speed",
+          apply: () => (state.stats.projectileSpeed += 15),
+        },
+        {
+          id: "heal",
+          name: "Nanobots",
+          desc: "Repair Hull (+30%)",
+          apply: () =>
+            (state.health = Math.min(state.maxHealth, state.health + 30)),
+        },
+      ];
+
+      function showUpgradeScreen() {
+        playSound("upgrade");
+        const screen = document.getElementById("upgrade-screen");
+        const container = document.getElementById("upgrade-options");
+        container.innerHTML = "";
+
+        // Pick 3 random upgrades
+        const opts = [];
+        while (opts.length < 3) {
+          const r = upgrades[Math.floor(Math.random() * upgrades.length)];
+          if (!opts.includes(r)) opts.push(r);
+        }
+
+        opts.forEach((opt) => {
+          const div = document.createElement("div");
+          div.className = "upgrade-card";
+          div.innerHTML = `<h3>${opt.name}</h3><p>${opt.desc}</p>`;
+          div.onclick = () => {
+            opt.apply();
+            state.wave++;
+            screen.classList.add("hidden");
+            updateHUD();
+            startWave();
+          };
+          container.appendChild(div);
+        });
+
+        screen.classList.remove("hidden");
+      }
+
+      // --- GAME LOOP ---
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (!state.isRunning) return;
+        if (
+          document
+            .getElementById("upgrade-screen")
+            .classList.contains("hidden") === false
+        )
+          return; // Paused for upgrade
+
+        const delta = clock.getDelta();
+
+        // Spawning Logic
+        if (state.waveActive && state.enemiesToSpawn > 0) {
+          state.spawnTimer += delta;
+          const spawnRate = Math.max(0.5, 2.0 - state.wave * 0.1);
+          if (state.spawnTimer > spawnRate) {
+            createEnemy();
+            state.enemiesToSpawn--;
+            state.spawnTimer = 0;
+          }
+        }
+
+        updateTurretRotation();
+        if (state.waveActive) {
+          shoot(); // Auto fire
+        }
+        updateEntities(delta);
+
+        // Pulse effect for floor
+        gridHelper.position.z = (Date.now() * 0.005) % 10;
+
+        composer.render();
+      }
+
+      // --- GAME STATE MANAGEMENT ---
+
+      function initGame() {
+        state.score = 0;
+        state.wave = 1;
+        state.health = 100;
+        state.stats = {
+          damage: 10,
+          fireRate: 4,
+          projectileSpeed: 60,
+          range: 100,
+        };
+        state.isRunning = true;
+
+        // Clear entities
+        enemies.forEach((e) => scene.remove(e.mesh));
+        projectiles.forEach((p) => scene.remove(p.mesh));
+        particles.forEach((p) => scene.remove(p.mesh));
+        enemies.length = 0;
+        projectiles.length = 0;
+        particles.length = 0;
+
+        document.getElementById("start-screen").classList.add("hidden");
+        document.getElementById("game-over-screen").classList.add("hidden");
+
+        updateHUD();
+        startWave();
+        animate();
+      }
+
+      function gameOver() {
+        state.isRunning = false;
+        document.getElementById(
+          "final-score"
+        ).innerText = `SCORE: ${state.score}`;
+        document.getElementById("game-over-screen").classList.remove("hidden");
+      }
+
+      document.getElementById("btn-start").addEventListener("click", () => {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        initGame();
+      });
+
+      document
+        .getElementById("btn-restart")
+        .addEventListener("click", initGame);
+    </script>
+  </body>
+</html>

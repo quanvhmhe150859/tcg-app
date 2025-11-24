@@ -25,6 +25,21 @@ const formatDiff = (stat, diff) => {
   return diff > 0 ? `+${formatted}` : `-${formatted}`;
 };
 
+// THỨ TỰ ƯU TIÊN HIỂN THỊ TRONG BẢNG SO SÁNH
+const STAT_ORDER = [
+  "maxHealth",
+  "regeneration",
+  "armor",
+  "minAttack",
+  "maxAttack",
+  "critChance",
+  "critDamage",
+  "lifeSteal",
+  "dodge",
+  "luck",
+  "thorn",
+];
+
 const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -53,10 +68,16 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
   const getSlotDisplayName = (slot) => {
     const map = {
-      weapon1: "Weapon 1", weapon2: "Weapon 2",
-      helmet: "Helmet", armor: "Armor", gloves: "Gloves",
-      belt: "Belt", boots: "Boots", necklace: "Necklace",
-      ring1: "Ring 1", ring2: "Ring 2",
+      weapon1: "Weapon 1",
+      weapon2: "Weapon 2",
+      helmet: "Helmet",
+      armor: "Armor",
+      gloves: "Gloves",
+      belt: "Belt",
+      boots: "Boots",
+      necklace: "Necklace",
+      ring1: "Ring 1",
+      ring2: "Ring 2",
     };
     return map[slot] || slot;
   };
@@ -67,6 +88,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     return dual[key] || [item.slot];
   };
 
+  // BẢNG SO SÁNH - SẮP XẾP THEO THỨ TỰ ĐẸP
   const calculateDiffs = (item) => {
     const panels = [];
     for (const slot of getAvailableSlots(item)) {
@@ -75,15 +97,38 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
       const newStats = item.stats || {};
       const oldStats = equipped.stats || {};
+      const diffMap = {};
 
-      const diffs = Object.keys({ ...oldStats, ...newStats })
-        .map((stat) => {
-          const diff = (newStats[stat] ?? 0) - (oldStats[stat] ?? 0);
-          return diff !== 0 ? { stat, diff } : null;
-        })
-        .filter(Boolean);
+      // Ưu tiên theo thứ tự đã định
+      STAT_ORDER.forEach((stat) => {
+        const newVal = newStats[stat] ?? 0;
+        const oldVal = oldStats[stat] ?? 0;
+        const diff = newVal - oldVal;
+        if (diff !== 0) {
+          diffMap[stat] = diff;
+        }
+      });
 
-      if (diffs.length > 0) panels.push({ slot, diffs });
+      // Các stat còn lại (nếu có stat mới trong tương lai)
+      [...new Set([...Object.keys(newStats), ...Object.keys(oldStats)])].forEach((stat) => {
+        if (!STAT_ORDER.includes(stat)) {
+          const newVal = newStats[stat] ?? 0;
+          const oldVal = oldStats[stat] ?? 0;
+          const diff = newVal - oldVal;
+          if (diff !== 0 && !(stat in diffMap)) {
+            diffMap[stat] = diff;
+          }
+        }
+      });
+
+      const diffs = Object.keys(diffMap).map((stat) => ({
+        stat,
+        diff: diffMap[stat],
+      }));
+
+      if (diffs.length > 0) {
+        panels.push({ slot, diffs });
+      }
     }
     return panels.length > 0 ? panels : null;
   };
@@ -114,10 +159,12 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const diffPanels = selectedItem ? calculateDiffs(selectedItem) : null;
   const availableSlots = selectedItem ? getAvailableSlots(selectedItem) : [];
 
+  const isPercentStat = (key) =>
+    ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"].includes(key);
+
   return (
     <div ref={wrapperRef} className="relative">
-
-      <p className="font-semibold mt-6 mb-2 border-t border-gray-500 pt-3">
+      <p className="font-semibold mt-4 mb-2 border-t border-gray-500 pt-3">
         Inventory ({inventoryItems.length}/10)
       </p>
 
@@ -146,11 +193,15 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         )}
       </div>
 
-      {/* MOBILE: NÚT EQUIP/REPLACE XẾP DỌC */}
+      {/* MOBILE: Tooltip dính đáy */}
       {isMobile && selectedItem && (
-        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-1000">
+        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
+          {/* Bảng so sánh */}
           {diffPanels?.map((panel, idx) => (
-            <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg pl-4 pr-4 shadow-2xl pointer-events-none animate-in slide-in-from-bottom">
+            <div
+              key={idx}
+              className="bg-gray-950 border-2 border-cyan-600 rounded-lg pl-4 pr-4 shadow-2xl pointer-events-none animate-in slide-in-from-bottom"
+            >
               <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
                 vs {getSlotDisplayName(panel.slot)}
               </div>
@@ -167,19 +218,23 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             </div>
           ))}
 
+          {/* Thông tin item */}
           <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl animate-in slide-in-from-bottom">
-            <div className="pl-5 pr-5 border-b border-gray-800">
+            <div className="pl-5 pr-5 pt-4 border-b border-gray-800">
               <p className="font-bold text-lg text-white">{selectedItem.name}</p>
-              <div className="text-sm text-gray-300">Lv.{selectedItem.itemLevel}</div>
+              <div className="text-sm text-gray-300">
+                Lv.{selectedItem.itemLevel} • {selectedItem.rarity}
+              </div>
             </div>
 
-            {selectedItem.stats && Object.keys(selectedItem.stats).length > 0 && (
-              <div className="pl-5 pr-5 text-sm border-b border-gray-800">
-                {Object.entries(selectedItem.stats).map(([stat, val]) => (
-                  <div key={stat} className="flex justify-between text-gray-300">
-                    <span>{formatStatName(stat)}</span>
+            {/* Affixes - từng dòng riêng biệt */}
+            {selectedItem.affixes && selectedItem.affixes.length > 0 && (
+              <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
+                {selectedItem.affixes.map((affix, idx) => (
+                  <div key={idx} className="flex justify-between text-gray-300">
+                    <span>{formatStatName(affix.key)}</span>
                     <span className="text-green-400 font-medium">
-                      +{val}{["critChance","dodge","lifeSteal","critDamage","thorn"].includes(stat) ? "%" : ""}
+                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -187,7 +242,6 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             )}
 
             <div className="p-4 space-y-3">
-              {/* NÚT EQUIP/REPLACE - XẾP DỌC */}
               {availableSlots.map((slot) => {
                 const equipped = player.equipment?.[slot];
                 return (
@@ -204,7 +258,6 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                 );
               })}
 
-              {/* Destroy + Cancel - XẾP NGANG */}
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => {
@@ -227,22 +280,24 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         </div>
       )}
 
-      {/* DESKTOP: GIỮ NGUYÊN STYLE ĐẸP */}
+      {/* DESKTOP: Tooltip đẹp */}
       {!isMobile && selectedItem && (
         <>
           <div className="absolute z-50 mt-3 mx-4 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl" style={{ top: "100%" }}>
             <div className="p-5 border-b border-gray-800">
               <p className="font-bold text-lg text-white">{selectedItem.name}</p>
-              <div className="text-sm text-gray-300">Lv.{selectedItem.itemLevel}</div>
+              <div className="text-sm text-gray-300">
+                Lv.{selectedItem.itemLevel} • {selectedItem.rarity}
+              </div>
             </div>
 
-            {selectedItem.stats && Object.keys(selectedItem.stats).length > 0 && (
+            {selectedItem.affixes && selectedItem.affixes.length > 0 && (
               <div className="p-5 space-y-1 text-sm border-b border-gray-800">
-                {Object.entries(selectedItem.stats).map(([stat, val]) => (
-                  <div key={stat} className="flex justify-between text-gray-300">
-                    <span>{formatStatName(stat)}</span>
+                {selectedItem.affixes.map((affix, idx) => (
+                  <div key={idx} className="flex justify-between text-gray-300">
+                    <span>{formatStatName(affix.key)}</span>
                     <span className="text-green-400 font-medium">
-                      +{val}{["critChance","dodge","lifeSteal","critDamage","thorn"].includes(stat) ? "%" : ""}
+                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -280,10 +335,17 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             </div>
           </div>
 
+          {/* Bảng so sánh bên phải */}
           {diffPanels && (
-            <div className="absolute z-50 space-y-4" style={{ top: "calc(100% + 12px)", left: "100%", marginLeft: "16px", width: "280px" }}>
+            <div
+              className="absolute z-50 space-y-4"
+              style={{ top: "calc(100% + 12px)", left: "100%", marginLeft: "16px", width: "280px" }}
+            >
               {diffPanels.map((panel, idx) => (
-                <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none">
+                <div
+                  key={idx}
+                  className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none"
+                >
                   <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
                     vs {getSlotDisplayName(panel.slot)}
                   </div>

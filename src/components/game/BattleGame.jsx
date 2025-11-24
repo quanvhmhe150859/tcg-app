@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { initPlayer, initEnemy } from "./logic/initializers";
 import { useTickets } from "../../context/TicketContext";
+import EntityHeader from "./components/EntityHeader";
+import ToggleButtons from "./components/ToggleButtons";
 import StatsPanel from "./components/StatsPanel";
 import BattleLog from "./components/BattleLog";
 import UpgradePanel from "./components/UpgradePanel";
 import ShopPanel from "./components/ShopPanel";
 import GameControls from "./components/GameControls";
 import Header from "./components/Header";
-import ToggleButtons from "./components/ToggleButtons";
 import useGameLogic from "./hooks/useGameLogic";
 import SkillsAndItemsPanel from "./components/SkillsAndItemsPanel";
 import InventoryPanel from "./components/InventoryPanel";
@@ -258,18 +259,8 @@ const BattleGame = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <StatsPanel
-              entity={player}
-              name="Player"
-              showNormalStats={showNormalStats}
-              showRareStats={showRareStats}
-            />
-            <StatsPanel
-              entity={enemy}
-              name="Enemy"
-              showNormalStats={showNormalStats}
-              showRareStats={showRareStats}
-            />
+            <EntityHeader name="Player" entity={player} />
+            <EntityHeader name="Enemy" entity={enemy} />
           </div>
           <ToggleButtons
             showNormalStats={showNormalStats}
@@ -277,9 +268,34 @@ const BattleGame = () => {
             toggleNormalStats={toggleNormalStats}
             toggleRareStats={toggleRareStats}
           />
-          <div className="grid grid-cols-[40%_60%] text-xs sm:text-sm">
-            <p className="text-green-500">Luck: {player.luck} 🍀</p>
-            <p className="text-yellow-500">Gold: {player.gold} 💰</p>
+          <div className="grid grid-cols-2 gap-4">
+            <StatsPanel
+              entity={player}
+              showNormalStats={showNormalStats}
+              showRareStats={showRareStats}
+            />
+            <StatsPanel
+              entity={enemy}
+              showNormalStats={showNormalStats}
+              showRareStats={showRareStats}
+            />
+          </div>
+          <div className="flex items-center justify-between text-xs sm:text-sm p-1">
+            {/* Luck - chỉ hiện khi bật stats */}
+            {showNormalStats && (
+              <div className="text-green-500 font-medium">
+                Luck: {player.luck} 🍀
+              </div>
+            )}
+
+            {/* Gold - luôn hiện, tự động căn giữa nếu không có Luck */}
+            <div
+              className={`${
+                showNormalStats ? "text-right" : "mx-auto text-center"
+              } flex-1 text-yellow-400 font-medium`}
+            >
+              Gold: {player.gold} 💰
+            </div>
           </div>
           <SkillsAndItemsPanel
             player={player}
@@ -295,9 +311,7 @@ const BattleGame = () => {
             onEquipItem={handleEquipItem}
             onDestroyItem={handleDestroyItem}
           />
-          <EquipmentPanel
-            player={player}
-          />
+          <EquipmentPanel player={player} />
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
