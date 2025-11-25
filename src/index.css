@@ -41,6 +41,15 @@
   --color-input-range-volume: var(--color-indigo-light);
 
   --color-bg-battle-game: var(--color-bg-battle-game-light);
+
+  /* Equipments */
+  --eq-container-bg: #030712;
+  --eq-container-border: #0092b8;
+  --eq-header-text: #00d3f3;
+  --eq-header-border: #104e64;
+  --eq-stat-text: #99a1af;
+  --eq-stat-text-plus: #05df72;
+  --eq-stat-text-minus: #ff6467;
 }
 
 body {
@@ -105,6 +114,15 @@ button:hover {
   --color-input-range-volume: var(--color-indigo-light);
 
   --color-bg-battle-game: var(--color-bg-battle-game-dark);
+
+  /* Equipments */
+  --eq-container-bg: #030712;
+  --eq-container-border: #0092b8;
+  --eq-header-text: #00d3f3;
+  --eq-header-border: #104e64;
+  --eq-stat-text: #99a1af;
+  --eq-stat-text-plus: #05df72;
+  --eq-stat-text-minus: #ff6467;
 }
 
 .dark-container button:hover,
@@ -128,6 +146,15 @@ button:hover {
   --color-input-range-volume: var(--color-indigo-dark);
 
   --color-bg-battle-game: var(--color-bg-battle-game-light);
+
+  /* Equipments */
+  --eq-container-bg: white;
+  --eq-container-border: #51a2ff;
+  --eq-header-text: #155dfc;
+  --eq-header-border: #bedbff;
+  --eq-stat-text: #6a7282;
+  --eq-stat-text-plus: #00a63e;
+  --eq-stat-text-minus: #e7000b;
 }
 
 .light-container button:hover,
@@ -177,7 +204,7 @@ button:hover {
   color: var(--color-text-dark);
 }
 
-.bg-game-animate{
+.bg-game-animate {
   background: var(--color-bg-battle-game);
   display: flex;
   justify-content: space-between;
@@ -220,11 +247,35 @@ button:hover {
   mix-blend-mode: multiply;
 }
 
-.special-icon{
+.special-icon {
   background: var(--color-button-bg);
   border-radius: 100%;
 }
 
-.option-list-spacing button{
+.option-list-spacing button {
   padding: 0.5rem 0rem;
+}
+
+.eq-text {
+  color: var(--color-text);
+}
+
+.eq-container {
+  background-color: var(--eq-container-bg);
+  border: 2px solid var(--eq-container-border);
+}
+
+.eq-header {
+  color: var(--eq-header-text);
+  border-bottom: 1px solid var(--eq-header-border);
+}
+
+.eq-stat-text {
+  color: var(--eq-stat-text);
+}
+.eq-stat-text-plus {
+  color: var(--eq-stat-text-plus);
+}
+.eq-stat-text-minus {
+  color: var(--eq-stat-text-minus);
 }

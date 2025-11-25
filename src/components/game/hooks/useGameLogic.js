@@ -136,18 +136,18 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
   // === CẤU HÌNH STAT (giữ nguyên) ===
   const STAT_CONFIG = {
     maxHealth: {
-      base: 20,
-      rand: 0.7,
+      base: 19,
+      rand: 0.6,
       slots: ["armor", "helmet", "gloves", "belt", "boots", "necklace"],
     },
     armor: {
-      base: 4,
-      rand: 0.6,
+      base: 1,
+      rand: 0.7,
       slots: ["armor", "helmet", "gloves", "boots"],
     },
     regeneration: {
-      base: 0.5,
-      rand: 0.7,
+      base: 0.2,
+      rand: 0.5,
       slots: ["armor", "helmet", "belt", "necklace"],
     },
     minAttack: { base: 0.4, rand: 0.6, slots: ["weapon"] },
@@ -158,14 +158,14 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       slots: ["weapon", "ring", "gloves", "necklace"],
     },
     critDamage: { base: 5, rand: 0.5, slots: ["weapon", "ring", "helmet"] },
-    dodge: { base: 0.2, rand: 0.7, slots: ["boots", "belt", "gloves"] },
-    thorn: { base: 0.18, rand: 0.7, slots: ["armor"] },
+    dodge: { base: 0.1, rand: 0.6, slots: ["boots", "belt", "gloves"] },
+    thorn: { base: 0.08, rand: 0.7, slots: ["armor"] },
     lifeSteal: {
-      base: 0.22,
-      rand: 0.8,
+      base: 0.15,
+      rand: 0.7,
       slots: ["weapon", "necklace", "armor"],
     },
-    luck: { base: 0.05, rand: 0.4, slots: ["ring", "necklace"] },
+    luck: { base: 0.04, rand: 0.5, slots: ["ring", "necklace"] },
   };
 
   // === 1. ITEM LEVEL + LUCK SIÊU MẠNH ===

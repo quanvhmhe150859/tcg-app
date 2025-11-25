@@ -228,11 +228,11 @@ const EquipmentPanel = ({ player }) => {
 
       {/* DESKTOP: Tooltip bên phải */}
       {currentItem && !isMobile && (
-        <div className="absolute z-50 top-1/2 -translate-y-1/2 left-full ml-1 w-80 bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl p-6">
+        <div className="eq-container absolute z-50 top-1/2 -translate-y-1/2 left-full ml-1 w-80 bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl p-6">
           <div className="border-b border-gray-800 pb-4 mb-4">
-            <p className="font-bold text-xl text-white">{currentItem.name}</p>
-            <p className="text-sm">
-              <span className="text-gray-400">Lv.{currentItem.itemLevel}</span>
+            <p className="eq-text font-bold text-xl text-white">{currentItem.name}</p>
+            <p className="eq-stat-text text-sm">
+              <span className="">Lv.{currentItem.itemLevel}</span>
               <span className="mx-2">•</span>
               <span
                 className={`font-medium ${getRarityTextColor(
@@ -249,9 +249,9 @@ const EquipmentPanel = ({ player }) => {
           {currentItem.affixes && currentItem.affixes.length > 0 && (
             <div className="space-y-2 text-sm">
               {currentItem.affixes.map((affix, idx) => (
-                <div key={idx} className="flex justify-between text-gray-300">
+                <div key={idx} className="eq-stat-text flex justify-between text-gray-300">
                   <span>{formatStatName(affix.key)}</span>
-                  <span className="text-green-400 font-medium">
+                  <span className="eq-stat-text-plus font-medium">
                     +{affix.value}
                     {isPercentStat(affix.key) ? "%" : ""}
                   </span>

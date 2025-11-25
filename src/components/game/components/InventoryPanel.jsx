@@ -15,11 +15,19 @@ const formatStatName = (stat) => {
     luck: "Luck",
     armor: "Armor",
   };
-  return map[stat] || stat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+  return (
+    map[stat] ||
+    stat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())
+  );
 };
 
 const formatDiff = (stat, diff) => {
-  const percentStats = ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"];
+  const percentStats = [
+    "critChance",
+    "dodge",
+    "lifeSteal",
+    "critDamage",
+  ];
   const value = Math.abs(diff);
   const formatted = percentStats.includes(stat) ? `${value}%` : value;
   return diff > 0 ? `+${formatted}` : `-${formatted}`;
@@ -44,6 +52,8 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const wrapperRef = useRef(null);
+
+  const [position, setPosition] = useState("down");
 
   const equippedIds = new Set(
     Object.values(player?.equipment || {})
@@ -110,7 +120,9 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
       });
 
       // Các stat còn lại (nếu có stat mới trong tương lai)
-      [...new Set([...Object.keys(newStats), ...Object.keys(oldStats)])].forEach((stat) => {
+      [
+        ...new Set([...Object.keys(newStats), ...Object.keys(oldStats)]),
+      ].forEach((stat) => {
         if (!STAT_ORDER.includes(stat)) {
           const newVal = newStats[stat] ?? 0;
           const oldVal = oldStats[stat] ?? 0;
@@ -134,6 +146,17 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   };
 
   const handleItemClick = (e, item) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    // Kiểm tra khoảng không phía dưới nút
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    if (spaceBelow < 425) {
+      setPosition("up"); // thiếu không gian → hiển thị lên trên
+    } else {
+      setPosition("down");
+    }
+
     e.stopPropagation();
     setSelectedItem(selectedItem?.id === item.id ? null : item);
   };
@@ -160,7 +183,18 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const availableSlots = selectedItem ? getAvailableSlots(selectedItem) : [];
 
   const isPercentStat = (key) =>
-    ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"].includes(key);
+    ["critChance", "dodge", "lifeSteal", "critDamage"].includes(key);
+
+  const getRarityTextColor = (rarity = "common") => {
+    const map = {
+      common: "text-gray-400",
+      uncommon: "text-green-400",
+      rare: "text-blue-400",
+      epic: "text-purple-400",
+      legendary: "text-orange-400",
+    };
+    return map[rarity] || "text-gray-400";
+  };
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -182,10 +216,18 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                   onClick={(e) => handleItemClick(e, item)}
                   className={`relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(
                     item.rarity
-                  )} ${selectedItem?.id === item.id ? "ring-4 ring-cyan-400 ring-inset" : ""}`}
+                  )} ${
+                    selectedItem?.id === item.id
+                      ? "ring-2 ring-cyan-400 ring-inset"
+                      : ""
+                  }`}
                   title={item.name}
                 >
-                  <img src={item.icon} alt={item.name} className="w-full h-full object-cover" />
+                  <img
+                    src={item.icon}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -208,8 +250,12 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
               <div className="text-sm font-medium">
                 {panel.diffs.map(({ stat, diff }) => (
                   <div key={stat} className="flex justify-between">
-                    <span className="text-gray-400">{formatStatName(stat)}</span>
-                    <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
+                    <span className="text-gray-400">
+                      {formatStatName(stat)}
+                    </span>
+                    <span
+                      className={diff > 0 ? "text-green-400" : "text-red-400"}
+                    >
                       {formatDiff(stat, diff)}
                     </span>
                   </div>
@@ -221,7 +267,9 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           {/* Thông tin item */}
           <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl animate-in slide-in-from-bottom">
             <div className="pl-5 pr-5 pt-4 border-b border-gray-800">
-              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
+              <p className="font-bold text-lg text-white">
+                {selectedItem.name}
+              </p>
               <div className="text-sm text-gray-300">
                 Lv.{selectedItem.itemLevel} • {selectedItem.rarity}
               </div>
@@ -234,7 +282,8 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                   <div key={idx} className="flex justify-between text-gray-300">
                     <span>{formatStatName(affix.key)}</span>
                     <span className="text-green-400 font-medium">
-                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
+                      +{affix.value}
+                      {isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -253,7 +302,9 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                     }}
                     className="w-full px-6 py-5 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
                   >
-                    {equipped ? `Replace ${getSlotDisplayName(slot)}` : `Equip to ${getSlotDisplayName(slot)}`}
+                    {equipped
+                      ? `Replace ${getSlotDisplayName(slot)}`
+                      : `Equip to ${getSlotDisplayName(slot)}`}
                   </button>
                 );
               })}
@@ -283,21 +334,39 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
       {/* DESKTOP: Tooltip đẹp */}
       {!isMobile && selectedItem && (
         <>
-          <div className="absolute z-50 mt-3 mx-4 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl" style={{ top: "100%" }}>
-            <div className="p-5 border-b border-gray-800">
-              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
-              <div className="text-sm text-gray-300">
-                Lv.{selectedItem.itemLevel} • {selectedItem.rarity}
-              </div>
+          <div
+            className={`eq-container absolute z-301 mx-4 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl 
+               ${position === "down" ? "top-full" : "bottom-full"}`}
+            // style={{ top: "100%" }}
+          >
+            <div className="eq-header p-5 border-b border-gray-800">
+              <p className="eq-text font-bold text-lg">
+                {selectedItem.name}
+              </p>
+              <p className="eq-stat-text text-sm">
+                <span className="">
+                  Lv.{selectedItem.itemLevel}
+                </span>
+                <span className="mx-2">•</span>
+                <span
+                  className={`font-medium ${getRarityTextColor(
+                    selectedItem.rarity
+                  )}`}
+                >
+                  {selectedItem.rarity.charAt(0).toUpperCase() +
+                    selectedItem.rarity.slice(1)}
+                </span>
+              </p>
             </div>
 
             {selectedItem.affixes && selectedItem.affixes.length > 0 && (
-              <div className="p-5 space-y-1 text-sm border-b border-gray-800">
+              <div className="eq-header p-5 space-y-1 text-sm">
                 {selectedItem.affixes.map((affix, idx) => (
-                  <div key={idx} className="flex justify-between text-gray-300">
+                  <div key={idx} className="eq-stat-text flex justify-between">
                     <span>{formatStatName(affix.key)}</span>
-                    <span className="text-green-400 font-medium">
-                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
+                    <span className="eq-stat-text-plus font-medium">
+                      +{affix.value}
+                      {isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -316,7 +385,9 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                     }}
                     className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform hover:scale-105"
                   >
-                    {equipped ? `Replace ${getSlotDisplayName(slot)}` : `Equip to ${getSlotDisplayName(slot)}`}
+                    {equipped
+                      ? `Replace ${getSlotDisplayName(slot)}`
+                      : `Equip to ${getSlotDisplayName(slot)}`}
                   </button>
                 );
               })}
@@ -338,22 +409,37 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           {/* Bảng so sánh bên phải */}
           {diffPanels && (
             <div
-              className="absolute z-50 space-y-4"
-              style={{ top: "calc(100% + 12px)", left: "100%", marginLeft: "16px", width: "280px" }}
+              className={`absolute z-50 space-y-4 ${
+                position === "down" ? "top-full" : "bottom-full"
+              }`}
+              style={{
+                // top: "calc(100% + 12px)",
+                left: "100%",
+                marginLeft: "16px",
+                width: "280px",
+              }}
             >
               {diffPanels.map((panel, idx) => (
                 <div
                   key={idx}
-                  className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none"
+                  className="eq-container bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none"
                 >
-                  <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
+                  <div className="eq-header text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
                     vs {getSlotDisplayName(panel.slot)}
                   </div>
                   <div className="space-y-2 text-sm font-medium">
                     {panel.diffs.map(({ stat, diff }) => (
                       <div key={stat} className="flex justify-between">
-                        <span className="text-gray-400">{formatStatName(stat)}</span>
-                        <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
+                        <span className="eq-stat-text">
+                          {formatStatName(stat)}
+                        </span>
+                        <span
+                          className={
+                            diff > 0
+                              ? "eq-stat-text-plus"
+                              : "eq-stat-text-minus"
+                          }
+                        >
                           {formatDiff(stat, diff)}
                         </span>
                       </div>

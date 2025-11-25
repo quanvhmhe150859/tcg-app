@@ -394,7 +394,7 @@ const attackPhase = (
     return false;
   }
 
-  applyLifeSteal(attacker, attackerName, preArmorDamage, currentTurnLogs);
+  applyLifeSteal(attacker, attackerName, applyArmor(defender, preArmorDamage), currentTurnLogs);
 
   applyStun(attacker, defender, attackerName, currentTurnLogs);
   applyBurnEffect(attacker, defender);
