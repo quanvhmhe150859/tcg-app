@@ -15,7 +15,7 @@ const SkillsAndItemsPanel = ({
 }) => {
   return (
     <>
-      <p className="font-semibold mt-4 mb-2 border-t border-gray-500 pt-2">
+      <p className="font-semibold py-2 px-4">
         Skills & Items
       </p>
 

@@ -18,7 +18,7 @@ const GameControls = ({
   return (
     <>
       <div
-        className="flex justify-center items-center space-x-2 mb-4"
+        className="flex justify-center items-center space-x-2 py-2 px-4"
         title={`Adjust Auto Speed: ${autoSpeed} ms`}
       >
         <span>Auto Speed:</span>

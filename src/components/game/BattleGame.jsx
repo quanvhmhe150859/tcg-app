@@ -17,6 +17,8 @@ import EquipmentPanel from "./components/EquipmentPanel";
 import SpriteAnimation from "./animations/SpriteAnimation";
 import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
 
+import Hr from "./components/Hr";
+
 const BattleGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -262,6 +264,7 @@ const BattleGame = () => {
             <EntityHeader name="Player" entity={player} />
             <EntityHeader name="Enemy" entity={enemy} />
           </div>
+          <Hr/>
           <ToggleButtons
             showNormalStats={showNormalStats}
             showRareStats={showRareStats}
@@ -297,6 +300,7 @@ const BattleGame = () => {
               Gold: {player.gold} 💰
             </div>
           </div>
+          <Hr />
           <SkillsAndItemsPanel
             player={player}
             gameOver={gameOver}
@@ -306,20 +310,28 @@ const BattleGame = () => {
             handleSpecial={handleSpecial}
             handleUseConsumable={handleUseConsumable}
           />
+          <Hr />
           <InventoryPanel
             player={player}
             onEquipItem={handleEquipItem}
             onDestroyItem={handleDestroyItem}
           />
+          <Hr />
           <EquipmentPanel player={player} />
         </div>
 
         {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
         <div className="flex-1 md:w-1/2 flex flex-col md:flex-col">
-          <div className="order-2 md:order-1 mt-4 md:mt-0">
+          <div className="order-1 md:hidden">
+            <Hr />
+          </div>
+          <div className="order-4 md:order-2">
             <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
           </div>
-          <div className="order-1 md:order-2 mt-4">
+          <div className="order-3 md:order-3">
+            <Hr />
+          </div>
+          <div className="order-2 md:order-4">
             <GameControls
               isAuto={isAuto}
               toggleAuto={enhancedToggleAuto}

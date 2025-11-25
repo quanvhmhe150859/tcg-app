@@ -198,7 +198,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
   return (
     <div ref={wrapperRef} className="relative">
-      <p className="font-semibold mt-4 mb-2 border-t border-gray-500 pt-3">
+      <p className="font-semibold py-2 px-4">
         Inventory ({inventoryItems.length}/10)
       </p>
 
