@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 const EquipmentPanel = ({ player }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isOpen, setIsOpen] = useState(true); // Mở mặc định, bạn có thể đổi thành false
+  const [isOpen, setIsOpen] = useState(true);
   const wrapperRef = useRef(null);
 
   const onEquipClick = (slot) => {
@@ -13,7 +13,7 @@ const EquipmentPanel = ({ player }) => {
   };
 
   const closeMenu = () => setSelectedSlot(null);
-  const toggleOpen = () => setIsOpen(prev => !prev);
+  const toggleOpen = () => setIsOpen((prev) => !prev);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -78,6 +78,11 @@ const EquipmentPanel = ({ player }) => {
 
   const currentItem = selectedSlot ? player.equipment?.[selectedSlot] : null;
 
+  // Kiểm tra xem có đang cầm Two-Handed weapon không
+  const isTwoHandedEquipped =
+    player.equipment?.weapon1?.type === "twoHanded" &&
+    player.equipment?.weapon1?.id === player.equipment?.weapon2?.id;
+
   return (
     <div ref={wrapperRef} className="relative">
       {/* Nút Toggle Equipment */}
@@ -98,8 +103,20 @@ const EquipmentPanel = ({ player }) => {
           {/* Layout Desktop */}
           <div className="hidden lg:flex items-center justify-center gap-6">
             <div className="flex flex-col justify-center gap-4">
-              <EquipSlot slot="weapon1" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
-              <EquipSlot slot="weapon2" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
+              <EquipSlot
+                slot="weapon1"
+                player={player}
+                onEquipClick={onEquipClick}
+                getRarityBackground={getRarityBackground}
+                isTwoHanded={isTwoHandedEquipped}
+              />
+              <EquipSlot
+                slot="weapon2"
+                player={player}
+                onEquipClick={onEquipClick}
+                getRarityBackground={getRarityBackground}
+                isTwoHanded={isTwoHandedEquipped}
+              />
             </div>
             <div className="flex flex-col items-center gap-4">
               <EquipSlot slot="helmet" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
@@ -126,8 +143,20 @@ const EquipmentPanel = ({ player }) => {
               <EquipSlot slot="belt" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
               <EquipSlot slot="boots" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
               <div className="border-t border-gray-600 w-20 my-3" />
-              <EquipSlot slot="weapon1" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
-              <EquipSlot slot="weapon2" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
+              <EquipSlot
+                slot="weapon1"
+                player={player}
+                onEquipClick={onEquipClick}
+                getRarityBackground={getRarityBackground}
+                isTwoHanded={isTwoHandedEquipped}
+              />
+              <EquipSlot
+                slot="weapon2"
+                player={player}
+                onEquipClick={onEquipClick}
+                getRarityBackground={getRarityBackground}
+                isTwoHanded={isTwoHandedEquipped}
+              />
             </div>
             <div className="flex flex-col items-center gap-4">
               <EquipSlot slot="necklace" player={player} onEquipClick={onEquipClick} getRarityBackground={getRarityBackground} />
@@ -141,7 +170,6 @@ const EquipmentPanel = ({ player }) => {
       {/* Tooltip Desktop */}
       {currentItem && !isMobile && (
         <div className="eq-container absolute z-50 top-1/2 -translate-y-1/2 left-full ml-1 w-80 bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl p-6">
-          {/* ... giữ nguyên phần tooltip desktop */}
           <div className="border-b border-gray-800 pb-4 mb-4">
             <p className="eq-text font-bold text-xl text-white">{currentItem.name}</p>
             <p className="eq-stat-text text-sm">
@@ -206,11 +234,14 @@ const EquipmentPanel = ({ player }) => {
   );
 };
 
-// EquipSlot giữ nguyên 100%
-const EquipSlot = ({ slot, player, onEquipClick, getRarityBackground }) => {
+// Component EquipSlot – ĐÃ ĐƯỢC CẬP NHẬT ĐỂ HIỂN THỊ TWO-HANDED
+const EquipSlot = ({ slot, player, onEquipClick, getRarityBackground, isTwoHanded }) => {
   const item = player.equipment?.[slot];
   const hasItem = !!item;
   const rarity = item?.rarity || "common";
+
+  // Nếu là weapon2 và đang cầm Two-Handed → làm mờ + thêm nhãn
+  const isSecondaryTwoHandedSlot = slot === "weapon2" && isTwoHanded;
 
   return (
     <button
@@ -223,13 +254,18 @@ const EquipSlot = ({ slot, player, onEquipClick, getRarityBackground }) => {
           : "border-gray-700 bg-gray-800"
         }
         ${hasItem ? "cursor-pointer" : "cursor-default"}
+        ${isSecondaryTwoHandedSlot ? "opacity-70" : ""}
       `}
       title={hasItem ? `${item.name} • Lv.${item.itemLevel} • ${item.rarity}` : "Empty slot"}
     >
       {hasItem ? (
         <>
-          <div className={`absolute inset-0 ${getRarityBackground(rarity)} opacity-50`} />
-          <img src={item.icon} alt={slot} className="relative z-10 w-full h-full object-cover" />
+          <div className={`absolute inset-0 ${getRarityBackground(rarity)} opacity-60`} />
+          <img
+            src={item.icon}
+            alt={slot}
+            className={`relative z-10 w-full h-full object-cover ${isSecondaryTwoHandedSlot ? "opacity-50" : ""}`}
+          />
         </>
       ) : (
         <span className="text-gray-600 text-3xl font-bold select-none">+</span>

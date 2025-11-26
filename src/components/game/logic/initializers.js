@@ -371,8 +371,8 @@ export const generateRareUpgradeOptions = (player) => {
     {
       key: "luck",
       name: "Luck",
-      min: 5,
-      max: 10 + Math.floor(player.luck / 2),
+      min: 2,
+      max: 6 + Math.floor(player.luck / 2),
       format: (val) => `+${val}`,
     },
   ];

@@ -1,6 +1,7 @@
 // src/components/battle/InventoryPanel.jsx
 import React, { useState, useRef, useEffect } from "react";
 
+// ĐẶT Ở NGOÀI COMPONENT ĐỂ TẤT CẢ CÁC PHẦN ĐỀU DÙNG ĐƯỢC
 const formatStatName = (stat) => {
   const map = {
     minAttack: "Min Attack",
@@ -15,54 +16,37 @@ const formatStatName = (stat) => {
     luck: "Luck",
     armor: "Armor",
   };
-  return (
-    map[stat] ||
-    stat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())
-  );
+  return map[stat] || stat.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase());
 };
 
 const formatDiff = (stat, diff) => {
-  const percentStats = [
-    "critChance",
-    "dodge",
-    "lifeSteal",
-    "critDamage",
-  ];
+  const percentStats = ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"];
   const value = Math.abs(diff);
   const formatted = percentStats.includes(stat) ? `${value}%` : value;
   return diff > 0 ? `+${formatted}` : `-${formatted}`;
 };
 
-// THỨ TỰ ƯU TIÊN HIỂN THỊ TRONG BẢNG SO SÁNH
 const STAT_ORDER = [
-  "maxHealth",
-  "regeneration",
-  "armor",
-  "minAttack",
-  "maxAttack",
-  "critChance",
-  "critDamage",
-  "lifeSteal",
-  "dodge",
-  "luck",
-  "thorn",
+  "maxHealth", "regeneration", "armor",
+  "minAttack", "maxAttack",
+  "critChance", "critDamage", "lifeSteal",
+  "dodge", "luck", "thorn",
 ];
 
 const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const wrapperRef = useRef(null);
-
   const [position, setPosition] = useState("down");
+  const wrapperRef = useRef(null);
 
   const equippedIds = new Set(
     Object.values(player?.equipment || {})
       .filter(Boolean)
-      .map((eq) => eq.id)
+      .map(eq => eq.id)
   );
 
   const inventoryItems = (player?.inventory || []).filter(
-    (item) => item.slot && item.icon && !equippedIds.has(item.id)
+    item => item.slot && item.icon && !equippedIds.has(item.id)
   );
 
   const getRarityBackground = (rarity = "common") => {
@@ -76,18 +60,23 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     return map[rarity] || map.common;
   };
 
+  const getRarityTextColor = (rarity = "common") => {
+    const map = {
+      common: "text-gray-400",
+      uncommon: "text-green-400",
+      rare: "text-blue-400",
+      epic: "text-purple-400",
+      legendary: "text-orange-400",
+    };
+    return map[rarity] || "text-gray-400";
+  };
+
   const getSlotDisplayName = (slot) => {
     const map = {
-      weapon1: "Weapon 1",
-      weapon2: "Weapon 2",
-      helmet: "Helmet",
-      armor: "Armor",
-      gloves: "Gloves",
-      belt: "Belt",
-      boots: "Boots",
-      necklace: "Necklace",
-      ring1: "Ring 1",
-      ring2: "Ring 2",
+      weapon1: "Weapon 1", weapon2: "Weapon 2",
+      helmet: "Helmet", armor: "Armor", gloves: "Gloves",
+      belt: "Belt", boots: "Boots", necklace: "Necklace",
+      ring1: "Ring 1", ring2: "Ring 2",
     };
     return map[slot] || slot;
   };
@@ -98,65 +87,77 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
     return dual[key] || [item.slot];
   };
 
-  // BẢNG SO SÁNH - SẮP XẾP THEO THỨ TỰ ĐẸP
+  // BẢNG SO SÁNH – ĐÃ FIX HOÀN TOÀN (hỗ trợ Two-Handed + tên chỉ số đẹp)
   const calculateDiffs = (item) => {
     const panels = [];
-    for (const slot of getAvailableSlots(item)) {
-      const equipped = player.equipment?.[slot];
-      if (!equipped) continue;
+    const newStats = item.stats || {};
+    const isTwoHanded = item.type === "twoHanded";
 
-      const newStats = item.stats || {};
-      const oldStats = equipped.stats || {};
+    if (isTwoHanded) {
+      const w1 = player.equipment?.weapon1;
+      const w2 = player.equipment?.weapon2;
+      if (!w1 && !w2) return null;
+
+      const oldTotalStats = {};
+      [w1, w2].forEach(eq => {
+        if (eq?.stats) {
+          Object.entries(eq.stats).forEach(([k, v]) => {
+            oldTotalStats[k] = (oldTotalStats[k] || 0) + v;
+          });
+        }
+      });
+
       const diffMap = {};
-
-      // Ưu tiên theo thứ tự đã định
-      STAT_ORDER.forEach((stat) => {
-        const newVal = newStats[stat] ?? 0;
-        const oldVal = oldStats[stat] ?? 0;
-        const diff = newVal - oldVal;
-        if (diff !== 0) {
-          diffMap[stat] = diff;
-        }
+      STAT_ORDER.forEach(stat => {
+        const diff = (newStats[stat] ?? 0) - (oldTotalStats[stat] ?? 0);
+        if (diff !== 0) diffMap[stat] = diff;
       });
 
-      // Các stat còn lại (nếu có stat mới trong tương lai)
-      [
-        ...new Set([...Object.keys(newStats), ...Object.keys(oldStats)]),
-      ].forEach((stat) => {
+      [...new Set([...Object.keys(newStats), ...Object.keys(oldTotalStats)])].forEach(stat => {
         if (!STAT_ORDER.includes(stat)) {
-          const newVal = newStats[stat] ?? 0;
-          const oldVal = oldStats[stat] ?? 0;
-          const diff = newVal - oldVal;
-          if (diff !== 0 && !(stat in diffMap)) {
-            diffMap[stat] = diff;
-          }
+          const diff = (newStats[stat] ?? 0) - (oldTotalStats[stat] ?? 0);
+          if (diff !== 0 && !(stat in diffMap)) diffMap[stat] = diff;
         }
       });
 
-      const diffs = Object.keys(diffMap).map((stat) => ({
-        stat,
-        diff: diffMap[stat],
-      }));
-
+      const diffs = Object.keys(diffMap).map(stat => ({ stat, diff: diffMap[stat] }));
       if (diffs.length > 0) {
-        panels.push({ slot, diffs });
+        panels.push({ slot: "both", label: "vs Both Weapons", diffs });
+      }
+    } else {
+      for (const slot of getAvailableSlots(item)) {
+        const equipped = player.equipment?.[slot];
+        if (!equipped) continue;
+
+        const oldStats = equipped.stats || {};
+        const diffMap = {};
+
+        STAT_ORDER.forEach(stat => {
+          const diff = (newStats[stat] ?? 0) - (oldStats[stat] ?? 0);
+          if (diff !== 0) diffMap[stat] = diff;
+        });
+
+        [...new Set([...Object.keys(newStats), ...Object.keys(oldStats)])].forEach(stat => {
+          if (!STAT_ORDER.includes(stat)) {
+            const diff = (newStats[stat] ?? 0) - (oldStats[stat] ?? 0);
+            if (diff !== 0 && !(stat in diffMap)) diffMap[stat] = diff;
+          }
+        });
+
+        const diffs = Object.keys(diffMap).map(stat => ({ stat, diff: diffMap[stat] }));
+        if (diffs.length > 0) {
+          panels.push({ slot, label: `vs ${getSlotDisplayName(slot)}`, diffs });
+        }
       }
     }
+
     return panels.length > 0 ? panels : null;
   };
 
   const handleItemClick = (e, item) => {
     const rect = e.currentTarget.getBoundingClientRect();
-
-    // Kiểm tra khoảng không phía dưới nút
     const spaceBelow = window.innerHeight - rect.bottom;
-
-    if (spaceBelow < 425) {
-      setPosition("up"); // thiếu không gian → hiển thị lên trên
-    } else {
-      setPosition("down");
-    }
-
+    setPosition(spaceBelow < 425 ? "up" : "down");
     e.stopPropagation();
     setSelectedItem(selectedItem?.id === item.id ? null : item);
   };
@@ -181,20 +182,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
   const diffPanels = selectedItem ? calculateDiffs(selectedItem) : null;
   const availableSlots = selectedItem ? getAvailableSlots(selectedItem) : [];
-
-  const isPercentStat = (key) =>
-    ["critChance", "dodge", "lifeSteal", "critDamage"].includes(key);
-
-  const getRarityTextColor = (rarity = "common") => {
-    const map = {
-      common: "text-gray-400",
-      uncommon: "text-green-400",
-      rare: "text-blue-400",
-      epic: "text-purple-400",
-      legendary: "text-orange-400",
-    };
-    return map[rarity] || "text-gray-400";
-  };
+  const isPercentStat = (key) => ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"].includes(key);
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -204,9 +192,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
       <div className="bg-game-secondary rounded-lg p-4 h-[98px]">
         {inventoryItems.length === 0 ? (
-          <div className="text-center text-gray-500 italic py-6">
-            Inventory is empty
-          </div>
+          <div className="text-center text-gray-500 italic py-6">Inventory is empty</div>
         ) : (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
             <div className="flex gap-3 py-2 min-w-max ml-1 mr-1">
@@ -214,20 +200,13 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                 <button
                   key={item.id}
                   onClick={(e) => handleItemClick(e, item)}
-                  className={`relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(
-                    item.rarity
-                  )} ${
-                    selectedItem?.id === item.id
-                      ? "ring-2 ring-cyan-400 ring-inset"
-                      : ""
-                  }`}
+                  className={`relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(item.rarity)} ${selectedItem?.id === item.id ? "ring-2 ring-cyan-400 ring-inset" : ""}`}
                   title={item.name}
                 >
-                  <img
-                    src={item.icon}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={item.icon} alt={item.name} className="w-full h-full object-cover" />
+                  {item.type === "twoHanded" && (
+                    <div className="absolute bottom-0 right-0 bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white rounded-tl">2H</div>
+                  )}
                 </button>
               ))}
             </div>
@@ -235,27 +214,19 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         )}
       </div>
 
-      {/* MOBILE: Tooltip dính đáy */}
+      {/* MOBILE */}
       {isMobile && selectedItem && (
         <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
-          {/* Bảng so sánh */}
           {diffPanels?.map((panel, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-950 border-2 border-cyan-600 rounded-lg pl-4 pr-4 shadow-2xl pointer-events-none animate-in slide-in-from-bottom"
-            >
+            <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl animate-in slide-in-from-bottom">
               <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
-                vs {getSlotDisplayName(panel.slot)}
+                {panel.label}
               </div>
-              <div className="text-sm font-medium">
+              <div className="text-sm font-medium space-y-1">
                 {panel.diffs.map(({ stat, diff }) => (
                   <div key={stat} className="flex justify-between">
-                    <span className="text-gray-400">
-                      {formatStatName(stat)}
-                    </span>
-                    <span
-                      className={diff > 0 ? "text-green-400" : "text-red-400"}
-                    >
+                    <span className="text-gray-400">{formatStatName(stat)}</span>
+                    <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
                       {formatDiff(stat, diff)}
                     </span>
                   </div>
@@ -264,26 +235,23 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             </div>
           ))}
 
-          {/* Thông tin item */}
+          {/* Item info + buttons */}
           <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl animate-in slide-in-from-bottom">
-            <div className="pl-5 pr-5 pt-4 border-b border-gray-800">
-              <p className="font-bold text-lg text-white">
-                {selectedItem.name}
-              </p>
-              <div className="text-sm text-gray-300">
-                Lv.{selectedItem.itemLevel} • {selectedItem.rarity}
+            <div className="px-5 pt-4 border-b border-gray-800">
+              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
+              <div className="text-sm text-gray-300 pb-4">
+                Lv.{selectedItem.itemLevel} • {selectedItem.rarity.charAt(0).toUpperCase() + selectedItem.rarity.slice(1)}
+                {selectedItem.type === "twoHanded" && " • Two-Handed"}
               </div>
             </div>
 
-            {/* Affixes - từng dòng riêng biệt */}
-            {selectedItem.affixes && selectedItem.affixes.length > 0 && (
+            {selectedItem.affixes?.length > 0 && (
               <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
                 {selectedItem.affixes.map((affix, idx) => (
                   <div key={idx} className="flex justify-between text-gray-300">
                     <span>{formatStatName(affix.key)}</span>
                     <span className="text-green-400 font-medium">
-                      +{affix.value}
-                      {isPercentStat(affix.key) ? "%" : ""}
+                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -291,38 +259,27 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             )}
 
             <div className="p-4 space-y-3">
-              {availableSlots.map((slot) => {
-                const equipped = player.equipment?.[slot];
-                return (
-                  <button
-                    key={slot}
-                    onClick={() => {
-                      onEquipItem?.(selectedItem, slot);
-                      setSelectedItem(null);
-                    }}
-                    className="w-full px-6 py-5 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
-                  >
-                    {equipped
-                      ? `Replace ${getSlotDisplayName(slot)}`
-                      : `Equip to ${getSlotDisplayName(slot)}`}
-                  </button>
-                );
-              })}
+              {availableSlots.map((slot) => (
+                <button
+                  key={slot}
+                  onClick={() => { onEquipItem?.(selectedItem, slot); setSelectedItem(null); }}
+                  className="w-full px-6 py-5 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition active:scale-95"
+                >
+                  {selectedItem.type === "twoHanded"
+                    ? "Equip Two-Handed (Replace both)"
+                    : player.equipment?.[slot]
+                    ? `Replace ${getSlotDisplayName(slot)}`
+                    : `Equip to ${getSlotDisplayName(slot)}`}
+                </button>
+              ))}
 
               <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => {
-                    onDestroyItem?.(selectedItem);
-                    setSelectedItem(null);
-                  }}
-                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
-                >
+                <button onClick={() => { onDestroyItem?.(selectedItem); setSelectedItem(null); }}
+                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition active:scale-95">
                   Destroy
                 </button>
-                <button
-                  onClick={closeMenu}
-                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold text-lg shadow-lg transition transform active:scale-95"
-                >
+                <button onClick={closeMenu}
+                  className="px-5 py-5 rounded-lg bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold text-lg shadow-lg transition active:scale-95">
                   Cancel
                 </button>
               </div>
@@ -331,42 +288,29 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         </div>
       )}
 
-      {/* DESKTOP: Tooltip đẹp */}
+      {/* DESKTOP */}
       {!isMobile && selectedItem && (
         <>
-          <div
-            className={`eq-container absolute z-301 mx-4 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl 
-               ${position === "down" ? "top-full" : "bottom-full"}`}
-            // style={{ top: "100%" }}
-          >
-            <div className="eq-header p-5 border-b border-gray-800">
-              <p className="eq-text font-bold text-lg">
-                {selectedItem.name}
-              </p>
-              <p className="eq-stat-text text-sm">
-                <span className="">
-                  Lv.{selectedItem.itemLevel}
+          {/* Tooltip chính */}
+          <div className={`eq-container absolute z-301 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl ${position === "down" ? "top-full" : "bottom-full"}`}>
+            <div className="p-5 border-b border-gray-800">
+              <p className="font-bold text-lg text-white">{selectedItem.name}</p>
+              <p className="text-sm text-gray-300">
+                Lv.{selectedItem.itemLevel} •{" "}
+                <span className={getRarityTextColor(selectedItem.rarity)}>
+                  {selectedItem.rarity.charAt(0).toUpperCase() + selectedItem.rarity.slice(1)}
                 </span>
-                <span className="mx-2">•</span>
-                <span
-                  className={`font-medium ${getRarityTextColor(
-                    selectedItem.rarity
-                  )}`}
-                >
-                  {selectedItem.rarity.charAt(0).toUpperCase() +
-                    selectedItem.rarity.slice(1)}
-                </span>
+                {selectedItem.type === "twoHanded" && " • Two-Handed"}
               </p>
             </div>
 
-            {selectedItem.affixes && selectedItem.affixes.length > 0 && (
-              <div className="eq-header p-5 space-y-1 text-sm">
+            {selectedItem.affixes?.length > 0 && (
+              <div className="p-5 space-y-1 text-sm">
                 {selectedItem.affixes.map((affix, idx) => (
-                  <div key={idx} className="eq-stat-text flex justify-between">
+                  <div key={idx} className="flex justify-between text-gray-300">
                     <span>{formatStatName(affix.key)}</span>
-                    <span className="eq-stat-text-plus font-medium">
-                      +{affix.value}
-                      {isPercentStat(affix.key) ? "%" : ""}
+                    <span className="text-green-400 font-medium">
+                      +{affix.value}{isPercentStat(affix.key) ? "%" : ""}
                     </span>
                   </div>
                 ))}
@@ -374,72 +318,42 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             )}
 
             <div className="p-5 space-y-3">
-              {availableSlots.map((slot) => {
-                const equipped = player.equipment?.[slot];
-                return (
-                  <button
-                    key={slot}
-                    onClick={() => {
-                      onEquipItem?.(selectedItem, slot);
-                      setSelectedItem(null);
-                    }}
-                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition transform hover:scale-105"
-                  >
-                    {equipped
-                      ? `Replace ${getSlotDisplayName(slot)}`
-                      : `Equip to ${getSlotDisplayName(slot)}`}
-                  </button>
-                );
-              })}
-
-              <div className="flex gap-3">
+              {availableSlots.map((slot) => (
                 <button
-                  onClick={() => {
-                    onDestroyItem?.(selectedItem);
-                    setSelectedItem(null);
-                  }}
-                  className="flex-1 px-6 py-4 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition transform hover:scale-105"
+                  key={slot}
+                  onClick={() => { onEquipItem?.(selectedItem, slot); setSelectedItem(null); }}
+                  className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition hover:scale-105"
                 >
-                  Destroy Item
+                  {selectedItem.type === "twoHanded"
+                    ? "Equip Two-Handed (Replace both weapons)"
+                    : player.equipment?.[slot]
+                    ? `Replace ${getSlotDisplayName(slot)}`
+                    : `Equip to ${getSlotDisplayName(slot)}`}
                 </button>
-              </div>
+              ))}
+
+              <button
+                onClick={() => { onDestroyItem?.(selectedItem); setSelectedItem(null); }}
+                className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-lg transition hover:scale-105"
+              >
+                Destroy Item
+              </button>
             </div>
           </div>
 
-          {/* Bảng so sánh bên phải */}
+          {/* BẢNG SO SÁNH BÊN PHẢI – ĐÃ FIX TÊN CHỈ SỐ */}
           {diffPanels && (
-            <div
-              className={`absolute z-50 space-y-4 ${
-                position === "down" ? "top-full" : "bottom-full"
-              }`}
-              style={{
-                // top: "calc(100% + 12px)",
-                left: "100%",
-                marginLeft: "16px",
-                width: "280px",
-              }}
-            >
+            <div className={`absolute z-50 space-y-4 ${position === "down" ? "top-full" : "bottom-full"}`} style={{ left: "100%", marginLeft: "16px", width: "280px" }}>
               {diffPanels.map((panel, idx) => (
-                <div
-                  key={idx}
-                  className="eq-container bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl pointer-events-none"
-                >
-                  <div className="eq-header text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
-                    vs {getSlotDisplayName(panel.slot)}
+                <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl">
+                  <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
+                    {panel.label}
                   </div>
-                  <div className="space-y-2 text-sm font-medium">
+                  <div className="space-y-2 text-sm">
                     {panel.diffs.map(({ stat, diff }) => (
-                      <div key={stat} className="flex justify-between">
-                        <span className="eq-stat-text">
-                          {formatStatName(stat)}
-                        </span>
-                        <span
-                          className={
-                            diff > 0
-                              ? "eq-stat-text-plus"
-                              : "eq-stat-text-minus"
-                          }
-                        >
+                      <div key={stat} className="flex justify-between font-medium">
+                        <span className="text-gray-400">{formatStatName(stat)}</span>
+                        <span className={diff > 0 ? "text-green-400" : "text-red-400"}>
                           {formatDiff(stat, diff)}
                         </span>
                       </div>

@@ -26,42 +26,6 @@ const EQUIPMENT_RARITIES = [
   { name: "legendary", weight: 1, color: "orange" },
 ];
 
-const EQUIPMENT_PREFIXES = [
-  "Flaming",
-  "Frozen",
-  "Thunder",
-  "Shadow",
-  "Blood",
-  "Holy",
-  "Void",
-  "Ancient",
-  "Cursed",
-  "Eternal",
-  "Berserker",
-  "Titan",
-  "Dragon",
-  "Phantom",
-  "Celestial",
-  "Demonic",
-  "Radiant",
-  "Corrupted",
-];
-
-const EQUIPMENT_SUFFIXES = [
-  "of Power",
-  "of Destruction",
-  "of the Gods",
-  "of Chaos",
-  "of Eternity",
-  "of Doom",
-  "of Glory",
-  "of Rage",
-  "of the Phoenix",
-  "of the Void",
-  "of Legends",
-  "of the Damned",
-];
-
 const SLOT_TYPES = [
   "weapon1",
   "weapon2",
@@ -132,6 +96,9 @@ const ICON_POOL = {
 // === HÀM TẠO TRANG BỊ HOÀN CHỈNH - ĐÃ FIX LỖI + LUCK CỰC MẠNH ===
 // === HÀM TẠO TRANG BỊ HOÀN CHỈNH - LUCK SIÊU MẠNH (luck=40 → 90%+ LEGENDARY) ===
 // === HÀM TẠO TRANG BỊ HOÀN CHỈNH - ĐÃ THÊM ITEM LEVEL + LUCK ẢNH HƯỞNG VƯỢT CẤP ===
+// === HÀM generateRandomEquipment ĐÃ ĐƯỢC CẬP NHẬT ===
+// Thêm type: "normal" hoặc "twoHanded" (chỉ với weapon)
+// twoHanded → stats ×1.5
 const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
   // === CẤU HÌNH STAT (giữ nguyên) ===
   const STAT_CONFIG = {
@@ -183,11 +150,9 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     epic: 4 * Math.pow(1.5, playerLuck / 10),
     legendary: 1 * Math.pow(4.5, playerLuck / 10),
   };
-
-  Object.keys(weights).forEach((key) => {
-    weights[key] = Math.min(weights[key], 1e12);
-  });
-
+  Object.keys(weights).forEach(
+    (k) => (weights[k] = Math.min(weights[k], 1e12))
+  );
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
   let roll = Math.random() * totalWeight;
 
@@ -209,33 +174,39 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
 
   const rarityInfo = EQUIPMENT_RARITIES.find((r) => r.name === selectedRarity);
 
-  // === 3. SLOT, NAME, ICON ===
+  // === 3. SLOT ===
   const slot = SLOT_TYPES[Math.floor(Math.random() * SLOT_TYPES.length)];
 
-  const prefix =
-    EQUIPMENT_PREFIXES[Math.floor(Math.random() * EQUIPMENT_PREFIXES.length)];
-  const suffix =
-    Math.random() > 0.6
-      ? " " +
-        EQUIPMENT_SUFFIXES[
-          Math.floor(Math.random() * EQUIPMENT_SUFFIXES.length)
-        ]
-      : "";
+  // === 4. XÁC ĐỊNH TYPE (twoHanded chỉ dành cho weapon) ===
+  let type = "normal";
+  if (slot.includes("weapon")) {
+    if (Math.random() < 0.5) {
+      // 20% chance trở thành two-handed
+      type = "twoHanded";
+    }
+  }
+
+  // === 5. TÊN ITEM ===
   const baseName =
     {
-      weapon1: "Sword",
-      weapon2: "Shield",
+      weapon1: "Weapon",
+      weapon2: "Weapon",
       helmet: "Helmet",
       armor: "Armor",
-      gloves: "Gauntlets",
+      gloves: "Gloves",
       belt: "Belt",
       boots: "Boots",
-      necklace: "Amulet",
+      necklace: "Necklace",
       ring1: "Ring",
       ring2: "Ring",
     }[slot] || "Item";
-  const name = `${prefix} ${baseName}${suffix}`.trim();
 
+  const typeSuffix = type === "twoHanded" ? " (Two-Handed)" : "";
+  const name = `${
+    selectedRarity.charAt(0).toUpperCase() + selectedRarity.slice(1)
+  } ${baseName}${typeSuffix}`;
+
+  // === 6. MULTIPLIER ===
   const rarityMultiplier = {
     common: 0.5,
     uncommon: 1.0,
@@ -243,6 +214,9 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     epic: 3.2,
     legendary: 5.5,
   }[selectedRarity];
+
+  const typeMultiplier = type === "twoHanded" ? 1.5 : 1.0;
+  const finalMultiplier = rarityMultiplier * typeMultiplier;
 
   const statCount =
     selectedRarity === "legendary"
@@ -263,32 +237,26 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
   const finalPool =
     possibleStats.length > 0 ? possibleStats : Object.keys(STAT_CONFIG);
 
-  // === MỚI: Tạo affixes (mỗi dòng riêng) + stats tổng hợp ===
-  const affixes = []; // ← Dùng để hiển thị từng dòng
-
+  // === TẠO AFFIXES + STATS ===
+  const affixes = [];
   for (let i = 0; i < statCount; i++) {
     if (finalPool.length === 0) continue;
-
     const stat = finalPool[Math.floor(Math.random() * finalPool.length)];
     const cfg = STAT_CONFIG[stat];
 
     let value =
       itemLevel *
       cfg.base *
-      rarityMultiplier *
+      finalMultiplier *
       (1 - cfg.rand / 2 + Math.random() * cfg.rand);
-
     value = Math.round(value);
     value = Math.max(1, value);
 
-    affixes.push({ key: stat, value }); // ← Mỗi dòng riêng biệt
+    affixes.push({ key: stat, value });
   }
 
-  // Tính tổng stats để dùng cho gameplay
   const stats = {};
-  affixes.forEach((affix) => {
-    stats[affix.key] = (stats[affix.key] || 0) + affix.value;
-  });
+  affixes.forEach((a) => (stats[a.key] = (stats[a.key] || 0) + a.value));
 
   // === ICON ===
   const getIcon = () => {
@@ -311,10 +279,11 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     name,
     icon: getIcon(),
     slot,
+    type, // ← MỚI: "normal" | "twoHanded"
     rarity: selectedRarity,
     rarityColor: rarityInfo?.color || "gray",
-    stats, // ← Tổng stats (dùng để tính toán trong game)
-    affixes, // ← Danh sách từng dòng để hiển thị đẹp
+    stats,
+    affixes,
     itemLevel,
   };
 };
@@ -1059,95 +1028,141 @@ const useGameLogic = ({
    * Trang bị một item từ inventory vào slot tương ứng
    * Khi replace: HỦY LUÔN ITEM CŨ (không trả về túi)
    */
-  const handleEquipItem = (item, slot) => {
-    if (!item || !item.slot || !item.stats) return;
+  /**
+ * Trang bị item từ inventory
+ * - Two-Handed Weapon: chiếm cả weapon1 + weapon2
+ * - Thay thế: hủy luôn item cũ (không trả về túi)
+ */
+/**
+ * handleEquipItem – ĐÃ FIX HOÀN TOÀN
+ * - Two-Handed: chiếm cả 2 slot weapon
+ * - Đổi từ Two-Handed → 1 tay: hủy luôn Two-Handed cũ
+ * - Các trang bị khác (áo, giày, nhẫn...) hoạt động bình thường
+ */
+const handleEquipItem = (item, targetSlot) => {
+  if (!item || !item.slot || !item.stats || !targetSlot) return;
 
-    setPlayer((prev) => {
-      const currentTurnLogs = [];
-      const newPlayer = {
-        ...prev,
-        equipment: { ...prev.equipment },
-        inventory: [...(prev.inventory || [])],
-        rareStats: { ...prev.rareStats },
-      };
+  setPlayer((prev) => {
+    const currentTurnLogs = [];
+    const newPlayer = {
+      ...prev,
+      equipment: { ...prev.equipment },
+      inventory: [...(prev.inventory || [])],
+      rareStats: { ...prev.rareStats },
+    };
 
-      const currentlyEquipped = newPlayer.equipment[slot];
+    const isWeaponItem = item.slot.includes("weapon");
+    const isWeaponSlot = targetSlot.includes("weapon");
+    const isTwoHanded = item.type === "twoHanded";
 
-      // === 1. Nếu có item cũ → TRỪ STATS + HỦY LUÔN (không trả về túi) ===
-      if (currentlyEquipped && currentlyEquipped.id !== item.id) {
-        Object.entries(currentlyEquipped.stats).forEach(([stat, value]) => {
-          const adjustedValue = PERCENTAGE_KEYS.includes(stat)
-            ? value / 100
-            : value;
-          if (stat in newPlayer) newPlayer[stat] -= adjustedValue;
-          else if (stat in newPlayer.rareStats)
-            newPlayer.rareStats[stat] -= adjustedValue;
-        });
-
-        addLog(
-          `Destroyed old ${currentlyEquipped.name} (${
-            currentlyEquipped.rarity
-          }) from ${getSlotDisplayName(slot)}`,
-          "equipment",
-          currentTurnLogs
-        );
-        // Không push về inventory → bị hủy vĩnh viễn
-      }
-
-      // === 2. Kiểm tra slot hợp lệ (weapon/ring linh hoạt) ===
-      const normalizedItemSlot = item.slot.replace(/1|2$/, "");
-      const normalizedTargetSlot = slot.replace(/1|2$/, "");
-      const isDualSlot =
-        normalizedItemSlot === "weapon" || normalizedItemSlot === "ring";
-
-      if (!isDualSlot && item.slot !== slot) {
-        addLog(
-          `Cannot equip ${item.name} to ${getSlotDisplayName(slot)}!`,
-          "error",
-          currentTurnLogs
-        );
+    // =================================================================
+    // 1. XỬ LÝ RIÊNG CHO WEAPON (có Two-Handed)
+    // =================================================================
+    if (isWeaponItem) {
+      if (!isWeaponSlot) {
+        addLog(`Cannot equip ${item.name} to ${getSlotDisplayName(targetSlot)}!`, "error", currentTurnLogs);
         updateTurnLogs(currentTurnLogs);
         return prev;
       }
 
-      // === 3. Cộng stats item mới ===
-      Object.entries(item.stats).forEach(([stat, value]) => {
-        const adjustedValue = PERCENTAGE_KEYS.includes(stat)
-          ? value / 100
-          : value;
-        if (stat in newPlayer) newPlayer[stat] += adjustedValue;
-        else if (stat in newPlayer.rareStats)
-          newPlayer.rareStats[stat] += adjustedValue;
+      const w1 = newPlayer.equipment.weapon1;
+      const w2 = newPlayer.equipment.weapon2;
+      const currentlyTwoHanded = w1?.type === "twoHanded" && w1.id === w2?.id;
+
+      // Danh sách item cũ cần bị hủy (tránh trùng)
+      const oldItemsToRemove = new Set();
+
+      if (isTwoHanded || currentlyTwoHanded) {
+        // Nếu trang bị Two-Handed HOẶC đang có Two-Handed → xóa cả 2 slot
+        if (w1) oldItemsToRemove.add(w1);
+        if (w2 && w2.id !== w1?.id) oldItemsToRemove.add(w2);
+      } else {
+        // Chỉ thay 1 slot
+        const oldInTarget = newPlayer.equipment[targetSlot];
+        if (oldInTarget) oldItemsToRemove.add(oldInTarget);
+      }
+
+      // === TRỪ STATS CŨ - CHỈ 1 LẦN DUY NHẤT ===
+      oldItemsToRemove.forEach((oldItem) => {
+        if (oldItem && oldItem.id !== item.id) {
+          Object.entries(oldItem.stats).forEach(([stat, val]) => {
+            const v = PERCENTAGE_KEYS.includes(stat) ? val / 100 : val;
+            if (stat in newPlayer) newPlayer[stat] -= v;
+            else if (stat in newPlayer.rareStats) newPlayer.rareStats[stat] -= v;
+          });
+
+          addLog(
+            `Destroyed old ${oldItem.name} (${oldItem.rarity})`,
+            "equipment",
+            currentTurnLogs
+          );
+        }
       });
 
-      // === 4. Cập nhật equipment + xóa khỏi inventory ===
-      newPlayer.equipment[slot] = item;
-      newPlayer.inventory = newPlayer.inventory.filter((i) => i.id !== item.id);
+      // === XÓA KHỎI EQUIPMENT ===
+      if (isTwoHanded || currentlyTwoHanded) {
+        delete newPlayer.equipment.weapon1;
+        delete newPlayer.equipment.weapon2;
+      } else {
+        delete newPlayer.equipment[targetSlot];
+      }
 
-      // === 5. Log hành động ===
-      const action = currentlyEquipped ? "replaced" : "equipped";
-      addLog(
-        `Player ${action} ${item.name} (${item.rarity}) to ${getSlotDisplayName(
-          slot
-        )}!`,
-        "equipment",
-        currentTurnLogs
-      );
+      // === TRANG BỊ MỚI ===
+      if (isTwoHanded) {
+        newPlayer.equipment.weapon1 = item;
+        newPlayer.equipment.weapon2 = item;
+        addLog(`Equipped ${item.name} (${item.rarity}) as Two-Handed Weapon! (Both slots)`, "equipment", currentTurnLogs);
+      } else {
+        newPlayer.equipment[targetSlot] = item;
+        const action = currentlyTwoHanded ? "replaced Two-Handed with" : "equipped";
+        addLog(`Player ${action} ${item.name} (${item.rarity}) to ${getSlotDisplayName(targetSlot)}!`, "equipment", currentTurnLogs);
+      }
+    }
+    // =================================================================
+    // 2. CÁC TRANG BỊ KHÁC (áo, giày, nhẫn...) - GIỮ NGUYÊN
+    // =================================================================
+    else {
+      const normalizedItemSlot = item.slot.replace(/1|2$/, "");
+      const normalizedTargetSlot = targetSlot.replace(/1|2$/, "");
+      const isFlexible = normalizedItemSlot === "ring";
 
-      // Log chi tiết stats
-      // Object.entries(item.stats).forEach(([stat, value]) => {
-      //   const formatted = PERCENTAGE_KEYS.includes(stat) ? `${value}%` : value;
-      //   addLog(
-      //     `+ ${formatStatName(stat)} ${formatted}`,
-      //     "stat",
-      //     currentTurnLogs
-      //   );
-      // });
+      if (!isFlexible && item.slot !== targetSlot) {
+        addLog(`Cannot equip ${item.name} to ${getSlotDisplayName(targetSlot)}!`, "error", currentTurnLogs);
+        updateTurnLogs(currentTurnLogs);
+        return prev;
+      }
 
-      updateTurnLogs(currentTurnLogs);
-      return newPlayer;
+      const oldItem = newPlayer.equipment[targetSlot];
+      if (oldItem && oldItem.id !== item.id) {
+        Object.entries(oldItem.stats).forEach(([stat, val]) => {
+          const v = PERCENTAGE_KEYS.includes(stat) ? val / 100 : val;
+          if (stat in newPlayer) newPlayer[stat] -= v;
+          else if (stat in newPlayer.rareStats) newPlayer.rareStats[stat] -= v;
+        });
+        addLog(`Destroyed old ${oldItem.name} (${oldItem.rarity}) from ${getSlotDisplayName(targetSlot)}`, "equipment", currentTurnLogs);
+      }
+
+      newPlayer.equipment[targetSlot] = item;
+      const action = oldItem ? "replaced" : "equipped";
+      addLog(`Player ${action} ${item.name} (${item.rarity}) to ${getSlotDisplayName(targetSlot)}!`, "equipment", currentTurnLogs);
+    }
+
+    // =================================================================
+    // 3. CỘNG STATS MỚI (chỉ 1 lần)
+    // =================================================================
+    Object.entries(item.stats).forEach(([stat, val]) => {
+      const v = PERCENTAGE_KEYS.includes(stat) ? val / 100 : val;
+      if (stat in newPlayer) newPlayer[stat] += v;
+      else if (stat in newPlayer.rareStats) newPlayer.rareStats[stat] += v;
     });
-  };
+
+    // Xóa khỏi túi
+    newPlayer.inventory = newPlayer.inventory.filter((i) => i.id !== item.id);
+
+    updateTurnLogs(currentTurnLogs);
+    return newPlayer;
+  });
+};
 
   /**
    * Hủy item trong inventory - KHÔNG HIỆN CONFIRM NỮA
