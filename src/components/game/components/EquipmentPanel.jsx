@@ -148,7 +148,7 @@ const EquipmentPanel = ({ player }) => {
               <span>Lv.{currentItem.itemLevel}</span>
               <span className="mx-2">•</span>
               <span className={`font-medium ${getRarityTextColor(currentItem.rarity)}`}>
-                {currentItem.rarity.charAt(0).toUpperCase() + currentItem.r25arity.slice(1)}
+                {currentItem.rarity.charAt(0).toUpperCase() + currentItem.rarity.slice(1)}
               </span>
             </p>
           </div>

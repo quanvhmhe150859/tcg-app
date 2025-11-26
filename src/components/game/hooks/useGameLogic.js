@@ -586,21 +586,53 @@ const useGameLogic = ({
   /**
    * Rerolls shop options if player has enough gold.
    */
+  /**
+   * Rerolls shop options if player has enough gold.
+   * → Nếu đã mua hết tất cả item trong shop → lần reroll tiếp theo MIỄN PHÍ
+   */
+  /**
+   * Rerolls shop options.
+   * Nếu đã mua hết tất cả item trong shop → reroll MIỄN PHÍ (giá = 0, không trừ vàng, không log gì thêm)
+   */
+  // === THAY TOÀN BỘ HÀM handleReroll BÊN TRONG useGameLogic.js ===
+
   const handleReroll = () => {
-    if (player.gold < rerollPrice) return;
+    const totalOptions = shopOptions.length;
+    const boughtCount = boughtOptions.length;
+    const isShopCleared = boughtCount >= totalOptions && totalOptions > 0;
+
+    // Giá thật để reroll: nếu mua hết → 0
+    const actualRerollPrice = isShopCleared ? 0 : rerollPrice;
+
+    // Nếu không đủ tiền VÀ không được miễn phí → không cho reroll
+    if (player.gold < actualRerollPrice) {
+      return;
+    }
+
+    // Cập nhật gold (chỉ trừ khi có phí)
     setPlayer((prev) => {
-      const newPlayer = { ...prev, gold: prev.gold - rerollPrice };
-      const currentTurnLogs = [];
+      const newGold = prev.gold - actualRerollPrice;
+      const logs = [];
+
       addLog(
-        `Player rerolled shop for ${rerollPrice} gold!`,
+        `Player rerolled shop for ${actualRerollPrice} gold!`,
         "purchase",
-        currentTurnLogs
+        logs
       );
-      updateTurnLogs(currentTurnLogs);
-      return newPlayer;
+      updateTurnLogs(logs);
+
+      return { ...prev, gold: newGold };
     });
+
+    // Tạo shop mới + reset danh sách đã mua
     setShopOptions(generateUpgradeOptions(player, SHOP_STRATEGY));
+    setBoughtOptions([]);
+
+    // Chỉ tăng giá reroll khi KHÔNG miễn phí
+    // if (!isShopCleared) {
     increaseRerollPrice();
+    // }
+    // Nếu miễn phí → giá giữ nguyên → lần sau vẫn dễ clear tiếp
   };
 
   /**
