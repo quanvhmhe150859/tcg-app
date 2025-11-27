@@ -216,7 +216,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
       {/* MOBILE */}
       {isMobile && selectedItem && (
-        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
+        <div className="fixed inset-x-0 bottom-0 z-1003 flex flex-col gap-3 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
           {diffPanels?.map((panel, idx) => (
             <div key={idx} className="bg-gray-950 border-2 border-cyan-600 rounded-lg p-4 shadow-2xl animate-in slide-in-from-bottom">
               <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
@@ -265,9 +265,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                   onClick={() => { onEquipItem?.(selectedItem, slot); setSelectedItem(null); }}
                   className="w-full px-6 py-5 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition active:scale-95"
                 >
-                  {selectedItem.type === "twoHanded"
-                    ? "Equip Two-Handed (Replace both)"
-                    : player.equipment?.[slot]
+                  {player.equipment?.[slot]
                     ? `Replace ${getSlotDisplayName(slot)}`
                     : `Equip to ${getSlotDisplayName(slot)}`}
                 </button>
@@ -324,9 +322,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
                   onClick={() => { onEquipItem?.(selectedItem, slot); setSelectedItem(null); }}
                   className="w-full px-6 py-4 rounded-lg bg-gradient-to-b from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg shadow-lg transition hover:scale-105"
                 >
-                  {selectedItem.type === "twoHanded"
-                    ? "Equip Two-Handed (Replace both weapons)"
-                    : player.equipment?.[slot]
+                  {player.equipment?.[slot]
                     ? `Replace ${getSlotDisplayName(slot)}`
                     : `Equip to ${getSlotDisplayName(slot)}`}
                 </button>

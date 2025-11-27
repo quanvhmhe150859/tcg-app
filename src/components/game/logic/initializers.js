@@ -128,7 +128,7 @@ export const initPlayer = (characterKey) => {
 };
 
 export const initEnemy = (level) => {
-  const scale = Math.pow(level, 1.3);
+  const scale = Math.pow(level, 1.2);
   const isBoss = level % 10 === 0;
   const baseFactor = 0.5 + Math.random() * 0.5;
   const bossMultiplier = (isBoss ? 1 : 0) + (level > 30 ? 2 : 1);
@@ -191,9 +191,9 @@ export const generateUpgradeOptions = (player, strategy) => {
     {
       key: "currentHealth",
       name: "Current Health",
-      basePrice: 0.1,
-      min: 200,
-      max: 500 + player.luck * 30,
+      basePrice: 0.05,
+      min: 300,
+      max: 600 + player.luck * 30,
       format: (val) => `+${val}`,
     },
     {
