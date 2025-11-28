@@ -17,7 +17,7 @@ import EquipmentPanel from "./components/EquipmentPanel";
 import SpriteAnimation from "./animations/SpriteAnimation";
 import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
 
-import TwoColumnReorder from "./components/TwoColumnReorder";
+import Hr from "./components/Hr";
 
 const BattleGame = () => {
   const navigate = useNavigate();
@@ -226,55 +226,81 @@ const BattleGame = () => {
     <div className="p-4 max-w-7xl md:min-h-[870px] mx-auto rounded-lg bg-game">
       <Header level={level} />
 
-      <TwoColumnReorder
-        boxes={[
-          /* Box 1 */
-          <div>
-            <div className="rounded-md bg-game-animate">
-              <SpriteAnimation
-                name={playerCharacter}
-                flip={true}
-                ref={playerSpriteRef}
-                distance={distance}
-                health={player.currentHealth}
-              />
-              <SpriteAnimation
-                name={enemyCharacter}
-                flip={false}
-                ref={enemySpriteRef}
-                distance={distance}
-                health={enemy.currentHealth}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <EntityHeader name="Player" entity={player} />
-              <EntityHeader name="Enemy" entity={enemy} />
-            </div>
-          </div>,
+      <div className="flex flex-col md:flex-row md:gap-4">
+        {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
+        <div className="flex-1 md:w-1/3">
+          <div className="rounded-md bg-game-animate">
+            <SpriteAnimation
+              name={playerCharacter}
+              flip={true}
+              ref={playerSpriteRef}
+              distance={distance}
+              health={player.currentHealth}
+            />
+            {/* <SpriteSheetPlayer
+              name={playerCharacter}
+              flip={false}
+              ref={playerSpriteRef}
+              distance={distance}
+              health={player.currentHealth}
+            /> */}
+            <SpriteAnimation
+              name={enemyCharacter}
+              flip={false}
+              ref={enemySpriteRef}
+              distance={distance}
+              health={enemy.currentHealth}
+            />
+            {/* <SpriteSheetPlayer
+              name={enemyCharacter}
+              flip={true}
+              ref={enemySpriteRef}
+              distance={distance}
+              health={enemy.currentHealth}
+            /> */}
+          </div>
 
-          /* Box 2 */
-          <div>
-            <ToggleButtons
+          <div className="grid grid-cols-2 gap-4">
+            <EntityHeader name="Player" entity={player} />
+            <EntityHeader name="Enemy" entity={enemy} />
+          </div>
+          <Hr/>
+          <ToggleButtons
+            showNormalStats={showNormalStats}
+            showRareStats={showRareStats}
+            toggleNormalStats={toggleNormalStats}
+            toggleRareStats={toggleRareStats}
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <StatsPanel
+              entity={player}
               showNormalStats={showNormalStats}
               showRareStats={showRareStats}
-              toggleNormalStats={toggleNormalStats}
-              toggleRareStats={toggleRareStats}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <StatsPanel
-                entity={player}
-                showNormalStats={showNormalStats}
-                showRareStats={showRareStats}
-              />
-              <StatsPanel
-                entity={enemy}
-                showNormalStats={showNormalStats}
-                showRareStats={showRareStats}
-              />
-            </div>
-          </div>,
+            <StatsPanel
+              entity={enemy}
+              showNormalStats={showNormalStats}
+              showRareStats={showRareStats}
+            />
+          </div>
+          <div className="flex items-center justify-between text-xs sm:text-sm p-1">
+            {/* Luck - chỉ hiện khi bật stats */}
+            {showNormalStats && (
+              <div className="text-green-500 font-medium">
+                Luck: {player.luck} 🍀
+              </div>
+            )}
 
-          /* Box 3 */
+            {/* Gold - luôn hiện, tự động căn giữa nếu không có Luck */}
+            <div
+              className={`${
+                showNormalStats ? "text-right" : "mx-auto text-center"
+              } flex-1 text-yellow-400 font-medium`}
+            >
+              Gold: {player.gold} 💰
+            </div>
+          </div>
+          <Hr />
           <SkillsAndItemsPanel
             player={player}
             gameOver={gameOver}
@@ -283,23 +309,29 @@ const BattleGame = () => {
             showShop={showShop}
             handleSpecial={handleSpecial}
             handleUseConsumable={handleUseConsumable}
-          />,
-
-          /* Box 4 */
+          />
+          <Hr />
           <InventoryPanel
             player={player}
             onEquipItem={handleEquipItem}
             onDestroyItem={handleDestroyItem}
-          />,
+          />
+          <Hr />
+          <EquipmentPanel player={player} />
+        </div>
 
-          /* Box 5 */
-          <EquipmentPanel player={player} />,
-
-          /* Box 6 */
-          <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />,
-
-          /* Box 7 */
-          <div>
+        {/* Right column: Gold, Controls, Panels, and Log (below in portrait, right in landscape) */}
+        <div className="flex-1 md:w-1/2 flex flex-col md:flex-col">
+          <div className="order-1 md:hidden">
+            <Hr />
+          </div>
+          <div className="order-4 md:order-2">
+            <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
+          </div>
+          <div className="order-3 md:order-3">
+            <Hr />
+          </div>
+          <div className="order-2 md:order-4">
             <GameControls
               isAuto={isAuto}
               toggleAuto={enhancedToggleAuto}
@@ -333,9 +365,9 @@ const BattleGame = () => {
                 handleExitShop={handleExitShop}
               />
             )}
-          </div>,
-        ]}
-      />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
