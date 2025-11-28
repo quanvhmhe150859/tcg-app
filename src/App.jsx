@@ -12,6 +12,7 @@ import "./i18n";
 import MainLayout from "./layouts/MainLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
 import SpriteSheetUploaderAndPlayer from "./components/game/animations/SpriteSheetUploaderAndPlayer";
+import ReorderGridToggle from "./components/game/components/ReorderGridToggle";
 
 // Lazy load các trang
 const RandomCardsPokemon = lazy(() => import("./components/pokemon/RandomCardsPokemon"));
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/image-generator" element={<ImageGenerator />} />
             <Route path="/sprite-sheet-animation" element={<SpriteSheetUploaderAndPlayer />} />
+            <Route path="/test" element={<ReorderGridToggle/>} />
           </Route>
 
           {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}

@@ -225,7 +225,7 @@ const BattleGame = () => {
   return (
     <div className="p-4 max-w-7xl md:min-h-[870px] mx-auto rounded-lg bg-game">
       <Header level={level} />
-
+      {/* Box 1 */}
       <div className="flex flex-col md:flex-row md:gap-4">
         {/* Left column: Sprites and Stats (always on top in portrait, left in landscape) */}
         <div className="flex-1 md:w-1/3">
@@ -265,6 +265,7 @@ const BattleGame = () => {
             <EntityHeader name="Enemy" entity={enemy} />
           </div>
           <Hr/>
+          {/* Box 2 */}
           <ToggleButtons
             showNormalStats={showNormalStats}
             showRareStats={showRareStats}
@@ -301,6 +302,7 @@ const BattleGame = () => {
             </div>
           </div>
           <Hr />
+          {/* Box 3 */}
           <SkillsAndItemsPanel
             player={player}
             gameOver={gameOver}
@@ -311,12 +313,14 @@ const BattleGame = () => {
             handleUseConsumable={handleUseConsumable}
           />
           <Hr />
+          {/* Box 4 */}
           <InventoryPanel
             player={player}
             onEquipItem={handleEquipItem}
             onDestroyItem={handleDestroyItem}
           />
           <Hr />
+          {/* Box 5 */}
           <EquipmentPanel player={player} />
         </div>
 
@@ -326,12 +330,14 @@ const BattleGame = () => {
             <Hr />
           </div>
           <div className="order-4 md:order-2">
+            {/* Box 6 */}
             <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />
           </div>
           <div className="order-3 md:order-3">
             <Hr />
           </div>
           <div className="order-2 md:order-4">
+            {/* Box 7 */}
             <GameControls
               isAuto={isAuto}
               toggleAuto={enhancedToggleAuto}

@@ -93,7 +93,7 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
       rand: 0.5,
       slots: ["armor", "helmet", "belt", "necklace"],
     },
-    minAttack: { base: 0.4, rand: 0.6, slots: ["weapon"] },
+    attack: { base: 0.4, rand: 0.6, slots: ["weapon"] },
     maxAttack: { base: 1.4, rand: 0.6, slots: ["weapon"] },
     critChance: {
       base: 0.15,
