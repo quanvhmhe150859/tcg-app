@@ -15,9 +15,7 @@ const SkillsAndItemsPanel = ({
 }) => {
   return (
     <>
-      <p className="font-semibold py-2 px-4">
-        Skills & Items
-      </p>
+      <p className="font-semibold py-2 px-4">Skills & Items</p>
 
       <div className="flex gap-2 flex-wrap">
         {/* ==================== SPECIAL SKILLS ==================== */}
@@ -68,7 +66,9 @@ const SkillsAndItemsPanel = ({
                     ? specialData.effect(specialData.power)
                     : specialData.effect
                 }\n` +
-                `Cooldown: ${special?.currentCooldown ?? 0}/${specialData.cooldown}`
+                `Cooldown: ${special?.currentCooldown ?? 0}/${
+                  specialData.cooldown
+                }`
               }
             >
               <img
@@ -103,13 +103,22 @@ const SkillsAndItemsPanel = ({
               if (quantity <= 0 && quantity !== false) return null; // ẩn nếu hết (trừ revive có thể hiện 0)
 
               const parts = id.split("_");
-              if (parts.length < 3) return null;
+              // if (parts.length < 3) return null;
 
               const type = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
               const value = parts[1];
               const mode = parts[2];
               const displayValue = mode === "percent" ? `${value}%` : value;
-              const itemName = `${type} ${displayValue} Potion`;
+              const itemTypeMap = {
+                Health: "Potion",
+                Revive: "Potion",
+                Throwable: "Damage",
+                Random: "Equipment",
+              };
+
+              const itemName = [type, displayValue, itemTypeMap[type]]
+                .filter(Boolean)
+                .join(" ");
 
               const hasQuantity = quantity > 0;
 
@@ -131,7 +140,11 @@ const SkillsAndItemsPanel = ({
                         ? "opacity-30 grayscale border-gray-600"
                         : "border-cyan-400 hover:scale-110 hover:border-cyan-300 shadow-lg"
                     }
-                    ${gameOver || id.includes("revive") ? "!cursor-not-allowed" : ""}
+                    ${
+                      gameOver || id.includes("revive")
+                        ? "!cursor-not-allowed"
+                        : ""
+                    }
                   `}
                   title={itemName}
                 >

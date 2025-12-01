@@ -1,5 +1,5 @@
-// src/components/battle/InventoryPanel.jsx
 import React, { useState, useRef, useEffect } from "react";
+import { viewport } from "../utils/viewport";
 
 // ĐẶT Ở NGOÀI COMPONENT ĐỂ TẤT CẢ CÁC PHẦN ĐỀU DÙNG ĐƯỢC
 const formatStatName = (stat) => {
@@ -52,7 +52,8 @@ const STAT_ORDER = [
 const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [position, setPosition] = useState("down");
+  const [menuVertical, setMenuVertical] = useState("down");
+  const [menuHorizontal, setMenuHorizontal] = useState("right");
   const wrapperRef = useRef(null);
 
   const equippedIds = new Set(
@@ -238,11 +239,41 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   };
 
   const handleItemClick = (e, item) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    setPosition(spaceBelow < 425 ? "up" : "down");
     e.stopPropagation();
-    setSelectedItem(selectedItem?.id === item.id ? null : item);
+
+    // Click lại item đang mở → đóng
+    if (selectedItem?.id === item.id) {
+      setSelectedItem(null);
+      return;
+    }
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const menuHeight = viewport.height / 2;
+    const menuWidth = viewport.width / 2;
+
+    // Xác định hướng dọc
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    setMenuVertical(
+      spaceBelow >= menuHeight
+        ? "down"
+        : spaceAbove >= menuHeight
+        ? "up"
+        : "down"
+    );
+
+    // Xác định hướng ngang
+    const spaceRight = window.innerWidth - rect.left;
+    const spaceLeft = rect.right;
+    setMenuHorizontal(
+      spaceRight >= menuWidth
+        ? "right"
+        : spaceLeft >= menuWidth
+        ? "left"
+        : "right"
+    );
+
+    setSelectedItem(item);
   };
 
   const closeMenu = () => setSelectedItem(null);
@@ -323,7 +354,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
               <div className="text-cyan-400 text-xs font-bold mb-2 border-b border-cyan-900 pb-1">
                 {panel.label}
               </div>
-              <div className="text-sm font-medium space-y-1">
+              <div className="text-sm font-medium">
                 {panel.diffs.map(({ stat, diff }) => (
                   <div key={stat} className="flex justify-between">
                     <span className="text-gray-400">
@@ -342,11 +373,11 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
 
           {/* Item info + buttons */}
           <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl animate-in slide-in-from-bottom">
-            <div className="px-5 pt-4 border-b border-gray-800">
+            <div className="px-5 pt-2 border-b border-gray-800">
               <p className="font-bold text-lg text-white">
                 {selectedItem.name}
               </p>
-              <div className="text-sm text-gray-300 pb-4">
+              <div className="text-sm text-gray-300 pb-2">
                 Lv.{selectedItem.itemLevel} •{" "}
                 {selectedItem.rarity.charAt(0).toUpperCase() +
                   selectedItem.rarity.slice(1)}
@@ -355,7 +386,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
             </div>
 
             {selectedItem.affixes?.length > 0 && (
-              <div className="px-5 py-3 space-y-1 text-sm border-b border-gray-800">
+              <div className="px-5 text-sm border-b border-gray-800">
                 {selectedItem.affixes.map((affix, idx) => (
                   <div key={idx} className="flex justify-between text-gray-300">
                     <span>{formatStatName(affix.key)}</span>
@@ -412,7 +443,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           {/* Tooltip chính */}
           <div
             className={`eq-container absolute z-301 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl ${
-              position === "down" ? "top-full" : "bottom-full"
+              menuVertical === "down" ? "top-full" : "bottom-full"
             }`}
           >
             <div className="p-5 border-b border-gray-800">
@@ -474,10 +505,14 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
           {/* BẢNG SO SÁNH BÊN PHẢI – ĐÃ FIX TÊN CHỈ SỐ */}
           {diffPanels && (
             <div
-              className={`absolute z-50 space-y-4 ${
-                position === "down" ? "top-full" : "bottom-full"
+              className={`absolute z-301 space-y-4 ${
+                menuVertical === "down" ? "top-full" : "bottom-full"
+              } ${
+                menuHorizontal === "right"
+                  ? "left-full ml-4"
+                  : "right-full mr-4"
               }`}
-              style={{ left: "100%", marginLeft: "16px", width: "280px" }}
+              style={{ width: "280px" }}
             >
               {diffPanels.map((panel, idx) => (
                 <div

@@ -26,8 +26,8 @@ export const initPlayer = (characterKey) => {
     critDamage: 1.5,
     lifeSteal: 0.05,
     dodge: 0.01,
-    luck: 0,
-    gold: 0,
+    luck: 110,
+    gold: 999990,
     inventory: [],
     equipment: {
       weapon1: null,
@@ -177,7 +177,8 @@ export const initEnemy = (level) => {
 export const generateUpgradeOptions = (player, strategy) => {
   // Tính xác suất potion xuất hiện: 50% + (luck * 10)%
   const potionChance = 0.1 + player.luck * 0.1;
-  const includePotion = strategy.includePotion && Math.random() < potionChance;
+  const includeConsumable =
+    strategy.includeConsumable && Math.random() < potionChance;
 
   const stats = [
     {
@@ -200,7 +201,7 @@ export const generateUpgradeOptions = (player, strategy) => {
       key: "regeneration",
       name: "Regeneration",
       basePrice: 10,
-      min: ((player.level - 6) /2) <= 0 ? 1 : (player.level - 6) / 2,
+      min: (player.level - 6) / 2 <= 0 ? 1 : (player.level - 6) / 2,
       max: (player.level + 0) / 2 + player.luck,
       format: (val) => `+${val}`,
     },
@@ -265,23 +266,48 @@ export const generateUpgradeOptions = (player, strategy) => {
   );
 
   // Chỉ thêm potion nếu thỏa điều kiện xác suất
-  if (includePotion) {
+  if (includeConsumable) {
     stats.push(
       {
-        key: "potion",
+        key: "consumable",
         name: "🧋 Health 500 Potion",
-        potionId: "health_500_fixed",
+        id: "health_500_fixed",
         basePrice: 500,
         format: () => "+1",
       },
       {
-        key: "potion",
+        key: "consumable",
         name: "🧃 Revive 500 Potion",
-        potionId: "revive_500_fixed",
+        id: "revive_500_fixed",
         basePrice: 1000,
         format: () => "+1",
+      },
+      {
+        key: "consumable",
+        name: "🪖 Random Equipment",
+        id: "random_1_eq",
+        basePrice: 2000,
+        format: () => "+1",
       }
+      // {
+      //   key: "consumable",
+      //   name: "🔫 Throwable",
+      //   id: "throwable_5_percent",
+      //   basePrice: 300,
+      //   format: () => "+1 ~ +5",
+      // },
     );
+
+    // Throwable: random 1-5 cái, value và format phải khớp nhau
+    const throwableCount = Math.floor(Math.random() * 5) + 1; // 1 đến 5
+    stats.push({
+      key: "consumable",
+      name: "🔫 Throwable",
+      id: "throwable_5_percent",
+      basePrice: 300,
+      value: throwableCount,
+      format: () => `+${throwableCount}`,
+    });
   }
 
   // Trộn ngẫu nhiên và lấy 3 phần tử
@@ -292,8 +318,8 @@ export const generateUpgradeOptions = (player, strategy) => {
   return shuffled.map((stat) => {
     let value, price, format;
 
-    if (stat.key === "potion") {
-      value = 1;
+    if (stat.key === "consumable") {
+      value = stat.value ?? 1;
       price = stat.basePrice + Math.floor(Math.random() * 30);
       format = stat.format;
     } else {
@@ -311,7 +337,7 @@ export const generateUpgradeOptions = (player, strategy) => {
       value,
       format,
       price,
-      potionId: stat.potionId,
+      id: stat.id,
     };
   });
 };

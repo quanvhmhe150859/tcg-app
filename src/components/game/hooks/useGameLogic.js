@@ -113,7 +113,7 @@ const updatePlayerAndLog = (
       currentTurnLogs
     );
   } else if (option.key === "consumable") {
-    const { potionId, value: quantityToAdd } = option;
+    const { id, value: quantityToAdd } = option;
 
     // Đảm bảo consumables là object
     if (!newPlayer.consumables || Array.isArray(newPlayer.consumables)) {
@@ -121,10 +121,10 @@ const updatePlayerAndLog = (
     }
 
     // Cộng dồn hoặc tạo mới
-    if (newPlayer.consumables[potionId]) {
-      newPlayer.consumables[potionId] += quantityToAdd;
+    if (newPlayer.consumables[id]) {
+      newPlayer.consumables[id] += quantityToAdd;
     } else {
-      newPlayer.consumables[potionId] = quantityToAdd;
+      newPlayer.consumables[id] = quantityToAdd;
     }
 
     // Log mua potion
@@ -267,7 +267,7 @@ const useGameLogic = ({
         prev,
         {
           ...option,
-          key: option.key === "potion" ? "consumable" : option.key,
+          key: option.key,
         },
         currentTurnLogs,
         "purchase",
@@ -346,31 +346,8 @@ const useGameLogic = ({
       const currentTurnLogs = [];
       let newPlayer = { ...prev };
 
-      if (option.key === "potion") {
-        // XỬ LÝ POTION: CỘNG DỒN HOẶC TẠO MỚI (dạng object)
-        const potionId = option.potionId;
-        const quantityToAdd = option.value;
-
-        // Đảm bảo consumables là object
-        if (!newPlayer.consumables || Array.isArray(newPlayer.consumables)) {
-          newPlayer.consumables = {};
-        }
-
-        // Cộng dồn nếu đã có, hoặc tạo mới
-        if (newPlayer.consumables[potionId]) {
-          newPlayer.consumables[potionId] += quantityToAdd;
-        } else {
-          newPlayer.consumables[potionId] = quantityToAdd;
-        }
-      } else {
-        // XỬ LÝ STAT THƯỜNG
-        newPlayer = updatePlayerAndLog(
-          prev,
-          option,
-          currentTurnLogs,
-          "upgrade"
-        );
-      }
+      // XỬ LÝ STAT THƯỜNG
+      newPlayer = updatePlayerAndLog(prev, option, currentTurnLogs, "upgrade");
 
       newPlayer.effects = resetEffects(newPlayer);
       updateTurnLogs(currentTurnLogs);
@@ -497,51 +474,91 @@ const useGameLogic = ({
   };
 
   const handleUseConsumable = (consumableId) => {
-    const consumables = player.consumables;
+  if (
+    !player.consumables ||
+    typeof player.consumables !== "object" ||
+    !player.consumables[consumableId] ||
+    player.consumables[consumableId] <= 0
+  ) {
+    return;
+  }
 
-    if (
-      !consumables ||
-      typeof consumables !== "object" ||
-      Array.isArray(consumables) ||
-      !consumables[consumableId] ||
-      consumables[consumableId] <= 0
-    ) {
-      return;
+  const currentTurnLogs = [];
+
+  setPlayer((prev) => {
+    const newPlayer = {
+      ...prev,
+      consumables: { ...prev.consumables },
+    };
+
+    // Giảm số lượng item
+    newPlayer.consumables[consumableId] -= 1;
+    if (newPlayer.consumables[consumableId] <= 0) {
+      delete newPlayer.consumables[consumableId];
     }
 
     const [type, rawValue, mode] = consumableId.split("_");
     const value = parseInt(rawValue, 10);
     const isPercent = mode === "percent";
 
-    let healAmount = 0;
+    let logMessage = "";
+    let logType = "consumable";
+
     if (type === "health") {
-      healAmount = isPercent
-        ? Math.floor((player.maxHealth * value) / 100)
+      const healAmount = isPercent
+        ? Math.floor((newPlayer.maxHealth * value) / 100)
         : value;
+
+      const newHealth = Math.min(newPlayer.maxHealth, newPlayer.currentHealth + healAmount);
+      const actualHeal = newHealth - newPlayer.currentHealth;
+
+      newPlayer.currentHealth = newHealth;
+
+      logMessage = `Used Health Potion! Restored +${actualHeal} HP`;
     }
 
-    const newHealth = Math.min(
-      player.maxHealth,
-      player.currentHealth + healAmount
-    );
-
-    setPlayer((prev) => {
-      const newConsumables = { ...prev.consumables };
-      const newQuantity = newConsumables[consumableId] - 1;
-
-      if (newQuantity <= 0) {
-        delete newConsumables[consumableId]; // XÓA ITEM HOÀN TOÀN
+    else if (type === "throwable") {
+      if (!enemy || enemy.currentHealth <= 0) {
+        logMessage = "No enemy to throw at!";
+        logType = "error";
       } else {
-        newConsumables[consumableId] = newQuantity;
-      }
+        const damage = isPercent
+          ? Math.floor((enemy.currentHealth * value) / 100)  // dùng maxHealth để ổn định
+          : value;
 
-      return {
-        ...prev,
-        currentHealth: newHealth,
-        consumables: newConsumables,
-      };
-    });
-  };
+        const newEnemy = { ...enemy };
+        newEnemy.currentHealth = Math.max(0, newEnemy.currentHealth - damage);
+
+        setEnemy(newEnemy);
+
+        logMessage = `Threw Throwable! Dealt ${damage} damage!`;
+        if (newEnemy.currentHealth <= 0) {
+          logMessage += " Enemy defeated!";
+        }
+      }
+    }
+
+    else if (type === "random" && rawValue === "1" && mode === "eq") {
+      const droppedItem = generateRandomEquipment(level + 1, newPlayer.luck || 0);
+      addEquipmentToInventory(newPlayer, droppedItem, currentTurnLogs);
+
+      logMessage = `Used Random Equipment! Obtained new gear!`;
+    }
+
+    else {
+      logMessage = `Unknown consumable used: ${consumableId}`;
+      logType = "error";
+    }
+
+    // Ghi log chung (trừ trường hợp đã được addEquipmentToInventory tự log)
+    if (logMessage && !consumableId.includes("random_1_eq")) {
+      addLog(logMessage, logType, currentTurnLogs);
+    }
+
+    updateTurnLogs(currentTurnLogs);
+    return newPlayer;
+  });
+};
 
   const toggleAuto = () => {
     setIsAuto((prev) => !prev);
@@ -659,6 +676,44 @@ const useGameLogic = ({
     return { revived, newPlayer: revivedPlayer };
   };
 
+  // utils/inventory.js hoặc trong cùng file nếu chưa có cấu trúc
+const addEquipmentToInventory = (player, item, logs = []) => {
+  const MAX_INVENTORY = 10;
+  let inventory = player.inventory || [];
+
+  let destroyedItem = null;
+
+  // Nếu túi đầy → xóa item cũ nhất (ở cuối mảng)
+  if (inventory.length >= MAX_INVENTORY) {
+    destroyedItem = inventory[inventory.length - 1];
+    inventory = inventory.slice(0, -1);
+
+    // Log item bị hủy
+    if (logs.push) {
+      logs.push({
+        message: `Inventory full! Destroyed oldest: ${destroyedItem.name} (${destroyedItem.rarity || 'Common'})`,
+        type: "equipment",
+        destroyed: true,
+      });
+    }
+  }
+
+  // Thêm item mới vào đầu (hiển thị đầu tiên)
+  inventory.unshift(item);
+  player.inventory = inventory;
+
+  // Log item nhận được
+  if (logs.push) {
+    logs.push({
+      message: `Found: ${item.name} (${item.rarity || 'Common'})`,
+      type: "equipment",
+      item,
+    });
+  }
+
+  return { destroyedItem };
+};
+
   const checkGameOver = (newPlayer, newEnemy, currentTurnLogs, level) => {
     // 1. Kiểm tra enemy chết → level up
     if (newEnemy.currentHealth <= 0) {
@@ -697,34 +752,7 @@ const useGameLogic = ({
           newPlayer.luck || 0
         );
 
-        // Đảm bảo inventory luôn tồn tại
-        let currentInventory = newPlayer.inventory || [];
-
-        const MAX_INVENTORY = 10;
-
-        if (currentInventory.length >= MAX_INVENTORY) {
-          // LẤY ITEM Ở CUỐI MẢNG (cũ nhất trong hiển thị) ĐỂ HỦY
-          const destroyedItem = currentInventory[currentInventory.length - 1];
-
-          addLog(
-            `Inventory full! Destroyed oldest: ${destroyedItem.name} (${destroyedItem.rarity})`,
-            "equipment",
-            currentTurnLogs
-          );
-
-          // Xóa item cuối cùng
-          currentInventory = currentInventory.slice(0, -1);
-        }
-
-        // THÊM ITEM MỚI VÀO ĐẦU MẢNG → hiện đầu tiên trong inventory
-        currentInventory.unshift(droppedItem);
-        newPlayer.inventory = currentInventory;
-
-        addLog(
-          `Found: ${droppedItem.name} (${droppedItem.rarity})`,
-          "equipment",
-          currentTurnLogs
-        );
+        addEquipmentToInventory(newPlayer, droppedItem, currentTurnLogs);
       }
 
       return { isOver: false, levelUp: true };

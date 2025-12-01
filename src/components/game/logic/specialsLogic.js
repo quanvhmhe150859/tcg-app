@@ -312,7 +312,7 @@ export const applySpecial = (specialId, player, enemy, currentTurnLogs) => {
       const venomDamage = Math.floor(player.minAttack * specialData.power);
       receiveDamage(enemy, venomDamage, "Enemy", "attack", currentTurnLogs);
       if (Math.random() < 0.2) {
-        const poisonAmount = enemy.maxHealth * 0.05;
+        const poisonAmount = Math.floor(enemy.maxHealth * 0.05);
         enemy.effects.poisonBase += poisonAmount;
         enemy.effects.poisonDot += poisonAmount;
         addLog(`Enemy is poisoned by venom!`, "poison", currentTurnLogs);

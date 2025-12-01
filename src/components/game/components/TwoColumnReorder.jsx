@@ -19,8 +19,8 @@ import Hr from "./Hr";
  */
 
 export default function TwoColumnReorder({ boxes }) {
-  const [leftOrder, setLeftOrder] = useState([0, 1, 2]);
-  const [rightOrder, setRightOrder] = useState([3, 4, 5, 6]);
+  const [leftOrder, setLeftOrder] = useState([0, 1, 2, 3, 4]);
+  const [rightOrder, setRightOrder] = useState([5, 6]);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -213,7 +213,7 @@ export default function TwoColumnReorder({ boxes }) {
     <div className="two-col-reorder-wrapper">
       <div className="reorder-bar">
         <button className="reorder-btn" onClick={() => setEditMode((v) => !v)}>
-          {editMode ? "Done" : "Rearrange Layout"}
+          📐 {editMode ? "Done" : "Rearrange Layout"}
         </button>
         <div className="hint">Drag boxes to reorder across columns</div>
       </div>
