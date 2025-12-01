@@ -45,10 +45,6 @@
   width: 40%;
 }
 
-.column-end-spacer {
-  height:20px;
-}
-
 .box-wrapper {
   transition: transform 0.18s cubic-bezier(.2,.9,.2,1), box-shadow 0.18s;
   border-radius:10px;
@@ -70,3 +66,37 @@
   pointer-events: auto;
 }
 
+.mobile-column-separator {
+  display: none; /* Ẩn hoàn toàn trên desktop */
+  width: 100%;
+  padding: 0 6px; /* đồng bộ với padding của .column */
+}
+
+@media (max-width: 768px) {
+  .mobile-column-separator {
+    display: block;
+  }
+}
+
+/* Thêm vào two-column-reorder.css */
+.edit-mode {
+  border: 2px dashed rgba(96,165,250,0.6);
+  padding: 6px;
+  cursor: grab !important;
+}
+
+/* Khi đang kéo thực sự */
+.edit-mode:active,
+.box-wrapper:active {
+  cursor: grabbing !important;
+}
+
+/* Tắt ghost mặc định của trình duyệt (nếu vẫn thấy) */
+.box-wrapper {
+  -webkit-user-drag: element;
+}
+
+/* Đảm bảo ghost không bị cắt */
+.two-col-reorder-wrapper {
+  overflow: visible !important;
+}

@@ -15,7 +15,7 @@ const SkillsAndItemsPanel = ({
 }) => {
   return (
     <>
-      <p className="font-semibold py-2 px-4">Skills & Items</p>
+      <p className="font-semibold py-2">Skills & Items</p>
 
       <div className="flex gap-2 flex-wrap">
         {/* ==================== SPECIAL SKILLS ==================== */}

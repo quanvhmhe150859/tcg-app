@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { statIcons } from "../constants/stats";
 import { effectIcons } from "../constants/effects";
 
-const Header = ({ level }) => {
+const Header = ({ level, editMode, setEditMode }) => {
   const [openTips, setOpenTips] = useState(false);
   const [activeTab, setActiveTab] = useState("Stats");
   const [selectedItem, setSelectedItem] = useState(null); // Cho mobile modal
@@ -65,7 +65,9 @@ const Header = ({ level }) => {
               {/* === MOBILE: Hiển thị danh sách icon === */}
               {isMobile ? (
                 <div className="space-y-4">
-                  <h2 className="text-xl font-bold text-center mb-3">Information</h2>
+                  <h2 className="text-xl font-bold text-center mb-3">
+                    Information
+                  </h2>
 
                   {/* Danh sách icon */}
                   <div className="flex flex-wrap gap-2 justify-center">
@@ -102,7 +104,8 @@ const Header = ({ level }) => {
                     <div className="mt-4 p-3 rounded-lg border border-gray-400 text-sm">
                       {(() => {
                         const [type, name] = selectedItem.split("-");
-                        const data = type === "stat" ? statIcons[name] : effectIcons[name];
+                        const data =
+                          type === "stat" ? statIcons[name] : effectIcons[name];
                         if (!data) return null;
                         return (
                           <div className="flex items-start gap-2">
@@ -125,9 +128,7 @@ const Header = ({ level }) => {
                     <button
                       onClick={() => setActiveTab("Stats")}
                       className={`py-2 px-3 text-left font-semibold rounded transition-colors ${
-                        activeTab === "Stats"
-                          ? "selected-tab"
-                          : ""
+                        activeTab === "Stats" ? "selected-tab" : ""
                       }`}
                     >
                       <span className="md:inline hidden">Stats</span>
@@ -136,9 +137,7 @@ const Header = ({ level }) => {
                     <button
                       onClick={() => setActiveTab("Effects")}
                       className={`py-2 px-3 text-left font-semibold rounded transition-colors mt-1 ${
-                        activeTab === "Effects"
-                          ? "selected-tab"
-                          : ""
+                        activeTab === "Effects" ? "selected-tab" : ""
                       }`}
                     >
                       <span className="md:inline hidden">Effects</span>
@@ -149,7 +148,9 @@ const Header = ({ level }) => {
                   {/* Content */}
                   <div className="flex-1 overflow-y-auto pr-2">
                     <h2 className="text-xl font-bold mb-2 sticky top-0 bg-game-secondary pb-2 -mx-2 px-2">
-                      {activeTab === "Stats" ? "Stats Explanation" : "Effects Explanation"}
+                      {activeTab === "Stats"
+                        ? "Stats Explanation"
+                        : "Effects Explanation"}
                     </h2>
 
                     <ul className="list-none space-y-2 text-sm">
@@ -207,7 +208,15 @@ const Header = ({ level }) => {
           )}
         </h1>
       </div>
-      <div className="flex-1 text-right"></div>
+      <div className="flex-1 text-right">
+        <h1
+          onClick={() => setEditMode((v) => !v)}
+          className={`cursor-pointer relative z-300`}
+          title={editMode ? "Done" : "Click for Rearrange Layout"}
+        >
+          {editMode ? "🔨" : "📐"}
+        </h1>
+      </div>
     </div>
   );
 };

@@ -63,6 +63,8 @@ const BattleGame = () => {
   const [showRareStats, setShowRareStats] = useState(false);
   const [showNormalStats, setShowNormalStats] = useState(false);
 
+  const [editMode, setEditMode] = useState(false);
+
   useEffect(() => {
     const isDesktop = window.innerWidth >= 768;
     setShowRareStats(isDesktop);
@@ -223,10 +225,15 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-7xl md:min-h-[870px] mx-auto rounded-lg bg-game">
-      <Header level={level} />
+    <div className="p-4 max-w-7xl mx-auto rounded-lg bg-game">
+      <Header
+        level={level}
+        editMode={editMode}
+        setEditMode={setEditMode}
+      />
 
       <TwoColumnReorder
+        editMode={editMode}
         boxes={[
           /* Box 1 */
           <div>
@@ -316,7 +323,7 @@ const BattleGame = () => {
           <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />,
 
           /* Box 7 */
-          <div>
+          <div className="md:min-h-[485px]">
             <GameControls
               isAuto={isAuto}
               toggleAuto={enhancedToggleAuto}

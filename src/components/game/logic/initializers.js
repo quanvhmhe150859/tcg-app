@@ -26,8 +26,8 @@ export const initPlayer = (characterKey) => {
     critDamage: 1.5,
     lifeSteal: 0.05,
     dodge: 0.01,
-    luck: 110,
-    gold: 999990,
+    luck: 0,
+    gold: 0,
     inventory: [],
     equipment: {
       weapon1: null,
