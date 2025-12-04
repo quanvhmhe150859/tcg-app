@@ -1,4 +1,3 @@
-// src/components/battle/BattleLog.jsx
 import React, { useState, useEffect } from "react";
 
 const BattleLog = ({ turnLogs, logContainerRef }) => {
@@ -32,7 +31,7 @@ const BattleLog = ({ turnLogs, logContainerRef }) => {
         <div className="bg-game-secondary">
           <div
             ref={logContainerRef}
-            className="max-h-64 min-h-64 overflow-y-auto pt-2 pb-2 pr-2 space-y-3"
+            className="max-h-64 min-h-64 overflow-y-auto p-2 space-y-3"
           >
             {turnLogs.length > 0 && (
               turnLogs

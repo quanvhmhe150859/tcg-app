@@ -80,7 +80,7 @@ const EquipmentPanel = ({ player }) => {
   };
 
   const isPercentStat = (key) =>
-    ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"].includes(key);
+    ["critChance", "dodge", "lifeSteal", "critDamage"].includes(key);
 
   const getRarityBackground = (rarity = "common") => {
     const map = {
@@ -321,7 +321,7 @@ const EquipmentPanel = ({ player }) => {
 
       {/* Tooltip Mobile */}
       {currentItem && isMobile && (
-        <div className="fixed inset-x-0 bottom-0 z-50 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
+        <div className="fixed inset-x-0 bottom-0 z-1003 p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
           <div className="bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl p-6 animate-in slide-in-from-bottom">
             <div className="border-b border-gray-800 pb-4 mb-4">
               <p className="font-bold text-xl text-white">{currentItem.name}</p>

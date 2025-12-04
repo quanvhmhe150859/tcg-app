@@ -1,5 +1,3 @@
-// src/logic/generateRandomEquipment.js
-
 // === CẤU HÌNH RARITY ===
 export const EQUIPMENT_RARITIES = [
   { name: "common", weight: 50, color: "gray" },
@@ -22,56 +20,67 @@ export const SLOT_TYPES = [
   "ring2",
 ];
 
-// === ICON POOL (có thể chuyển sang file riêng nếu muốn) ===
+// === THIẾT LẬP ĐƯỜNG DẪN ẢNH THEO MÔI TRƯỜNG ===
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL_SPRITES === true || import.meta.env.VITE_USE_LOCAL_SPRITES === 'true';
+const API_BASE = USE_LOCAL ? '' : (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, ''); // loại bỏ dấu / cuối nếu có
+
+const prefixPath = (path) => {
+  return USE_LOCAL ? path : `${API_BASE}${path}`;
+};
+
+// === ICON POOL (đã thêm prefix tự động) ===
 export const ICON_POOL = {
   weapon: [
-    "/eq/weapons/Item__00.png",
-    "/eq/weapons/Item__01.png",
-    "/eq/weapons/Item__02.png",
-    "/eq/weapons/Item__03.png",
-    "/eq/weapons/Item__04.png",
-    "/eq/weapons/Item__05.png",
-    "/eq/weapons/Item__06.png",
-    "/eq/weapons/Item__07.png",
-    "/eq/weapons/Item__08.png",
-    "/eq/weapons/Item__09.png",
+    prefixPath("/eq/weapons/Item__00.png"),
+    prefixPath("/eq/weapons/Item__01.png"),
+    prefixPath("/eq/weapons/Item__02.png"),
+    prefixPath("/eq/weapons/Item__03.png"),
+    prefixPath("/eq/weapons/Item__04.png"),
+    prefixPath("/eq/weapons/Item__05.png"),
+    prefixPath("/eq/weapons/Item__06.png"),
+    prefixPath("/eq/weapons/Item__07.png"),
+    prefixPath("/eq/weapons/Item__08.png"),
+    prefixPath("/eq/weapons/Item__09.png"),
   ],
   helmet: [
-    "/eq/helmet/Item__44.png",
-    "/eq/helmet/Item__45.png",
-    "/eq/helmet/Item__46.png",
-    "/eq/helmet/Item__47.png",
+    prefixPath("/eq/helmet/Item__44.png"),
+    prefixPath("/eq/helmet/Item__45.png"),
+    prefixPath("/eq/helmet/Item__46.png"),
+    prefixPath("/eq/helmet/Item__47.png"),
   ],
   armor: [
-    "/eq/armor/Item__56.png",
-    "/eq/armor/Item__57.png",
-    "/eq/armor/Item__58.png",
-    "/eq/armor/Item__59.png",
+    prefixPath("/eq/armor/Item__56.png"),
+    prefixPath("/eq/armor/Item__57.png"),
+    prefixPath("/eq/armor/Item__58.png"),
+    prefixPath("/eq/armor/Item__59.png"),
   ],
   gloves: [
-    "/eq/gloves/Item__60.png",
-    "/eq/gloves/Item__61.png",
-    "/eq/gloves/Item__62.png",
-    "/eq/gloves/Item__63.png",
+    prefixPath("/eq/gloves/Item__60.png"),
+    prefixPath("/eq/gloves/Item__61.png"),
+    prefixPath("/eq/gloves/Item__62.png"),
+    prefixPath("/eq/gloves/Item__63.png"),
   ],
-  belt: ["/eq/belt/Item__40.png", "/eq/belt/Item__41.png"],
+  belt: [
+    prefixPath("/eq/belt/Item__40.png"),
+    prefixPath("/eq/belt/Item__41.png"),
+  ],
   boots: [
-    "/eq/boots/Item__48.png",
-    "/eq/boots/Item__49.png",
-    "/eq/boots/Item__50.png",
-    "/eq/boots/Item__51.png",
+    prefixPath("/eq/boots/Item__48.png"),
+    prefixPath("/eq/boots/Item__49.png"),
+    prefixPath("/eq/boots/Item__50.png"),
+    prefixPath("/eq/boots/Item__51.png"),
   ],
   necklace: [
-    "/eq/necklace/Item__32.png",
-    "/eq/necklace/Item__33.png",
-    "/eq/necklace/Item__34.png",
-    "/eq/necklace/Item__35.png",
+    prefixPath("/eq/necklace/Item__32.png"),
+    prefixPath("/eq/necklace/Item__33.png"),
+    prefixPath("/eq/necklace/Item__34.png"),
+    prefixPath("/eq/necklace/Item__35.png"),
   ],
   ring: [
-    "/eq/ring/Item__40.png",
-    "/eq/ring/Item__41.png",
-    "/eq/ring/Item__42.png",
-    "/eq/ring/Item__43.png",
+    prefixPath("/eq/ring/Item__40.png"),
+    prefixPath("/eq/ring/Item__41.png"),
+    prefixPath("/eq/ring/Item__42.png"),
+    prefixPath("/eq/ring/Item__43.png"),
   ],
 };
 
@@ -79,7 +88,7 @@ export const ICON_POOL = {
 const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
   const STAT_CONFIG = {
     maxHealth: {
-      base: 19,
+      base: 11,
       rand: 0.6,
       slots: ["armor", "helmet", "gloves", "belt", "boots", "necklace"],
     },
@@ -242,7 +251,7 @@ const generateRandomEquipment = (playerLevel = 1, playerLuck = 0) => {
     const pool = ICON_POOL[key] || [];
     return pool.length > 0
       ? pool[Math.floor(Math.random() * pool.length)]
-      : "/eq/default.png";
+      : "/default.jpg";
   };
 
   return {

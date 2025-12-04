@@ -1,4 +1,3 @@
-// src/components/stats/StatsPanel.jsx (đã sửa)
 import React from "react";
 import { statIcons } from "../constants/stats";
 

@@ -1,209 +1,247 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import "./two-column-reorder.css";
 import Hr from "./Hr";
 
-/**
- * TwoColumnReorder
- * - boxes: array of React nodes (7 boxes)
- * - editMode + setEditMode: được truyền từ ngoài vào (BattleGame → Header)
- *
- * Tất cả logic drag & drop giữ nguyên 100%, chỉ bỏ thanh reorder-bar đi
- */
-
 export default function TwoColumnReorder({ editMode, boxes }) {
-  const [leftOrder, setLeftOrder] = useState([0, 1, 2, 3, 4]);
-  const [rightOrder, setRightOrder] = useState([5, 6]);
+  const [leftOrder, setLeftOrder] = useState([0, 1, 2, 3, 4, 5, 6]);
+  const [rightOrder, setRightOrder] = useState([7, 8, 9]);
 
-  // dragging info (source)
+  // Tab hiện tại trên mobile
+  const [activeTab, setActiveTab] = useState(0);
+
   const dragSource = useRef({ col: null, index: null, id: null });
-
-  // preview orders while dragging
   const [previewLeft, setPreviewLeft] = useState(null);
   const [previewRight, setPreviewRight] = useState(null);
-
-  // refs để đo vị trí con
-  const leftColRef = useRef(null);
-  const rightColRef = useRef(null);
-  const leftChildrenRefs = useRef([]);
-  const rightChildrenRefs = useRef([]);
-
-  const setLeftChildRef = (el, i) => {
-    leftChildrenRefs.current[i] = el;
-  };
-  const setRightChildRef = (el, i) => {
-    rightChildrenRefs.current[i] = el;
-  };
 
   const currentLeft = previewLeft ?? leftOrder;
   const currentRight = previewRight ?? rightOrder;
 
-  // ==================== DRAG HANDLERS ====================
+  // Hard-code: mỗi tab chứa box nào
+  const tabContents = [
+    [0, 2, 1, 7, 8, 3, 9], // Tab 1
+    [1, 4, 5, 6], // Tab 2
+    // [0, 2],
+    // [1, 3, 9],
+  ];
 
+  // Tìm box hiện tại nằm ở tab nào + vị trí trong tab
+  const getBoxLocation = (boxId) => {
+    for (let tabIdx = 0; tabIdx < tabContents.length; tabIdx++) {
+      const idxInTab = tabContents[tabIdx].indexOf(boxId);
+      if (idxInTab !== -1) {
+        return { tabIdx, idxInTab };
+      }
+    }
+    return null;
+  };
+
+  // ==================== DRAG HANDLERS ====================
   const handleDragStart = (col, index) => (e) => {
     if (!editMode) {
       e.preventDefault();
       return;
     }
-
     const id = col === "left" ? leftOrder[index] : rightOrder[index];
     dragSource.current = { col, index, id };
 
-    // Custom ghost image đẹp
-    const draggedElement = e.target.closest(".box-wrapper");
-    if (!draggedElement) return;
+    const draggedEl = e.target.closest(".box-wrapper");
+    if (!draggedEl) return;
 
-    const ghost = draggedElement.cloneNode(true);
+    const ghost = draggedEl.cloneNode(true);
     ghost.style.cssText = `
-      width: ${draggedElement.offsetWidth}px;
-      opacity: 0.8;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      transform: rotate(5deg);
-      pointer-events: none;
-      position: absolute;
-      top: -1000px;
-      left: -1000px;
-      z-index: 9999;
+      width:${draggedEl.offsetWidth}px;
+      opacity:0.8; box-shadow:0 20px 40px rgba(0,0,0,0.3);
+      transform:rotate(5deg); pointer-events:none;
+      position:absolute; top:-1000px; left:-1000px; z-index:9999;
     `;
-
     document.body.appendChild(ghost);
     e.dataTransfer.setDragImage(ghost, 20, 20);
+    setTimeout(() => ghost?.parentNode?.removeChild(ghost), 0);
 
-    setTimeout(() => {
-      if (ghost?.parentNode) ghost.parentNode.removeChild(ghost);
-    }, 0);
-
-    // Firefox yêu cầu
     try {
       e.dataTransfer.setData("text/plain", String(id));
-    } catch (err) {}
+    } catch (_) {}
   };
 
-  const handleColumnDragOver = (col) => (e) => {
+  const handleColumnDragOver = (targetCol) => (e) => {
     if (!editMode) return;
     e.preventDefault();
 
-    const from = dragSource.current;
-    if (!from || from.col === null) return;
+    const { id } = dragSource.current;
+    if (id === null) return;
 
-    const targetRefs = col === "left" ? leftChildrenRefs.current : rightChildrenRefs.current;
-    const targetOrder = col === "left" ? leftOrder : rightOrder;
+    // Tính vị trí chèn trong cột đích
+    let insertIndex =
+      targetCol === "left" ? currentLeft.length : currentRight.length;
 
-    let insertIndex = targetRefs.length;
-
-    if (targetRefs.length === 0) {
-      insertIndex = 0;
-    } else {
-      for (let i = 0; i < targetRefs.length; i++) {
-        const el = targetRefs[i];
-        if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        const midpointY = rect.top + rect.height / 2;
-        if (e.clientY < midpointY) {
-          insertIndex = i;
-          break;
-        }
+    // Nếu đang drag trên một box cụ thể → tính chính xác hơn (giữ logic cũ)
+    const rect = e.currentTarget.getBoundingClientRect();
+    const elements = e.currentTarget.querySelectorAll(".box-wrapper");
+    for (let i = 0; i < elements.length; i++) {
+      const el = elements[i];
+      const boxRect = el.getBoundingClientRect();
+      if (e.clientY < boxRect.top + boxRect.height / 2) {
+        insertIndex = i;
+        break;
       }
     }
 
-    const { left, right } = buildPreviewForInsert(col, insertIndex);
+    const { left, right } = buildPreview(targetCol, insertIndex);
     setPreviewLeft(left);
     setPreviewRight(right);
   };
 
-  const buildPreviewForInsert = (targetCol, targetIndex) => {
-    let left = [...leftOrder];
-    let right = [...rightOrder];
-
+  const buildPreview = (targetCol, insertIdx) => {
+    let newLeft = [...leftOrder];
+    let newRight = [...rightOrder];
     const { col: srcCol, id } = dragSource.current;
 
-    // Xóa khỏi cột nguồn
-    if (srcCol === "left") {
-      const pos = left.indexOf(id);
-      if (pos !== -1) left.splice(pos, 1);
-    } else if (srcCol === "right") {
-      const pos = right.indexOf(id);
-      if (pos !== -1) right.splice(pos, 1);
-    }
+    // Xóa khỏi nguồn
+    if (srcCol === "left") newLeft = newLeft.filter((x) => x !== id);
+    else newRight = newRight.filter((x) => x !== id);
 
-    // Chèn vào cột đích
+    // Chèn vào đích
     if (targetCol === "left") {
-      const safeIdx = Math.max(0, Math.min(targetIndex, left.length));
-      left.splice(safeIdx, 0, id);
+      newLeft.splice(insertIdx, 0, id);
     } else {
-      const safeIdx = Math.max(0, Math.min(targetIndex, right.length));
-      right.splice(safeIdx, 0, id);
+      newRight.splice(insertIdx, 0, id);
     }
-
-    return { left, right };
+    return { left: newLeft, right: newRight };
   };
 
   const commitDrop = () => {
     if (!editMode) return;
-    if (previewLeft !== null || previewRight !== null) {
+    if (previewLeft || previewRight) {
       setLeftOrder(previewLeft ?? leftOrder);
       setRightOrder(previewRight ?? rightOrder);
     }
-
-    // Reset trạng thái kéo
     dragSource.current = { col: null, index: null, id: null };
     setPreviewLeft(null);
     setPreviewRight(null);
   };
 
-  const handleDragEnd = () => {
-    commitDrop();
-  };
+  // ==================== RENDER DESKTOP ====================
+  const renderDesktop = () => (
+    <div className="two-cols">
+      <div
+        className="column"
+        onDragOver={handleColumnDragOver("left")}
+        onDrop={commitDrop}
+      >
+        {currentLeft.map((id, i) => (
+          <React.Fragment key={`left-${id}`}>
+            <div
+              className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
+              draggable={editMode}
+              onDragStart={handleDragStart("left", i)}
+              onDragEnd={commitDrop}
+            >
+              {boxes[id]}
+            </div>
+            {i < currentLeft.length - 1 && <Hr />}
+          </React.Fragment>
+        ))}
+      </div>
 
-  // ==================== RENDER COLUMN ====================
-
-  const renderColumn = (order, colName) => (
-    <div
-      className="column"
-      ref={colName === "left" ? leftColRef : rightColRef}
-      onDragOver={handleColumnDragOver(colName)}
-      onDrop={commitDrop}
-    >
-      {order.map((boxId, idx) => (
-        <React.Fragment key={`frag-${colName}-${boxId}`}>
-          <div
-            key={`${colName}-${boxId}`}
-            className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
-            draggable={editMode}
-            onDragStart={handleDragStart(colName, idx)}
-            onDragEnd={handleDragEnd}
-            onDragEnter={handleColumnDragOver(colName)}
-            ref={(el) => {
-              if (colName === "left") setLeftChildRef(el, idx);
-              else setRightChildRef(el, idx);
-            }}
-          >
-            {boxes[boxId]}
-          </div>
-
-          {idx < order.length - 1 && <Hr />}
-        </React.Fragment>
-      ))}
+      <div
+        className="column"
+        onDragOver={handleColumnDragOver("right")}
+        onDrop={commitDrop}
+      >
+        {currentRight.map((id, i) => (
+          <React.Fragment key={`right-${id}`}>
+            <div
+              className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
+              draggable={editMode}
+              onDragStart={handleDragStart("right", i)}
+              onDragEnd={commitDrop}
+            >
+              {boxes[id]}
+            </div>
+            {i < currentRight.length - 1 && <Hr />}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 
-  // ==================== RETURN ====================
+  // ==================== RENDER MOBILE (Bottom Tabs) ====================
+  const renderMobile = () => {
+    const currentTabBoxes = tabContents[activeTab] || [];
+
+    return (
+      <div className="mobile-bottom-tabs">
+        {/* Nội dung tab */}
+        <div className="mobile-tab-content">
+          {currentTabBoxes.map((fixedId, idxInTab) => {
+            // Tìm id thực tế đang ở vị trí này (do người dùng đã sắp xếp lại)
+            const actualId =
+              [...currentLeft, ...currentRight].find((id) =>
+                tabContents.flat().indexOf(id) ===
+                tabContents.flat().indexOf(fixedId)
+                  ? false
+                  : getBoxLocation(id)?.tabIdx === activeTab &&
+                    getBoxLocation(id)?.idxInTab === idxInTab
+              ) || fixedId; // fallback nếu không tìm thấy (an toàn)
+
+            // Tìm đúng id đang ở vị trí này theo thứ tự hiện tại
+            const allBoxes = [...currentLeft, ...currentRight];
+            const currentBoxAtThisPos =
+              allBoxes.find((id) => {
+                const loc = getBoxLocation(id);
+                return (
+                  loc && loc.tabIdx === activeTab && loc.idxInTab === idxInTab
+                );
+              }) || fixedId;
+
+            const isInLeft = currentLeft.includes(currentBoxAtThisPos);
+            const col = isInLeft ? "left" : "right";
+            const sourceIdx = isInLeft
+              ? currentLeft.indexOf(currentBoxAtThisPos)
+              : currentRight.indexOf(currentBoxAtThisPos);
+
+            return (
+              <React.Fragment key={`mobile-${currentBoxAtThisPos}`}>
+                <div
+                  className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
+                  draggable={editMode}
+                  onDragStart={handleDragStart(col, sourceIdx)}
+                  onDragEnd={commitDrop}
+                >
+                  {boxes[currentBoxAtThisPos]}
+                </div>
+                {idxInTab === 0 && currentTabBoxes.length > 1 && <Hr />}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        {/* Tab bar ở dưới cùng */}
+        <div className="mobile-tab-bar">
+          {[
+            { id: 0, label: "", icon: "💡" },
+            { id: 1, label: "", icon: "⌛" },
+            // { id: 2, label: "", icon: "⋯" },
+            // Thêm tab mới ở đây nếu cần
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="tab-icon">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="two-col-reorder-wrapper">
-      {/* ĐÃ BỎ reorder-bar đi hoàn toàn */}
-
-      <div className="two-cols">
-        {renderColumn(currentLeft, "left")}
-
-        {/* Separator trên mobile */}
-        {currentRight.length > 0 && (
-          <div className="mobile-column-separator">
-            <Hr />
-          </div>
-        )}
-
-        {renderColumn(currentRight, "right")}
-      </div>
+      <div className="desktop-view">{renderDesktop()}</div>
+      <div className="mobile-view">{renderMobile()}</div>
     </div>
   );
 }

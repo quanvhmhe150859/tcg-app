@@ -100,3 +100,165 @@
 .two-col-reorder-wrapper {
   overflow: visible !important;
 }
+
+/* Ẩn/hiện theo màn hình */
+.desktop-view {
+  display: block;
+}
+.mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  .mobile-view {
+    display: block;
+  }
+  .two-cols {
+    display: none !important; /* đảm bảo 2 cột cũ không hiện */
+  }
+}
+
+/* ====================== MOBILE TABS ====================== */
+.mobile-tabs-container {
+  width: 100%;
+}
+
+.mobile-tab-headers {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #666;
+  border-radius: 8px 8px 0 0;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.mobile-tab-btn.active {
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+}
+
+.mobile-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 6px;
+  min-height: 200px;
+}
+
+/* Khu vực thả khi kéo từ tab khác vào */
+.mobile-drop-zone {
+  min-height: 80px;
+  width: 100%;
+}
+
+/* Đảm bảo box trong tab vẫn có style giống desktop */
+.mobile-tab-content .box-wrapper {
+  width: 100%;
+}
+
+/* Ẩn/hiện theo màn hình */
+.desktop-view { display: block; }
+.mobile-view { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-view { display: none; }
+  .mobile-view { display: block; }
+}
+
+/* Mobile Bottom Tabs */
+.mobile-bottom-tabs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.mobile-tab-content {
+  flex: 1;
+  padding: 0 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==================== MOBILE BOTTOM TAB BAR - GÓC DƯỚI BÊN PHẢI, XẾP DỌC ==================== */
+.mobile-tab-bar {
+  position: fixed;
+  bottom: 75px;
+  right: 7.5px;
+  left: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;                    /* khoảng cách giữa các nút */
+  
+  border-radius: 24px;
+  background: var(--color-bg-battle-game);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-text-dark);
+  padding: 12px 8px;            /* thêm padding để bar rộng hơn một chút */
+  z-index: 1000;
+}
+
+/* Nền mờ phía sau (glassmorphism) */
+.mobile-tab-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  z-index: -1;
+}
+
+.tab-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;              /* tránh bị co lại */
+  padding: 0;                   /* bỏ padding cũ */
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  font-size: 20px;              /* icon to hơn */
+  font-weight: 600;
+  border-radius: 50%;           /* hình tròn */
+  display: grid;
+  place-items: center;          /* căn giữa icon/text hoàn hảo */
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tab-btn.active {
+  background: var(--eq-header-text);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
+  transform: scale(1.1);       /* nổi bật hơn một chút khi active */
+}
+
+.tab-btn::before,
+.tab-btn::after {
+  display: none;
+}
+
+/* Khi có 4 tab → chữ hơi nhỏ hơn để vừa */
+@media (max-width: 768px) {
+  .tab-btn {
+    font-size: 13px;
+  }
+}

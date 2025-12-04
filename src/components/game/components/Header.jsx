@@ -211,7 +211,7 @@ const Header = ({ level, editMode, setEditMode }) => {
       <div className="flex-1 text-right">
         <h1
           onClick={() => setEditMode((v) => !v)}
-          className={`cursor-pointer relative z-300`}
+          className={`cursor-pointer relative z-300 hidden md:block`}
           title={editMode ? "Done" : "Click for Rearrange Layout"}
         >
           {editMode ? "🔨" : "📐"}

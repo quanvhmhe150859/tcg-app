@@ -1,4 +1,3 @@
-// src/components/battle/SkillsAndItemsPanel.jsx
 import React from "react";
 import { SPECIALS } from "../constants/specials";
 import { getSpecialIconPath } from "../configs/specialConfig";

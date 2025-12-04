@@ -1,4 +1,3 @@
-// src/components/EntityHeader.jsx
 import React, { useState, useEffect } from "react";
 import { statIcons } from "../constants/stats";
 import { effectIcons } from "../constants/effects";

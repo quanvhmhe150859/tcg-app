@@ -5,6 +5,7 @@ import { useTickets } from "../../context/TicketContext";
 import EntityHeader from "./components/EntityHeader";
 import ToggleButtons from "./components/ToggleButtons";
 import StatsPanel from "./components/StatsPanel";
+import PlayerGoldLuckBar from "./components/PlayerGoldLuckBar";
 import BattleLog from "./components/BattleLog";
 import UpgradePanel from "./components/UpgradePanel";
 import ShopPanel from "./components/ShopPanel";
@@ -226,37 +227,33 @@ const BattleGame = () => {
 
   return (
     <div className="p-4 max-w-7xl mx-auto rounded-lg bg-game">
-      <Header
-        level={level}
-        editMode={editMode}
-        setEditMode={setEditMode}
-      />
+      <Header level={level} editMode={editMode} setEditMode={setEditMode} />
 
       <TwoColumnReorder
         editMode={editMode}
         boxes={[
+          /* Box 0 */
+          <div className="rounded-md bg-game-animate">
+            <SpriteAnimation
+              name={playerCharacter}
+              flip={true}
+              ref={playerSpriteRef}
+              distance={distance}
+              health={player.currentHealth}
+            />
+            <SpriteAnimation
+              name={enemyCharacter}
+              flip={false}
+              ref={enemySpriteRef}
+              distance={distance}
+              health={enemy.currentHealth}
+            />
+          </div>,
+
           /* Box 1 */
-          <div>
-            <div className="rounded-md bg-game-animate">
-              <SpriteAnimation
-                name={playerCharacter}
-                flip={true}
-                ref={playerSpriteRef}
-                distance={distance}
-                health={player.currentHealth}
-              />
-              <SpriteAnimation
-                name={enemyCharacter}
-                flip={false}
-                ref={enemySpriteRef}
-                distance={distance}
-                health={enemy.currentHealth}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <EntityHeader name="Player" entity={player} />
-              <EntityHeader name="Enemy" entity={enemy} />
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            <EntityHeader name="Player" entity={player} />
+            <EntityHeader name="Enemy" entity={enemy} />
           </div>,
 
           /* Box 2 */
@@ -279,26 +276,15 @@ const BattleGame = () => {
                 showRareStats={showRareStats}
               />
             </div>
-            <div className="flex items-center justify-between text-xs sm:text-sm p-1">
-              {/* Luck - chỉ hiện khi bật stats */}
-              {showNormalStats && (
-                <div className="text-green-500 font-medium">
-                  Luck: {player.luck} 🍀
-                </div>
-              )}
-
-              {/* Gold - luôn hiện, tự động căn giữa nếu không có Luck */}
-              <div
-                className={`${
-                  showNormalStats ? "text-right" : "mx-auto text-center"
-                } flex-1 text-yellow-400 font-medium`}
-              >
-                Gold: {player.gold} 💰
-              </div>
-            </div>
           </div>,
 
           /* Box 3 */
+          <PlayerGoldLuckBar
+            player={player}
+            showNormalStats={showNormalStats}
+          />,
+
+          /* Box 4 */
           <SkillsAndItemsPanel
             player={player}
             gameOver={gameOver}
@@ -309,21 +295,21 @@ const BattleGame = () => {
             handleUseConsumable={handleUseConsumable}
           />,
 
-          /* Box 4 */
+          /* Box 5 */
           <InventoryPanel
             player={player}
             onEquipItem={handleEquipItem}
             onDestroyItem={handleDestroyItem}
           />,
 
-          /* Box 5 */
+          /* Box 6 */
           <EquipmentPanel player={player} />,
 
-          /* Box 6 */
+          /* Box 7 */
           <BattleLog turnLogs={turnLogs} logContainerRef={logContainerRef} />,
 
-          /* Box 7 */
-          <div className="md:min-h-[485px]">
+          /* Box 8 */
+          <div>
             <GameControls
               isAuto={isAuto}
               toggleAuto={enhancedToggleAuto}
@@ -339,6 +325,10 @@ const BattleGame = () => {
               showShop={showShop}
               resetGame={resetGame}
             />
+          </div>,
+
+          /* Box 9 */
+          <div className="min-h-[390px]">
             {showUpgradeOptions && (
               <UpgradePanel
                 isRareUpgrade={isRareUpgrade}

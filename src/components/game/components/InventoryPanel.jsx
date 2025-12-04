@@ -28,7 +28,6 @@ const formatDiff = (stat, diff) => {
     "dodge",
     "lifeSteal",
     "critDamage",
-    "thorn",
   ];
   const value = Math.abs(diff);
   const formatted = percentStats.includes(stat) ? `${value}%` : value;
@@ -297,7 +296,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
   const diffPanels = selectedItem ? calculateDiffs(selectedItem) : null;
   const availableSlots = selectedItem ? getAvailableSlots(selectedItem) : [];
   const isPercentStat = (key) =>
-    ["critChance", "dodge", "lifeSteal", "critDamage", "thorn"].includes(key);
+    ["critChance", "dodge", "lifeSteal", "critDamage"].includes(key);
 
   return (
     <div ref={wrapperRef} className="relative">
