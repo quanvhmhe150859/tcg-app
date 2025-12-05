@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { statIcons } from "../constants/stats";
 import { effectIcons } from "../constants/effects";
 
-const Header = ({ level, editMode, setEditMode }) => {
+const HeaderGame = ({ level, editMode, setEditMode }) => {
   const [openTips, setOpenTips] = useState(false);
   const [activeTab, setActiveTab] = useState("Stats");
   const [selectedItem, setSelectedItem] = useState(null); // Cho mobile modal
@@ -221,4 +221,4 @@ const Header = ({ level, editMode, setEditMode }) => {
   );
 };
 
-export default Header;
+export default HeaderGame;

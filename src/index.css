@@ -162,6 +162,10 @@ button:hover {
   color: var(--color-background);
 }
 
+.header-page{
+  background: var(--color-background);
+}
+
 .selected-tab {
   background-color: var(--color-button-selected);
   font-weight: bold;

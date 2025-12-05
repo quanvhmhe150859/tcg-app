@@ -10,7 +10,7 @@ import BattleLog from "./components/BattleLog";
 import UpgradePanel from "./components/UpgradePanel";
 import ShopPanel from "./components/ShopPanel";
 import GameControls from "./components/GameControls";
-import Header from "./components/Header";
+import HeaderGame from "./components/HeaderGame";
 import useGameLogic from "./hooks/useGameLogic";
 import SkillsAndItemsPanel from "./components/SkillsAndItemsPanel";
 import InventoryPanel from "./components/InventoryPanel";
@@ -19,6 +19,7 @@ import SpriteAnimation from "./animations/SpriteAnimation";
 import SpriteSheetPlayer from "./animations/SpriteSheetPlayer";
 
 import TwoColumnReorder from "./components/TwoColumnReorder";
+import SmartStickyHeader from "./components/SmartStickyHeader";
 
 const BattleGame = () => {
   const navigate = useNavigate();
@@ -226,8 +227,8 @@ const BattleGame = () => {
   }, [gameOver]);
 
   return (
-    <div className="p-4 max-w-7xl mx-auto rounded-lg bg-game">
-      <Header level={level} editMode={editMode} setEditMode={setEditMode} />
+    <div className="p-2 max-w-7xl mx-auto rounded-lg bg-game">
+      <HeaderGame level={level} editMode={editMode} setEditMode={setEditMode} />
 
       <TwoColumnReorder
         editMode={editMode}
@@ -251,10 +252,12 @@ const BattleGame = () => {
           </div>,
 
           /* Box 1 */
-          <div className="grid grid-cols-2 gap-4">
-            <EntityHeader name="Player" entity={player} />
-            <EntityHeader name="Enemy" entity={enemy} />
-          </div>,
+          <SmartStickyHeader>
+            <div className="grid grid-cols-2 gap-4">
+              <EntityHeader name="Player" entity={player} />
+              <EntityHeader name="Enemy" entity={enemy} />
+            </div>
+          </SmartStickyHeader>,
 
           /* Box 2 */
           <div>

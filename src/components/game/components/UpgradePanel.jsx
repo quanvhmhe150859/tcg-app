@@ -3,7 +3,7 @@ import { statIcons } from "../constants/stats"; // 🔹 Import stat icons
 
 const UpgradePanel = ({ isRareUpgrade, upgradeOptions, handleUpgrade }) => {
   return (
-    <div className="mt-4">
+    <div className="">
       <h2 className="font-semibold">
         {isRareUpgrade ? "Choose a Rare Upgrade:" : "Choose an Upgrade:"}
       </h2>

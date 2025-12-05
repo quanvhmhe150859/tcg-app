@@ -18,8 +18,9 @@ export default function TwoColumnReorder({ editMode, boxes }) {
 
   // Hard-code: mỗi tab chứa box nào
   const tabContents = [
-    [0, 2, 1, 7, 8, 3, 9], // Tab 1
-    [1, 4, 5, 6], // Tab 2
+    [0, 1, 2, 6, 5, 4, 7, 8, 3, 9]
+    // [0, 2, 1, 7, 8, 3, 9], // Tab 1
+    // [1, 4, 5, 6], // Tab 2
     // [0, 2],
     // [1, 3, 9],
   ];
@@ -217,10 +218,10 @@ export default function TwoColumnReorder({ editMode, boxes }) {
         </div>
 
         {/* Tab bar ở dưới cùng */}
-        <div className="mobile-tab-bar">
+        {/* <div className="mobile-tab-bar">
           {[
-            { id: 0, label: "", icon: "💡" },
-            { id: 1, label: "", icon: "⌛" },
+            // { id: 0, label: "", icon: "💡" },
+            // { id: 1, label: "", icon: "⌛" },
             // { id: 2, label: "", icon: "⋯" },
             // Thêm tab mới ở đây nếu cần
           ].map((tab) => (
@@ -233,7 +234,7 @@ export default function TwoColumnReorder({ editMode, boxes }) {
               {tab.label}
             </button>
           ))}
-        </div>
+        </div> */}
       </div>
     );
   };

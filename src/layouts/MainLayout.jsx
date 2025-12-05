@@ -33,7 +33,7 @@ export default function MainLayout() {
       {buttons.map((btn, i) => {
         const style =
           orientation === "vertical"
-            ? { top: `${15 + i * 60}px`, right: "15px" }
+            ? { top: `${75 + i * 60}px`, right: "15px" }
             : { top: "15px", right: `${15 + i * 60}px` };
         return (
           <div key={btn.id} className="fixed z-999" style={style}>
