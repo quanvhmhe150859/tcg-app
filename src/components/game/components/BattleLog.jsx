@@ -17,7 +17,7 @@ const BattleLog = ({ turnLogs, logContainerRef }) => {
       {/* Nút Toggle giống Equipment */}
       <button
         onClick={toggleOpen}
-        className="toggle-game-stats justify-center w-full flex items-center justify-between font-semibold hover:text-white transition-colors"
+        className="toggle-game-stats justify-center w-full flex items-center justify-between font-semibold"
       >
         <span>{isOpen ? "➖" : "➕"} Battle Log</span>
       </button>
@@ -42,7 +42,7 @@ const BattleLog = ({ turnLogs, logContainerRef }) => {
                     {turnEntry.logs.map((log, logIndex) => (
                       <p
                         key={`${turnEntry.turnId}-${logIndex}`}
-                        className={`text-sm animate-in slide-in-from-top fade-in duration-300 ${log.color}`}
+                        className={`text-sm animate-in slide-in-from-top fade-in ${log.color}`}
                       >
                         {log.message}
                       </p>

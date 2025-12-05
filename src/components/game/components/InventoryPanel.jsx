@@ -304,19 +304,19 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         Inventory ({inventoryItems.length}/10)
       </p>
 
-      <div className="bg-game-secondary rounded-lg p-4 h-[98px]">
+      <div className="">
         {inventoryItems.length === 0 ? (
           <div className="text-center text-gray-500 italic py-6">
             Inventory is empty
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-            <div className="flex gap-3 py-2 min-w-max ml-1 mr-1">
+            <div className="flex gap-3 min-w-max py-2 ml-1 mr-1">
               {inventoryItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={(e) => handleItemClick(e, item)}
-                  className={`relative flex-shrink-0 w-16 h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(
+                  className={`relative flex-shrink-0 w-14 h-10 sm:w-16 sm:h-12 rounded-lg border-4 overflow-hidden transition-all duration-300 hover:scale-110 ${getRarityBackground(
                     item.rarity
                   )} ${
                     selectedItem?.id === item.id

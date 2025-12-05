@@ -4,7 +4,7 @@ import { viewport } from "../utils/viewport";
 const EquipmentPanel = ({ player }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
 
   const [menuHorizontal, setMenuHorizontal] = useState("right");
@@ -116,7 +116,8 @@ const EquipmentPanel = ({ player }) => {
       {/* Nút Toggle Equipment */}
       <button
         onClick={toggleOpen}
-        className="toggle-game-stats justify-center w-full flex items-center justify-between font-semibold hover:text-white transition-colors"
+        className="toggle-game-stats justify-center w-full flex items-center justify-between font-semibold hover:text-white 
+        text-sm sm:text-base"
       >
         <span>{isOpen ? "➖" : "➕"} Equipment</span>
       </button>

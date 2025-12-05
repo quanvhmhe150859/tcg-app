@@ -16,7 +16,7 @@ const SkillsAndItemsPanel = ({
     <>
       <p className="font-semibold py-2">Skills & Items</p>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap py-2 ml-1 mr-1">
         {/* ==================== SPECIAL SKILLS ==================== */}
         {player.specials?.map((special, index) => {
           const specialData = SPECIALS.find((s) => s.id === special.specialId);

@@ -67,12 +67,6 @@ const BattleGame = () => {
 
   const [editMode, setEditMode] = useState(false);
 
-  useEffect(() => {
-    const isDesktop = window.innerWidth >= 768;
-    setShowRareStats(isDesktop);
-    setShowNormalStats(isDesktop);
-  }, []);
-
   const [autoSpeed, setAutoSpeed] = useState(150);
   const logContainerRef = useRef(null);
   const playerSpriteRef = useRef(null);

@@ -35,7 +35,7 @@ export default function SmartStickyHeader({ children }) {
       {/* Sticky Header nhân bản khi cuộn */}
       {isSticky && (
         <div
-          className="header-page fixed top-15 left-0 right-0 shadow-md pl-16 pr-16 py-3 text-center text-lg font-bold z-50"
+          className="header-page fixed top-0 left-0 right-0 pl-16 pr-16 pt-1 text-center text-lg font-bold z-500"
         >
           {children}
         </div>
