@@ -125,7 +125,7 @@ export const statIcons = {
     type: "percent",
     stackable: false,
     maxValue: 1,
-    desc: "Chance to perform a second attack in the same turn.",
+    desc: "Chance to perform a second attack.",
   },
   Shield: {
     icon: "🩹",

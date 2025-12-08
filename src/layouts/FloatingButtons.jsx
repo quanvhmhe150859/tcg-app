@@ -5,26 +5,17 @@ import LanguageSwitcher from "../components/ui/LanguageSwitcherButton";
 import MusicToggleButton from "../components/ui/MusicToggleButton";
 import TicketCount from "../components/ui/TicketCount";
 import { useOrientation } from "../context/OrientationContext";
-
-// Icon đơn giản (bạn có thể thay bằng icon thật từ lucide-react, heroicons, v.v.)
-const MenuIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+import { useTranslation } from "react-i18next";
 
 // Nút Toggle chính
 const ToggleButton = ({ isOpen, onToggle }) => {
+  const { t } = useTranslation();
   return (
     <button
       onClick={onToggle}
-      className="floating-button w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-200"
+      className="floating-button w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center 
+      hover:scale-110 transition-transform duration-200"
+      title={isOpen ? t("swallowTheMenu") : t("spewTheMenu")}
     >
       {isOpen ? "🤮" : "🤢"}
     </button>

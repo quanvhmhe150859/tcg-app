@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { statIcons } from "../constants/stats";
-import { effectIcons } from "../constants/effects";
+import { effectIcons, consumableIcons } from "../constants/effects"; // <-- Thêm consumableIcons
 
 const HeaderGame = ({ level, editMode, setEditMode }) => {
   const [openTips, setOpenTips] = useState(false);
@@ -10,6 +10,7 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
 
   const statNames = Object.keys(statIcons);
   const effectNames = Object.keys(effectIcons);
+  const consumableNames = Object.keys(consumableIcons); // <-- Thêm danh sách consumables
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -49,7 +50,8 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
             }}
           >
             <div
-              className="bg-game-secondary rounded-lg shadow-lg p-6 m-4 max-w-2xl w-full max-h-[80vh] relative overflow-y-auto"
+              className="bg-game-secondary rounded-lg shadow-lg p-6 m-4 max-w-2xl w-full min-h-[85vh] max-h-[90vh] relative 
+              overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -71,6 +73,7 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
 
                   {/* Danh sách icon */}
                   <div className="flex flex-wrap gap-2 justify-center">
+                    {/* Stats */}
                     {statNames.map((name) => {
                       const { icon } = statIcons[name];
                       return (
@@ -84,6 +87,8 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                         </button>
                       );
                     })}
+
+                    {/* Effects */}
                     {effectNames.map((name) => {
                       const { icon } = effectIcons[name];
                       return (
@@ -97,15 +102,33 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                         </button>
                       );
                     })}
+
+                    {/* Consumables - Thêm ở cuối */}
+                    {consumableNames.map((name) => {
+                      const { icon } = consumableIcons[name];
+                      return (
+                        <button
+                          key={`consumable-${name}`}
+                          onClick={() => handleIconClick(name, "consumable")}
+                          className="text-2xl hover:scale-125 transition-transform p-1"
+                          title={name}
+                        >
+                          {icon}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {/* Hiển thị giải thích khi chọn */}
+                  {/* Hiển thị chi tiết khi chọn */}
                   {selectedItem && (
                     <div className="mt-4 p-3 rounded-lg border border-gray-400 text-sm">
                       {(() => {
                         const [type, name] = selectedItem.split("-");
-                        const data =
-                          type === "stat" ? statIcons[name] : effectIcons[name];
+                        let data;
+                        if (type === "stat") data = statIcons[name];
+                        else if (type === "effect") data = effectIcons[name];
+                        else if (type === "consumable") data = consumableIcons[name];
+
                         if (!data) return null;
                         return (
                           <div className="flex items-start gap-2">
@@ -121,7 +144,7 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                   )}
                 </div>
               ) : (
-                /* === DESKTOP: Giữ nguyên giao diện cũ === */
+                /* === DESKTOP === */
                 <div className="flex gap-4" style={{ height: "75vh" }}>
                   {/* Sidebar */}
                   <div className="flex flex-col border-r border-gray-400 pr-4">
@@ -134,6 +157,7 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                       <span className="md:inline hidden">Stats</span>
                       <span className="md:hidden">📜</span>
                     </button>
+
                     <button
                       onClick={() => setActiveTab("Effects")}
                       className={`py-2 px-3 text-left font-semibold rounded transition-colors mt-1 ${
@@ -143,6 +167,16 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                       <span className="md:inline hidden">Effects</span>
                       <span className="md:hidden">✨</span>
                     </button>
+
+                    <button
+                      onClick={() => setActiveTab("Consumables")}
+                      className={`py-2 px-3 text-left font-semibold rounded transition-colors mt-1 ${
+                        activeTab === "Consumables" ? "selected-tab" : ""
+                      }`}
+                    >
+                      <span className="md:inline hidden">Consumables</span>
+                      <span className="md:hidden">Bubble Tea</span> {/* Icon đại diện */}
+                    </button>
                   </div>
 
                   {/* Content */}
@@ -150,10 +184,13 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                     <h2 className="text-xl font-bold mb-2 sticky top-0 bg-game-secondary pb-2 -mx-2 px-2">
                       {activeTab === "Stats"
                         ? "Stats Explanation"
-                        : "Effects Explanation"}
+                        : activeTab === "Effects"
+                        ? "Effects Explanation"
+                        : "Consumables Explanation"}
                     </h2>
 
                     <ul className="list-none space-y-2 text-sm">
+                      {/* Stats */}
                       {activeTab === "Stats" &&
                         statNames.map((name) => {
                           const { icon, desc } = statIcons[name];
@@ -168,9 +205,25 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
                           );
                         })}
 
+                      {/* Effects */}
                       {activeTab === "Effects" &&
                         effectNames.map((name) => {
                           const { icon, desc } = effectIcons[name];
+                          return (
+                            <li key={name} className="flex items-start">
+                              <span className="mr-2 w-6">{icon}</span>
+                              <div>
+                                <b className="hidden sm:inline">{name}</b>
+                                <span>: {desc}</span>
+                              </div>
+                            </li>
+                          );
+                        })}
+
+                      {/* Consumables */}
+                      {activeTab === "Consumables" &&
+                        consumableNames.map((name) => {
+                          const { icon, desc } = consumableIcons[name];
                           return (
                             <li key={name} className="flex items-start">
                               <span className="mr-2 w-6">{icon}</span>
@@ -208,6 +261,7 @@ const HeaderGame = ({ level, editMode, setEditMode }) => {
           )}
         </h1>
       </div>
+
       <div className="flex-1 text-right">
         <h1
           onClick={() => setEditMode((v) => !v)}

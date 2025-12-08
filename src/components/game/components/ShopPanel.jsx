@@ -26,6 +26,7 @@ const ShopPanel = ({
           else if (option.name.includes("Health"))
             if (option.name.includes("Current")) icon = "❤️‍🩹";
             else icon = statIcons["Health"]?.icon;
+          else if (option.key === "consumable") icon = option.name.trimStart().split(' ')[0];
           else icon = statIcons[option.name]?.icon || "";
 
           const isBought = boughtOptions.includes(index);

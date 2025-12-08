@@ -129,5 +129,7 @@
   "sort": "Sắp xếp",
   "quantity": "Số lượng",
   "scrollToTop": "Lên đầu trang",
-  "openAllCards": "Mở Tất Cả Thẻ"
+  "openAllCards": "Mở Tất Cả Thẻ",
+  "swallowTheMenu": "Nuốt vào menu",
+  "spewTheMenu": "Phun ra menu"
 }

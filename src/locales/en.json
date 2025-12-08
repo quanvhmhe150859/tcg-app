@@ -129,5 +129,7 @@
   "sort": "Sort",
   "quantity": "Quantity",
   "scrollToTop": "Scroll to top",
-  "openAllCards": "Open All Cards"
+  "openAllCards": "Open All Cards",
+  "swallowTheMenu": "Swallow the menu",
+  "spewTheMenu": "Spew the menu"
 }

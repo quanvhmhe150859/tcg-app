@@ -176,9 +176,9 @@ export const initEnemy = (level) => {
 
 export const generateUpgradeOptions = (player, strategy) => {
   // Tính xác suất potion xuất hiện: 50% + (luck * 10)%
-  const potionChance = 0.1 + player.luck * 0.1;
+  const itemChance = 1 + player.luck * 0.1;
   const includeConsumable =
-    strategy.includeConsumable && Math.random() < potionChance;
+    strategy.includeConsumable && Math.random() < itemChance;
 
   const stats = [
     {
@@ -288,14 +288,7 @@ export const generateUpgradeOptions = (player, strategy) => {
         id: "random_1_eq",
         basePrice: 2000,
         format: () => "+1",
-      }
-      // {
-      //   key: "consumable",
-      //   name: "🔫 Throwable",
-      //   id: "throwable_5_percent",
-      //   basePrice: 300,
-      //   format: () => "+1 ~ +5",
-      // },
+      },
     );
 
     // Throwable: random 1-5 cái, value và format phải khớp nhau
