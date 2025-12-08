@@ -134,7 +134,7 @@ const EntityHeader = ({ name, entity }) => {
 
   return (
     <div className="z-300">
-      <h2 className="font-semibold text-lg">{name} Stats:</h2>
+      <h2 className="font-semibold text-lg">{name}</h2>
 
       {/* Thanh máu */}
       <div

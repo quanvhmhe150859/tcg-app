@@ -247,7 +247,7 @@ const BattleGame = () => {
 
           /* Box 1 */
           <SmartStickyHeader>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="w-full grid grid-cols-2 gap-4">
               <EntityHeader name="Player" entity={player} />
               <EntityHeader name="Enemy" entity={enemy} />
             </div>

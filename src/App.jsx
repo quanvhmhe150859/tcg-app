@@ -13,15 +13,33 @@ import MainLayout from "./layouts/MainLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
 import SpriteSheetUploaderAndPlayer from "./components/game/animations/SpriteSheetUploaderAndPlayer";
 
+import SpritePreloader from "./components/common/SpritePreloader";
+
 // Lazy load các trang
-const RandomCardsPokemon = lazy(() => import("./components/pokemon/RandomCardsPokemon"));
-const ListCardsPokemon = lazy(() => import("./components/pokemon/ListCardsPokemon"));
-const OwnedPokemonCards = lazy(() => import("./components/pokemon/OwnedPokemonCards"));
-const RandomCardsYugioh = lazy(() => import("./components/yugioh/RandomCardsYugioh"));
-const ListCardsYugioh = lazy(() => import("./components/yugioh/ListCardsYugioh"));
-const OwnedYugiohCards = lazy(() => import("./components/yugioh/OwnedYugiohCards"));
-const CharacterSelection = lazy(() => import("./components/game/CharacterSelection"));
-const CharacterSelectionV2 = lazy(() => import("./components/game/CharacterSelectionV2"));
+const RandomCardsPokemon = lazy(() =>
+  import("./components/pokemon/RandomCardsPokemon")
+);
+const ListCardsPokemon = lazy(() =>
+  import("./components/pokemon/ListCardsPokemon")
+);
+const OwnedPokemonCards = lazy(() =>
+  import("./components/pokemon/OwnedPokemonCards")
+);
+const RandomCardsYugioh = lazy(() =>
+  import("./components/yugioh/RandomCardsYugioh")
+);
+const ListCardsYugioh = lazy(() =>
+  import("./components/yugioh/ListCardsYugioh")
+);
+const OwnedYugiohCards = lazy(() =>
+  import("./components/yugioh/OwnedYugiohCards")
+);
+const CharacterSelection = lazy(() =>
+  import("./components/game/CharacterSelection")
+);
+const CharacterSelectionV2 = lazy(() =>
+  import("./components/game/CharacterSelectionV2")
+);
 const BattleGame = lazy(() => import("./components/game/BattleGame"));
 const Chatbot = lazy(() => import("./components/bot/Chatbot"));
 const ImageGenerator = lazy(() => import("./components/bot/Artbot"));
@@ -67,35 +85,50 @@ export default function App() {
   return (
     <Router>
       <FaviconUpdater />
-      <Suspense fallback={<div className="text-center text-white mt-8">Thinking...</div>}>
-        <Routes>
-          {/* 🧭 Layout chính */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/settings" element={<AdminSettings />} />
-            <Route path="/pokemon" element={<RandomCardsPokemon />} />
-            <Route path="/pokemon-ls" element={<ListCardsPokemon />} />
-            <Route path="/pokemon-owned" element={<OwnedPokemonCards />} />
-            <Route path="/yugioh" element={<RandomCardsYugioh />} />
-            <Route path="/yugioh-ls" element={<ListCardsYugioh />} />
-            <Route path="/yugioh-owned" element={<OwnedYugiohCards />} />
-            <Route path="/character-selection" element={<CharacterSelection />} />
-            <Route path="/character-selection-v2" element={<CharacterSelectionV2 />} />
-            <Route path="/game" element={<BattleGame />} />
-            <Route path="/chatbot" element={<Chatbot />} />
-            <Route path="/image-generator" element={<ImageGenerator />} />
-            <Route path="/sprite-sheet-animation" element={<SpriteSheetUploaderAndPlayer />} />
-          </Route>
+      <SpritePreloader>
+        <Suspense
+          fallback={
+            <div className="text-center text-white mt-8">Thinking...</div>
+          }
+        >
+          <Routes>
+            {/* 🧭 Layout chính */}
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/settings" element={<AdminSettings />} />
+              <Route path="/pokemon" element={<RandomCardsPokemon />} />
+              <Route path="/pokemon-ls" element={<ListCardsPokemon />} />
+              <Route path="/pokemon-owned" element={<OwnedPokemonCards />} />
+              <Route path="/yugioh" element={<RandomCardsYugioh />} />
+              <Route path="/yugioh-ls" element={<ListCardsYugioh />} />
+              <Route path="/yugioh-owned" element={<OwnedYugiohCards />} />
+              <Route
+                path="/character-selection"
+                element={<CharacterSelection />}
+              />
+              <Route
+                path="/character-selection-v2"
+                element={<CharacterSelectionV2 />}
+              />
+              <Route path="/game" element={<BattleGame />} />
+              <Route path="/chatbot" element={<Chatbot />} />
+              <Route path="/image-generator" element={<ImageGenerator />} />
+              <Route
+                path="/sprite-sheet-animation"
+                element={<SpriteSheetUploaderAndPlayer />}
+              />
+            </Route>
 
-          {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}
-          <Route element={<EmptyLayout />}>
-            <Route path="/404" element={<NotFound />} />
-          </Route>
+            {/* ⚠️ Layout rỗng - chỉ dành cho trang đặc biệt */}
+            <Route element={<EmptyLayout />}>
+              <Route path="/404" element={<NotFound />} />
+            </Route>
 
-          {/* Route fallback */}
-          <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
-      </Suspense>
+            {/* Route fallback */}
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Routes>
+        </Suspense>
+      </SpritePreloader>
     </Router>
   );
 }

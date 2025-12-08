@@ -211,7 +211,7 @@ export default function TwoColumnReorder({ editMode, boxes }) {
                 >
                   {boxes[currentBoxAtThisPos]}
                 </div>
-                {idxInTab === 0 && currentTabBoxes.length > 1 && <Hr />}
+                 {idxInTab < currentTabBoxes.length - 1 && <Hr />}
               </React.Fragment>
             );
           })}
