@@ -3,8 +3,8 @@ import "./two-column-reorder.css";
 import Hr from "./Hr";
 
 export default function TwoColumnReorder({ editMode, boxes }) {
-  const [leftOrder, setLeftOrder] = useState([0, 1, 2, 3, 4, 5, 6]);
-  const [rightOrder, setRightOrder] = useState([7, 8, 9]);
+  const [leftOrder, setLeftOrder] = useState([0, 1, 2, 3, 4]);
+  const [rightOrder, setRightOrder] = useState([5, 6, 7]);
 
   // Tab hiện tại trên mobile
   const [activeTab, setActiveTab] = useState(0);
@@ -18,7 +18,7 @@ export default function TwoColumnReorder({ editMode, boxes }) {
 
   // Hard-code: mỗi tab chứa box nào
   const tabContents = [
-    [0, 1, 2, 6, 5, 4, 7, 8, 3, 9]
+    [0, 1, 2, 6, 5, 4, 7, 3],
     // [0, 2, 1, 7, 8, 3, 9], // Tab 1
     // [1, 4, 5, 6], // Tab 2
     // [0, 2],
@@ -123,47 +123,51 @@ export default function TwoColumnReorder({ editMode, boxes }) {
 
   // ==================== RENDER DESKTOP ====================
   const renderDesktop = () => (
-    <div className="two-cols">
-      <div
-        className="column"
-        onDragOver={handleColumnDragOver("left")}
-        onDrop={commitDrop}
-      >
-        {currentLeft.map((id, i) => (
-          <React.Fragment key={`left-${id}`}>
-            <div
-              className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
-              draggable={editMode}
-              onDragStart={handleDragStart("left", i)}
-              onDragEnd={commitDrop}
-            >
-              {boxes[id]}
-            </div>
-            {i < currentLeft.length - 1 && <Hr />}
-          </React.Fragment>
-        ))}
-      </div>
+    <>
+      <Hr />
 
-      <div
-        className="column"
-        onDragOver={handleColumnDragOver("right")}
-        onDrop={commitDrop}
-      >
-        {currentRight.map((id, i) => (
-          <React.Fragment key={`right-${id}`}>
-            <div
-              className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
-              draggable={editMode}
-              onDragStart={handleDragStart("right", i)}
-              onDragEnd={commitDrop}
-            >
-              {boxes[id]}
-            </div>
-            {i < currentRight.length - 1 && <Hr />}
-          </React.Fragment>
-        ))}
+      <div className="two-cols">
+        <div
+          className="column"
+          onDragOver={handleColumnDragOver("left")}
+          onDrop={commitDrop}
+        >
+          {currentLeft.map((id, i) => (
+            <React.Fragment key={`left-${id}`}>
+              <div
+                className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
+                draggable={editMode}
+                onDragStart={handleDragStart("left", i)}
+                onDragEnd={commitDrop}
+              >
+                {boxes[id]}
+              </div>
+              {i < currentLeft.length - 1 && <Hr />}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div
+          className="column"
+          onDragOver={handleColumnDragOver("right")}
+          onDrop={commitDrop}
+        >
+          {currentRight.map((id, i) => (
+            <React.Fragment key={`right-${id}`}>
+              <div
+                className={`box-wrapper ${editMode ? "edit-mode" : ""}`}
+                draggable={editMode}
+                onDragStart={handleDragStart("right", i)}
+                onDragEnd={commitDrop}
+              >
+                {boxes[id]}
+              </div>
+              {i < currentRight.length - 1 && <Hr />}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 
   // ==================== RENDER MOBILE (Bottom Tabs) ====================
@@ -211,7 +215,7 @@ export default function TwoColumnReorder({ editMode, boxes }) {
                 >
                   {boxes[currentBoxAtThisPos]}
                 </div>
-                 {idxInTab < currentTabBoxes.length - 1 && <Hr />}
+                {idxInTab < currentTabBoxes.length - 1 && <Hr />}
               </React.Fragment>
             );
           })}

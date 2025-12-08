@@ -224,34 +224,34 @@ const BattleGame = () => {
     <div className="p-2 max-w-7xl mx-auto rounded-lg bg-game">
       <HeaderGame level={level} editMode={editMode} setEditMode={setEditMode} />
 
+      <div className="flex justify-center md:justify-around items-center gap-8 my-4 relative">
+        <SpriteAnimation
+          name={playerCharacter}
+          flip={true}
+          ref={playerSpriteRef}
+          distance={distance}
+          health={player.currentHealth}
+        />
+        <SpriteAnimation
+          name={enemyCharacter === "random" ? "random" : enemyCharacter}
+          flip={false}
+          ref={enemySpriteRef}
+          distance={distance}
+          health={enemy.currentHealth}
+        />
+      </div>
+
+      <SmartStickyHeader>
+        <div className="w-full grid grid-cols-2 gap-4">
+          <EntityHeader name="Player" entity={player} />
+          <EntityHeader name="Enemy" entity={enemy} />
+        </div>
+      </SmartStickyHeader>
+
       <TwoColumnReorder
         editMode={editMode}
         boxes={[
-          /* Box 0 */
-          <div className="rounded-md bg-game-animate">
-            <SpriteAnimation
-              name={playerCharacter}
-              flip={true}
-              ref={playerSpriteRef}
-              distance={distance}
-              health={player.currentHealth}
-            />
-            <SpriteAnimation
-              name={enemyCharacter}
-              flip={false}
-              ref={enemySpriteRef}
-              distance={distance}
-              health={enemy.currentHealth}
-            />
-          </div>,
-
           /* Box 1 */
-          <SmartStickyHeader>
-            <div className="w-full grid grid-cols-2 gap-4">
-              <EntityHeader name="Player" entity={player} />
-              <EntityHeader name="Enemy" entity={enemy} />
-            </div>
-          </SmartStickyHeader>,
 
           /* Box 2 */
           <div>
