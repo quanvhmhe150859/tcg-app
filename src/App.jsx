@@ -85,7 +85,7 @@ export default function App() {
   return (
     <Router>
       <FaviconUpdater />
-      {/* <SpritePreloader> */}
+      <SpritePreloader>
         <Suspense
           fallback={
             <div className="text-center text-white mt-8">Thinking...</div>
@@ -128,7 +128,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </Suspense>
-      {/* </SpritePreloader> */}
+      </SpritePreloader>
     </Router>
   );
 }
