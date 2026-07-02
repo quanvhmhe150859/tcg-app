@@ -46,7 +46,7 @@ const ImageGenerator = lazy(() => import("./components/bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
 const Homepage = lazy(() => import("./components/pages/Homepage"));
 const NotFound = lazy(() => import("./components/pages/NotFound"));
-const Game = lazy(() => import("../test/new_sprite_animation/Game"));
+const Game = lazy(() => import("../testFunction/new_sprite_animation/Game"));
 
 // === FaviconUpdater giữ nguyên ===
 function setFavicon(iconUrl) {

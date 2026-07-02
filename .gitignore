@@ -32,3 +32,10 @@ public/sprites/
 public/specials/
 public/consumables/
 public/eq/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
