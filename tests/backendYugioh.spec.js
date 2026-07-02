@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // Hãy thay đổi cổng PORT đúng với Server Backend C# của bạn đang chạy
-const BACKEND_URL = 'https://tcg-backend-83ha.onrender.com'; 
+const BACKEND_URL = 'https://localhost:44391'; 
 
 test.describe('Automation Test Nâng Cao - Logic Nghiệp Vụ Yugioh API', () => {
 
