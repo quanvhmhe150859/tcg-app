@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // Đổi cổng port này thành cổng thực tế mà Server C# của bạn đang chạy ở Bước 1 nhé
-const BACKEND_URL = 'https://localhost:44391'; 
+const BACKEND_URL = 'https://tcg-backend-83ha.onrender.com'; 
 
 test.describe('Automation Test cho CardsPokemonController API', () => {
 
