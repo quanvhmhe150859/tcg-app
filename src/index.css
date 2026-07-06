@@ -265,6 +265,7 @@ button:hover {
 }
 
 .eq-container {
+  z-index: 501;
   background-color: var(--eq-container-bg);
   border: 2px solid var(--eq-container-border);
 }

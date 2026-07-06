@@ -441,7 +441,7 @@ const InventoryPanel = ({ player, onEquipItem, onDestroyItem }) => {
         <>
           {/* Tooltip chính */}
           <div
-            className={`eq-container absolute z-301 left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl ${
+            className={`eq-container absolute left-0 max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg shadow-2xl ${
               menuVertical === "down" ? "top-full" : "bottom-full"
             }`}
           >

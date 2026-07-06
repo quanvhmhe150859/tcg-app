@@ -279,7 +279,7 @@ const EquipmentPanel = ({ player }) => {
       {/* Tooltip Desktop */}
       {currentItem && !isMobile && (
         <div
-          className={`eq-container absolute z-301 top-1/2 -translate-y-1/2 w-80 bg-gray-900 border-2 
+          className={`eq-container absolute top-1/2 -translate-y-1/2 w-80 bg-gray-900 border-2 
         border-gray-700 rounded-lg shadow-2xl p-6 ${
           menuHorizontal === "right" ? "left-full ml-2" : "right-full mr-2"
         }`}

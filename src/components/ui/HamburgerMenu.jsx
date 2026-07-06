@@ -282,6 +282,15 @@ const HamburgerMenu = () => {
                         </li>
                         <li>
                           <Link
+                            to="/comic-reader"
+                            onClick={() => setOpen(false)}
+                            className="submenu-item ml-4"
+                          >
+                            🍖 Comic Reader
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
                             to="/test"
                             onClick={() => setOpen(false)}
                             className="submenu-item ml-4"

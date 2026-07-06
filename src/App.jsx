@@ -12,6 +12,7 @@ import "./i18n";
 import MainLayout from "./layouts/MainLayout";
 import EmptyLayout from "./layouts/EmptyLayout";
 import SpriteSheetUploaderAndPlayer from "./components/game/animations/SpriteSheetUploaderAndPlayer";
+import ComicReader from "./components/pages/ComicReader";
 
 import SpritePreloader from "./components/common/SpritePreloader";
 
@@ -46,7 +47,7 @@ const ImageGenerator = lazy(() => import("./components/bot/Artbot"));
 const AdminSettings = lazy(() => import("./components/setting/AdminSettings"));
 const Homepage = lazy(() => import("./components/pages/Homepage"));
 const NotFound = lazy(() => import("./components/pages/NotFound"));
-const Game = lazy(() => import("../testFunction/new_sprite_animation/Game"));
+const Game = lazy(() => import("../functionUnuse/new_sprite_animation/Game"));
 
 // === FaviconUpdater giữ nguyên ===
 function setFavicon(iconUrl) {
@@ -116,6 +117,10 @@ export default function App() {
               <Route
                 path="/sprite-sheet-animation"
                 element={<SpriteSheetUploaderAndPlayer />}
+              />
+              <Route
+                path="/comic-reader"
+                element={<ComicReader />}
               />
             </Route>
 
